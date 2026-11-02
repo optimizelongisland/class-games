@@ -1,0 +1,636 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+<title>Keep It Level</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: scale + move buttons on the left, written work on the right; stacks on phones. */
+:root{
+  --bg:#000; --panel:#0d0d12; --panel2:#15151c; --line:#2a2a35;
+  --fg:#f5f5f8; --mute:#a2a2b6;
+  --pink:#ff4fa8; --green:#35f09a;
+  --cyan:#33d6ff; --yellow:#ffd23d; --orange:#ff8a3a; --violet:#b9a0ff; --red:#ff5a5a;
+  --disp:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+  --m:clamp(1.55rem,.9rem + 1.4vw,2.9rem);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(17px,.9vw + 11px,26px);-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.4;
+  padding-inline:clamp(16px,2.4vw,44px);padding-block:.8rem 2.5rem;overflow-x:hidden}
+.app{max-width:1800px;margin:0 auto}
+button{font:inherit;color:inherit}
+i{font-style:italic}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.6rem;padding-block:.3rem 1rem}
+.brand h1{font:800 clamp(2.1rem,1.3rem + 2.4vw,3.6rem)/1 var(--disp);letter-spacing:-.02em;margin:0}
+.brand p{margin:.3rem 0 0;color:var(--mute)}
+.pk{color:var(--pink)} .yl{color:var(--yellow)} .gr{color:var(--green)}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-inline-start:auto}
+
+/* buttons */
+.btn{font-family:var(--body);font-weight:600;font-size:1.05rem;min-height:3.2rem;padding:.55rem 1.1rem;
+  border-radius:14px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;
+  transition:transform .08s,filter .15s,background .15s}
+.btn:active{transform:translateY(2px) scale(.98)}
+.btn:focus-visible,.chip:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+.btn.fill{border-color:transparent;color:#000}
+.fill.cyan{background:var(--cyan);--glow:var(--cyan)} .fill.yellow{background:var(--yellow);--glow:var(--yellow)}
+.fill.orange{background:var(--orange);--glow:var(--orange)} .fill.violet{background:var(--violet)}
+.btn.line.violet{border-color:var(--violet);color:var(--violet)}
+.btn.line.red{border-color:var(--red);color:var(--red)}
+.btn.big{font-size:1.25rem;min-height:3.8rem;padding-inline:1.6rem}
+.tab{display:flex;align-items:center;gap:.55rem;border-radius:999px;background:transparent;font-size:1rem;min-height:2.9rem}
+.tab span{display:grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--line);font:600 .85rem var(--mono)}
+.tab.on{background:var(--fg);color:#000;border-color:var(--fg)}
+.tab.on span{background:#000;color:var(--fg)}
+
+/* puzzle chips */
+.bar:empty{display:none}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding-bottom:1rem}
+.lab{font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:0 .4rem 0 0}
+#ctl .lab{margin:0 0 .5rem}
+.chip{position:relative;min-width:3rem;height:3rem;padding:0 .9rem;border-radius:12px;border:2px solid var(--line);
+  background:var(--panel2);font:600 1.2rem var(--mono);cursor:pointer}
+.chip.on{background:var(--yellow);border-color:var(--yellow);color:#000}
+.chip.ok::after{content:"";position:absolute;right:5px;top:5px;width:.55rem;height:.55rem;border-radius:50%;background:var(--green)}
+.chip.rand{font:600 1rem var(--body);border-color:var(--violet);color:var(--violet)}
+.chip.rand.on{background:var(--violet);color:#000}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:clamp(18px,2.6vw,48px);align-items:start}
+.left,.right{min-width:0}
+.scale{display:block;width:100%;height:auto}
+.post,.foot{fill:#2c2c38}
+.pivot{fill:#000;stroke:var(--yellow);stroke-width:5}
+.pan{--c:var(--pink)} .pan.sR{--c:var(--green)}
+.str{stroke:#4a4a5a;stroke-width:2.5}
+.bowl{fill:#15151c;stroke:var(--c);stroke-width:3.5;stroke-linejoin:round}
+.xb rect{fill:var(--c);fill-opacity:.17;stroke:var(--c);stroke-width:3}
+.xb text{fill:var(--c);font-family:var(--mono);font-style:italic;font-weight:600;text-anchor:middle}
+.ub rect{fill:var(--c)}
+.plabel{font-family:var(--mono);font-weight:600;font-size:36px;fill:var(--c);text-anchor:middle}
+.plabel .xi{font-style:italic}
+.pside{font-family:var(--body);font-weight:600;font-size:18px;letter-spacing:.24em;fill:var(--c);opacity:.85;text-anchor:middle}
+#badge rect{stroke-width:3}
+#badge text{font:600 21px var(--body);letter-spacing:.2em;text-anchor:middle}
+#badge.lvl rect{fill:rgba(53,240,154,.13);stroke:var(--green)} #badge.lvl text{fill:var(--green)}
+#badge.tip rect{fill:rgba(255,90,90,.15);stroke:var(--red)} #badge.tip text{fill:var(--red)}
+.it{transform-box:fill-box;transform-origin:center}
+.enter{animation:enter .42s cubic-bezier(.2,1.5,.4,1) both}
+.pop{animation:pop .46s ease-in forwards}
+@keyframes enter{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:scale(1)}}
+@keyframes pop{0%{transform:scale(1);opacity:1}35%{transform:scale(1.3);opacity:1}100%{transform:scale(0) translateY(-18px);opacity:0}}
+
+/* status + controls */
+.status{margin-top:.6rem;min-height:3.4rem;display:flex;align-items:center;padding:.6rem 1rem;border-radius:12px;
+  background:var(--panel);border-left:6px solid var(--k,var(--mute));font-size:1.15rem}
+.status.good{--k:var(--green)} .status.warn{--k:var(--yellow)} .status.bad{--k:var(--red)}
+.status.hint{--k:var(--violet)} .status.info{--k:var(--cyan)}
+#ctl{margin-top:1rem}
+#ctl:empty{display:none}
+.moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}
+.mv{min-height:4.6rem;font-size:1.3rem;line-height:1.15;font-family:var(--disp);font-weight:800}
+.mv[data-ready="0"]{filter:saturate(.3) brightness(.55)}
+.mv i{font-family:var(--mono);font-weight:600}
+.coach{animation:glow 1.15s ease-out infinite}
+@keyframes glow{0%{box-shadow:0 0 0 0 var(--glow,#fff)}75%,100%{box-shadow:0 0 0 .8rem rgba(255,255,255,0)}}
+.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:.7rem}
+.tools .btn{padding-inline:.4rem}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* cards + math */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:clamp(14px,1.6vw,26px)}
+.card+.card{margin-top:1rem}
+.cap{display:flex;justify-content:space-between;gap:1rem;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:.4rem}
+.cap b{margin-left:.9rem}
+.gridwrap{overflow-x:auto;overflow-y:hidden}
+.grid{display:grid;grid-template-columns:repeat(7,auto);justify-content:center;align-items:center;
+  font-family:var(--mono);font-size:var(--m);font-weight:500;line-height:1.2;width:max-content;max-width:none;margin-inline:auto}
+.c{padding:.1em .15em;text-align:center;white-space:nowrap}
+.c.cl{color:var(--pink)} .c.cr{color:var(--green)} .c.eq{color:var(--fg);padding-inline:.45em}
+.pl{opacity:.8}
+.neq{color:var(--red)}
+.op{font-weight:600}
+.ln{grid-column:1/-1;height:5px;border-radius:3px;margin:.05em .2em;background:linear-gradient(90deg,var(--pink),var(--green))}
+.ln.bad{background:var(--red)}
+.gap{grid-column:1/-1;height:.55rem}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15}
+.frac .n{padding:0 .3em .06em;border-bottom:.07em solid currentColor}
+.frac .d{padding-top:.06em}
+.plug{color:var(--yellow)}
+.new{animation:rise .5s both}
+.ln.new{transform-origin:left;animation-name:draw}
+@keyframes rise{from{opacity:0;transform:translateY(.4em)}to{opacity:1;transform:none}}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* finish */
+.finish{text-align:center}
+.ans{font:600 calc(var(--m)*1.6)/1.1 var(--mono);color:var(--yellow);margin-bottom:.4rem}
+.sm{margin:0 0 .8rem;color:var(--mute)}
+.check{margin-top:1rem}
+.check .grid{font-size:calc(var(--m)*.8)}
+.cap2{margin:0 0 .3rem;color:var(--mute)}
+.cap2 i{font-family:var(--mono)}
+.match{display:flex;align-items:center;justify-content:center;gap:.6rem;margin:.8rem 0 0;font:600 1.3rem var(--mono);color:var(--green)}
+.tick{width:1.8rem;height:1.8rem;fill:none;stroke:var(--green);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.next{display:flex;flex-wrap:wrap;justify-content:center;gap:.7rem;margin-top:1.1rem}
+
+/* warm-up copy */
+h2{font:800 clamp(1.7rem,1.2rem + 1.4vw,2.7rem)/1.05 var(--disp);letter-spacing:-.01em;margin:.2rem 0 .5rem}
+.lead{font-size:1.2rem;margin:0 0 1rem;color:var(--fg)}
+.lead i,.status i{font-family:var(--mono)}
+.choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:.4rem 0 1rem}
+.choice{font:600 1.7rem var(--mono);min-height:4rem;border-radius:14px;border:2px solid var(--cyan);color:var(--cyan);background:transparent;cursor:pointer}
+.choice.bad{border-color:var(--red);color:var(--red);opacity:.6}
+.choice.ok{background:var(--green);border-color:var(--green);color:#000}
+.row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.steps{list-style:none;margin:.6rem 0 1rem;padding:0;display:grid;gap:.8rem}
+.steps li{display:flex;gap:.9rem;align-items:flex-start}
+.steps b{flex:none;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:var(--k);color:#000;font:800 1.3rem var(--disp)}
+.steps h3{margin:0;font:800 1.3rem/1.2 var(--disp)}
+.steps p{margin:.1rem 0 0;color:var(--mute)}
+.steps i{font-family:var(--mono)}
+.small{font-size:.95rem;color:var(--mute);margin:.8rem 0 0}
+
+/* overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:16px;z-index:10}
+.overlay[hidden]{display:none}
+.overlay .card{width:min(640px,100%);background:#0d0d12;border-color:#3a3a48}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .tabs{margin-inline-start:0}
+}
+@media (max-width:520px){
+  .tools{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mv{font-size:1.05rem}
+  .status{font-size:1.05rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="pk">Keep</span> <span class="yl">it</span> <span class="gr">level</span></h1>
+      <p>Solving equations with <i style="font-family:var(--mono)">x</i> on both sides</p>
+    </div>
+    <nav class="tabs" aria-label="Lesson parts">
+      <button class="btn tab" data-act="tab" data-tab="warm"><span>1</span>Warm-up</button>
+      <button class="btn tab" data-act="tab" data-tab="guided"><span>2</span>Guided</button>
+      <button class="btn tab" data-act="tab" data-tab="practice"><span>3</span>Practice</button>
+      <button class="btn tab" data-act="how">How this works</button>
+    </nav>
+  </header>
+
+  <div id="bar" class="bar"></div>
+
+  <main class="stage">
+    <section class="left">
+      <svg id="scale" class="scale" viewBox="0 0 760 440" role="img" aria-label="Balance scale. Left side is pink, right side is green.">
+        <defs>
+          <linearGradient id="beamgrad" gradientUnits="userSpaceOnUse" x1="120" y1="0" x2="640" y2="0">
+            <stop offset="0" stop-color="#ff4fa8"/><stop offset="1" stop-color="#35f09a"/>
+          </linearGradient>
+        </defs>
+        <rect class="post" x="372" y="88" width="16" height="328" rx="6"/>
+        <rect class="foot" x="262" y="412" width="236" height="16" rx="8"/>
+        <g id="panL" class="pan sL"></g>
+        <g id="panR" class="pan sR"></g>
+        <line id="beam" stroke="url(#beamgrad)" stroke-width="14" stroke-linecap="round"/>
+        <circle class="pivot" cx="380" cy="80" r="16"/>
+        <g id="badge" class="lvl"><rect x="290" y="8" width="180" height="40" rx="20"/><text x="380" y="35">LEVEL</text></g>
+      </svg>
+      <div id="status" class="status info" aria-live="polite"></div>
+      <div id="ctl"></div>
+    </section>
+    <section class="right" id="right"></section>
+  </main>
+</div>
+
+<div id="how" class="overlay" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-label="How this works">
+    <h2>How this works</h2>
+    <div id="howsteps"></div>
+    <p class="small">Whole numbers only for now. Negative numbers are the next level.</p>
+    <div class="row"><button class="btn fill yellow big" data-act="close">Got it</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var mn=Math.min;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var X='<i>x</i>';
+function xt(n){return (n===1?'':n)+X}
+
+/* ---------- puzzles ---------- */
+var GUIDED={a:3,b:2,c:1,d:8,v:3};
+var PUZZLES=[
+  {a:2,b:3,c:1,d:7,v:4},
+  {a:4,b:3,c:2,d:9,v:3},
+  {a:4,b:1,c:1,d:10,v:3},
+  {a:5,b:4,c:2,d:19,v:5},
+  {a:2,b:14,c:5,d:2,v:4,note:'Heads up: more x\'s on the right this time.'},
+  {a:6,b:5,c:2,d:21,v:4},
+  {a:7,b:3,c:4,d:24,v:7},
+  {a:8,b:4,c:5,d:19,v:5}
+];
+var WARM=[
+  {s:{a:0,b:4,c:0,d:4},v:1},
+  {s:{a:1,b:2,c:0,d:5},v:3},
+  {s:{a:3,b:2,c:1,d:8},v:3}
+];
+function randomPuzzle(){
+  for(;;){
+    var c=1+Math.floor(Math.random()*4),k=1+Math.floor(Math.random()*3),a=c+k;
+    var v=1+Math.floor(Math.random()*7),b=1+Math.floor(Math.random()*8),d=b+k*v;
+    if(d>24)continue;
+    return Math.random()<.3?{a:c,b:d,c:a,d:b,v:v}:{a:a,b:b,c:c,d:d,v:v};
+  }
+}
+function mkGame(p,idx){return {start:{a:p.a,b:p.b,c:p.c,d:p.d},v:p.v,idx:idx,note:p.note,hist:[],cheat:null,checked:false}}
+var G={guided:mkGame(GUIDED,'g'),practice:mkGame(PUZZLES[0],0)};
+var S={tab:'warm',beat:0,guessOk:false,guessBad:null,done:{},busy:false,fresh:false,hintMv:null,msg:{t:'',k:'info'}};
+function game(){return G[S.tab]}
+function cur(g){return g.hist.length?g.hist[g.hist.length-1].to:g.start}
+function view(g){
+  var s=cur(g),c=g.cheat;if(!c)return s;
+  var t={a:s.a,b:s.b,c:s.c,d:s.d};
+  if(c.side==='L'){if(c.kind==='c')t.b-=c.m;else t.a-=c.m}
+  else{if(c.kind==='c')t.d-=c.m;else t.c-=c.m}
+  return t;
+}
+
+/* ---------- math rules ---------- */
+function isSolved(s){return (s.a===1&&s.b===0&&s.c===0)||(s.a===0&&s.c===1&&s.d===0)}
+function canDiv(s){
+  if(s.b===0&&s.c===0&&s.a>1)return s.a;
+  if(s.a===0&&s.d===0&&s.c>1)return s.c;
+  return 0;
+}
+function ready(t,s){return t==='subx'?mn(s.a,s.c)>0:t==='subc'?mn(s.b,s.d)>0:canDiv(s)>0}
+function nextMove(s){
+  if(mn(s.a,s.c)>0)return 'subx';
+  if(mn(s.b,s.d)>0)return 'subc';
+  if(canDiv(s))return 'div';
+  return null;
+}
+function applyMove(t,s){
+  if(t==='subx'){var m=mn(s.a,s.c);return {m:m,to:{a:s.a-m,b:s.b,c:s.c-m,d:s.d}}}
+  if(t==='subc'){var n=mn(s.b,s.d);return {m:n,to:{a:s.a,b:s.b-n,c:s.c,d:s.d-n}}}
+  var k=canDiv(s);
+  if(s.a>1)return {m:k,to:{a:1,b:0,c:0,d:s.d/k}};
+  return {m:k,to:{a:0,b:s.b/k,c:1,d:0}};
+}
+function notReady(t,s){
+  if(t==='subx')return (s.a===0&&s.c===0)?'No x\'s left to take.':'Only one side has <i>x</i>. Nothing to take from both.';
+  if(t==='subc')return (s.b===0&&s.d===0)?'No ones left to take.':'One side has no ones. Nothing to take from both.';
+  return 'Get <i>x</i> alone on one side first.';
+}
+function hintText(mv,s){
+  if(mv==='subx'){var m=mn(s.a,s.c);return 'Take away '+m+' <i>x</i>'+(m>1?'\'s':'')+' from both sides. Clear the <i>x</i>\'s off one side.'}
+  if(mv==='subc'){return 'Take away '+mn(s.b,s.d)+' from both sides.'}
+  return 'Split both sides into '+canDiv(s)+' equal piles. Divide.';
+}
+
+/* ---------- written work ---------- */
+function sideCells(a,b){
+  return [a>0?xt(a):'',(a>0&&b>0)?'<span class="pl">+</span>':'',(b>0||a===0)?String(b):''];
+}
+function cells(s,eq){
+  var L=sideCells(s.a,s.b),R=sideCells(s.c,s.d);
+  return [L[0],L[1],L[2],eq?'<span class="neq">'+eq+'</span>':'=',R[0],R[1],R[2]];
+}
+function frac(n,d){return '<span class="frac"><span class="n">'+n+'</span><span class="d">'+d+'</span></span>'}
+function opCells(st){
+  var o=['','','','','','',''];
+  if(st.type==='subx'){o[0]='−'+xt(st.m);o[4]=o[0]}
+  else{o[2]='−'+st.m;o[6]=o[2]}
+  return o;
+}
+function fracCells(s,k){
+  var o=['','','','=','','',''];
+  if(s.a>1){o[0]=frac(xt(s.a),k);o[6]=frac(String(s.d),k)}
+  else{o[2]=frac(String(s.b),k);o[4]=frac(xt(s.c),k)}
+  return o;
+}
+function cheatOpCells(c){
+  var o=['','','','','','',''],t=c.kind==='c'?'−'+c.m:'−'+xt(c.m);
+  var i=c.side==='L'?(c.kind==='c'?2:0):(c.kind==='c'?6:4);
+  o[i]=t;return o;
+}
+function gridBuilder(){
+  var h='',r=1;
+  return {
+    row:function(arr,cls,delay){
+      arr.forEach(function(html,i){
+        if(html===''||html==null)return;
+        var side=i<3?'cl':i===3?'eq':'cr';
+        h+='<div class="c '+side+' '+(cls||'')+'" style="grid-column:'+(i+1)+';grid-row:'+r+(delay!=null?';animation-delay:'+delay+'ms':'')+'">'+html+'</div>';
+      });r++;
+    },
+    line:function(cls,delay){h+='<div class="ln '+(cls||'')+'" style="grid-row:'+r+(delay!=null?';animation-delay:'+delay+'ms':'')+'"></div>';r++},
+    gap:function(){h+='<div class="gap" style="grid-row:'+r+'"></div>';r++},
+    html:function(){return h}
+  };
+}
+function workHTML(g){
+  var b=gridBuilder();
+  b.row(cells(g.start));
+  g.hist.forEach(function(st,k){
+    var nw=(S.fresh&&k===g.hist.length-1)?' new':'';
+    b.gap();
+    if(st.type==='div'){b.row(fracCells(st.from,st.m),'fr'+nw,0);b.row(cells(st.to),'res'+nw,450)}
+    else{b.row(opCells(st),'op'+nw,0);b.line(nw.trim(),200);b.row(cells(st.to),'res'+nw,550)}
+  });
+  if(g.cheat){
+    b.gap();b.row(cheatOpCells(g.cheat),'op new',0);b.line('bad new',200);b.row(cells(view(g),'≠'),'res new',550);
+  }
+  return b.html();
+}
+function checkHTML(g){
+  var a=g.start.a,b=g.start.b,c=g.start.c,d=g.start.d,v=g.v,wl=a*v+b,wr=c*v+d;
+  var pl=function(n){return '<span class="plug">'+n+'</span>'};
+  function mk(a,b,f){return [a>0?f(a):'',(a>0&&b>0)?'<span class="pl">+</span>':'',(b>0||a===0)?String(b):'']}
+  var A=function(a,b){return mk(a,b,function(n){return n>1?n+'('+pl(v)+')':pl(v)})};
+  var B=function(a,b){return mk(a,b,function(n){return String(n*v)})};
+  var gb=gridBuilder();
+  gb.row(A(a,b).concat(['=']).concat(A(c,d)),'new',0);
+  gb.row(B(a,b).concat(['=']).concat(B(c,d)),'new',500);
+  gb.line('new',900);
+  gb.row(['','',String(wl),'=',String(wr),'',''],'res new',1100);
+  return '<div class="check"><p class="cap2">Put <i>x</i> = '+v+' into the original</p><div class="gridwrap"><div class="grid">'+gb.html()+'</div></div>'+
+    '<p class="match new" style="animation-delay:1600ms"><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>'+wl+' = '+wr+'. Both sides match.</p></div>';
+}
+function finishHTML(g){
+  var s=cur(g),v=g.v,h='<div class="card finish" id="finish"><div class="ans"><i>x</i> = '+v+'</div>';
+  if(s.a===0)h+='<p class="sm">'+v+' = <i>x</i> says the same thing.</p>';
+  h+=g.checked?checkHTML(g):'<button class="btn fill violet big" data-act="check">Plug it back in</button>';
+  h+='<div class="next">';
+  if(S.tab==='guided')h+='<button class="btn fill yellow big" data-act="tab" data-tab="practice">On to practice</button>';
+  else h+='<button class="btn fill yellow big" data-act="next">Next puzzle</button><button class="btn line violet big" data-act="rand">Random</button>';
+  return h+'</div></div>';
+}
+
+/* ---------- scale ---------- */
+var CX=380,PY=80,L=232,STR=205;
+var sc={angle:0,raf:0};
+var panL=$('#panL'),panR=$('#panR'),beam=$('#beam'),badge=$('#badge');
+function setAngle(deg){
+  sc.angle=deg;var r=deg*Math.PI/180;
+  var lx=CX-L*Math.cos(r),ly=PY+L*Math.sin(r),rx=CX+L*Math.cos(r),ry=PY-L*Math.sin(r);
+  beam.setAttribute('x1',lx);beam.setAttribute('y1',ly);beam.setAttribute('x2',rx);beam.setAttribute('y2',ry);
+  panL.setAttribute('transform','translate('+lx+' '+(ly+STR)+')');
+  panR.setAttribute('transform','translate('+rx+' '+(ry+STR)+')');
+}
+function tween(target,ms){
+  cancelAnimationFrame(sc.raf);
+  if(reduce){setAngle(target);return}
+  var from=sc.angle,t0=performance.now();
+  (function f(t){
+    var p=Math.min(1,(t-t0)/ms);
+    var d=(from-target)*Math.exp(-4.6*p)*Math.cos(p*Math.PI*3.2);
+    setAngle(p>=1?target:target+d);
+    if(p<1)sc.raf=requestAnimationFrame(f);
+  })(t0);
+}
+function exprSvg(a,b){
+  var s='';
+  if(a>0)s+=(a>1?a:'')+'<tspan class="xi">x</tspan>';
+  if(a>0&&b>0)s+=' + ';
+  if(b>0||a===0)s+=b;
+  return s;
+}
+function panHTML(nx,nu,label,word,enter){
+  var W=250,bs=nx>4?40:46,bg=6,us=nu>12?19:23,ug=3;
+  var px=Math.floor((W+bg)/(bs+bg)),pu=Math.floor((W+ug)/(us+ug));
+  var out='<line class="str" x1="0" y1="'+(-STR)+'" x2="-122" y2="2"/><line class="str" x1="0" y1="'+(-STR)+'" x2="122" y2="2"/>';
+  var i,r,inRow,col,w,x,y,xr=Math.ceil(nx/px);
+  for(i=0;i<nx;i++){
+    r=Math.floor(i/px);inRow=mn(px,nx-r*px);col=i%px;
+    w=inRow*bs+(inRow-1)*bg;x=-w/2+col*(bs+bg);y=-4-(r+1)*bs-r*bg;
+    out+='<g class="it xb'+(enter?' enter':'')+'" data-k="x" data-i="'+i+'" style="animation-delay:'+(enter?mn(i,12)*40:0)+'ms"><rect x="'+x+'" y="'+y+'" width="'+bs+'" height="'+bs+'" rx="8"/><text x="'+(x+bs/2)+'" y="'+(y+bs*.7)+'" font-size="'+(bs*.66)+'">x</text></g>';
+  }
+  var top=nx?-4-xr*bs-(xr-1)*bg:-2,base=top-(nx?6:2);
+  for(i=0;i<nu;i++){
+    r=Math.floor(i/pu);inRow=mn(pu,nu-r*pu);col=i%pu;
+    w=inRow*us+(inRow-1)*ug;x=-w/2+col*(us+ug);y=base-(r+1)*us-r*ug;
+    out+='<g class="it ub'+(enter?' enter':'')+'" data-k="u" data-i="'+i+'" style="animation-delay:'+(enter?mn(i,20)*25+120:0)+'ms"><rect x="'+x+'" y="'+y+'" width="'+us+'" height="'+us+'" rx="5"/></g>';
+  }
+  out+='<path class="bowl" d="M-135 0 H135 L110 18 H-110 Z"/>';
+  out+='<text class="plabel" x="0" y="58">'+label+'</text><text class="pside" x="0" y="84">'+word+'</text>';
+  return out;
+}
+function showScale(s,v,o){
+  o=o||{};
+  panL.innerHTML=panHTML(s.a,s.b,exprSvg(s.a,s.b),'LEFT',o.enter);
+  panR.innerHTML=panHTML(s.c,s.d,exprSvg(s.c,s.d),'RIGHT',o.enter);
+  var diff=(s.a*v+s.b)-(s.c*v+s.d);
+  var target=diff===0?0:(diff>0?1:-1)*mn(14,Math.max(4,Math.abs(diff)*2.6));
+  if(o.nudge&&target===0&&!reduce)sc.angle=1.6;
+  tween(target,diff===0?800:1200);
+  badge.setAttribute('class',diff===0?'lvl':'tip');
+  badge.querySelector('text').textContent=diff===0?'LEVEL':'NOT EQUAL';
+}
+function popTo(s,t){
+  function go(pan,k,to){pan.querySelectorAll('.it[data-k="'+k+'"]').forEach(function(e){if(+e.dataset.i>=to)e.classList.add('pop')})}
+  go(panL,'x',t.a);go(panL,'u',t.b);go(panR,'x',t.c);go(panR,'u',t.d);
+}
+
+/* ---------- UI ---------- */
+var el={bar:$('#bar'),ctl:$('#ctl'),right:$('#right'),status:$('#status')};
+function paint(){el.status.className='status '+S.msg.k;el.status.innerHTML='<span>'+S.msg.t+'</span>'}
+function say(t,k){S.msg={t:t,k:k||'info'};paint()}
+function stepsHTML(){
+  return '<ol class="steps">'+
+  '<li><b style="--k:var(--cyan)">1</b><div><h3>Keep it level</h3><p>Do the same thing to both sides.</p></div></li>'+
+  '<li><b style="--k:var(--yellow)">2</b><div><h3>Get <i>x</i> on one side</h3><p>Take away <i>x</i>\'s, then take away ones.</p></div></li>'+
+  '<li><b style="--k:var(--orange)">3</b><div><h3>Divide, then check</h3><p>Get <i>x</i> alone. Plug it back in.</p></div></li></ol>';
+}
+function barHTML(){
+  if(S.tab!=='practice')return '';
+  var g=G.practice;
+  return '<div class="chips"><span class="lab">Puzzle</span>'+PUZZLES.map(function(p,i){
+    return '<button class="chip'+(g.idx===i?' on':'')+(S.done[i]?' ok':'')+'" data-act="pick" data-i="'+i+'" aria-label="Puzzle '+(i+1)+'">'+(i+1)+'</button>';
+  }).join('')+'<button class="chip rand'+(g.idx==='R'?' on':'')+'" data-act="rand">Random</button></div>';
+}
+function ctlHTML(){
+  if(S.tab==='warm')return '';
+  var g=game(),s=cur(g),solved=isSolved(s),mv=nextMove(s),on=!g.cheat&&!solved;
+  function m(t,cls,label){
+    var co=on&&((S.tab==='guided'&&mv===t)||S.hintMv===t)?' coach':'';
+    return '<button class="btn mv fill '+cls+co+'" data-act="'+t+'" data-ready="'+((on&&ready(t,s))?1:0)+'">'+label+'</button>';
+  }
+  return '<p class="lab">Do it to both sides</p><div class="moves">'+m('subx','cyan','Take away <i>x</i>\'s')+m('subc','yellow','Take away ones')+m('div','orange','Divide')+'</div>'+
+    '<div class="tools"><button class="btn line violet" data-act="hint">Hint</button><button class="btn line" data-act="undo">Undo</button><button class="btn line" data-act="reset">Start over</button>'+
+    '<button class="btn line red" data-act="cheat">'+(g.cheat?'Put it back':'Try cheating')+'</button></div>';
+}
+function warmHTML(){
+  var w=WARM[S.beat],b=gridBuilder();b.row(cells(w.s));
+  var h='<div class="card"><div class="cap"><span>The equation</span><span><b class="pk">left</b><b class="gr">right</b></span></div><div class="gridwrap"><div class="grid">'+b.html()+'</div></div></div><div class="card">';
+  if(S.beat===0){
+    h+='<h2>An equation is a level scale.</h2><p class="lead">Both sides weigh the same. That is what = means.</p><div class="row"><button class="btn fill yellow big" data-act="wnext">Next</button></div>';
+  }else if(S.beat===1){
+    h+='<h2><i style="font-family:var(--mono)">x</i> is a mystery box.</h2><p class="lead">Every <i>x</i> weighs the same. How much is one <i>x</i>?</p><div class="choices">';
+    [1,2,3,4].forEach(function(n){h+='<button class="choice'+(S.guessOk&&n===3?' ok':'')+(S.guessBad===n?' bad':'')+'" data-act="guess" data-n="'+n+'">'+n+'</button>'});
+    h+='</div><div class="row"><button class="btn line big" data-act="wback">Back</button>';
+    if(S.guessOk)h+='<button class="btn fill yellow big" data-act="wnext">Next</button>';
+    h+='</div>';
+  }else{
+    h+='<h2>Now <i style="font-family:var(--mono)">x</i> is on both sides.</h2>'+stepsHTML()+'<div class="row"><button class="btn line big" data-act="wback">Back</button><button class="btn fill yellow big" data-act="tab" data-tab="guided">Start solving</button></div><p class="small">Whole numbers only for now. Negative numbers are the next level.</p>';
+  }
+  return h+'</div>';
+}
+function render(o){
+  o=o||{};
+  document.querySelectorAll('.tab[data-tab]').forEach(function(b){b.classList.toggle('on',b.dataset.tab===S.tab)});
+  el.bar.innerHTML=barHTML();
+  el.ctl.innerHTML=ctlHTML();
+  if(S.tab==='warm'){
+    var w=WARM[S.beat];
+    el.right.innerHTML=warmHTML();
+    showScale(w.s,w.v,{enter:o.enter});
+  }else{
+    var g=game(),s=cur(g);
+    var h='<div class="card"><div class="cap"><span>Your work</span><span><b class="pk">left</b><b class="gr">right</b></span></div><div class="gridwrap"><div class="grid">'+workHTML(g)+'</div></div></div>';
+    if(isSolved(s)&&!g.cheat)h+=finishHTML(g);
+    el.right.innerHTML=h;
+    showScale(view(g),g.v,{enter:o.enter,nudge:o.nudge});
+  }
+  paint();
+}
+function intro(){
+  if(S.tab==='warm')say(['Count each side. Same weight on both.','Pick a number for <i>x</i>.','<i>x</i> is on both sides this time.'][S.beat],'info');
+  else if(S.tab==='guided')say('Tap the glowing button. It acts on both sides.','info');
+  else{var g=G.practice;say(g.note||'Pick a move. It happens on both sides.','info')}
+}
+function setTab(t){
+  if(S.busy)return;
+  S.tab=t;S.hintMv=null;intro();render({enter:true});
+}
+
+/* ---------- actions ---------- */
+function flashBtn(act){
+  var b=$('[data-act="'+act+'"]');if(!b)return;
+  b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');
+}
+function move(t){
+  if(S.busy)return;
+  var g=game(),s=cur(g);
+  if(g.cheat){say('Put it back first.','warn');flashBtn('cheat');return}
+  if(isSolved(s)){say('<i>x</i> is already alone. Plug it back in.','good');return}
+  if(!ready(t,s)){say(notReady(t,s),'warn');flashBtn(t);return}
+  S.busy=true;S.hintMv=null;
+  var r=applyMove(t,s);popTo(s,r.to);
+  setTimeout(function(){
+    g.hist.push({type:t,m:r.m,from:s,to:r.to});g.checked=false;
+    var done=isSolved(r.to);
+    if(done&&typeof g.idx==='number')S.done[g.idx]=true;
+    var txt=t==='subx'?'Took '+r.m+' <i>x</i>'+(r.m>1?'\'s':'')+' off each side. Still level.':
+            t==='subc'?'Took '+r.m+' off each side. Still level.':
+            'Split each side into '+r.m+' equal piles. Kept one pile.';
+    say(done?'<i>x</i> is alone. Now plug it back in.':txt,done?'good':'info');
+    S.busy=false;S.fresh=true;render({nudge:true});S.fresh=false;
+    if(done){var f=$('#finish');if(f)setTimeout(function(){f.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'})},350)}
+  },reduce?60:520);
+}
+function hint(){
+  if(S.busy)return;
+  var g=game(),s=cur(g);
+  if(g.cheat){say('Put it back first. Then follow the glow.','warn');S.hintMv=null;return}
+  if(isSolved(s)){say('You are done. Plug it back in to check.','good');return}
+  var mv=nextMove(s);S.hintMv=mv;say(hintText(mv,s),'hint');
+  el.ctl.innerHTML=ctlHTML();
+}
+function undo(){
+  if(S.busy)return;
+  var g=game();S.hintMv=null;
+  if(g.cheat){unCheat(g);return}
+  if(!g.hist.length){say('Nothing to undo yet.','warn');return}
+  g.hist.pop();g.checked=false;say('Undone.','info');render({enter:true});
+}
+function reset(){
+  if(S.busy)return;
+  var g=game();g.hist=[];g.cheat=null;g.checked=false;S.hintMv=null;
+  say('Fresh start.','info');render({enter:true});
+}
+function unCheat(g){g.cheat=null;say('Put back. Level again.','good');render({enter:true})}
+function cheat(){
+  if(S.busy)return;
+  var g=game();S.hintMv=null;
+  if(g.cheat){unCheat(g);return}
+  var s=cur(g),c;
+  if(s.b>0)c={side:'L',kind:'c',m:mn(2,s.b)};
+  else if(s.d>0)c={side:'R',kind:'c',m:mn(2,s.d)};
+  else if(s.a>0)c={side:'L',kind:'x',m:1};
+  else c={side:'R',kind:'x',m:1};
+  S.busy=true;
+  var t={a:s.a,b:s.b,c:s.c,d:s.d};
+  if(c.side==='L'){if(c.kind==='c')t.b-=c.m;else t.a-=c.m}else{if(c.kind==='c')t.d-=c.m;else t.c-=c.m}
+  popTo(s,t);
+  setTimeout(function(){
+    g.cheat=c;S.busy=false;
+    var side=c.side==='L'?'left':'right',what=c.kind==='c'?(c.m>1?c.m+' ones':'1 one'):'1 <i>x</i>';
+    say('Only the '+side+' lost '+what+'. The scale tips. Whatever you do to one side, do to the other.','bad');
+    render();
+  },reduce?60:480);
+}
+function startGame(p,idx){
+  if(S.busy)return;
+  G.practice=mkGame(p,idx);S.hintMv=null;intro();render({enter:true});
+}
+function nextPuzzle(){
+  var i=G.practice.idx;
+  if(typeof i==='number'&&i<PUZZLES.length-1)startGame(PUZZLES[i+1],i+1);
+  else startGame(randomPuzzle(),'R');
+}
+function guess(n){
+  if(S.guessOk)return;
+  if(n===3){S.guessOk=true;S.guessBad=null;say('3 + 2 = 5. Level! <i>x</i> = 3.','good')}
+  else{S.guessBad=n;say(n+' + 2 = '+(n+2)+', not 5. Try again.','warn')}
+  render();
+}
+function wnext(){S.beat=mn(2,S.beat+1);intro();render({enter:true})}
+function wback(){S.beat=Math.max(0,S.beat-1);intro();render({enter:true})}
+
+function openHow(){$('#howsteps').innerHTML=stepsHTML();$('#how').hidden=false;var b=$('#how [data-act="close"]');if(b)b.focus()}
+function closeHow(){$('#how').hidden=true}
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');
+  if(!b){if(e.target.id==='how')closeHow();return}
+  var a=b.dataset.act;
+  if(a==='tab')setTab(b.dataset.tab);
+  else if(a==='how')openHow();
+  else if(a==='close')closeHow();
+  else if(a==='subx'||a==='subc'||a==='div')move(a);
+  else if(a==='hint')hint();
+  else if(a==='undo')undo();
+  else if(a==='reset')reset();
+  else if(a==='cheat')cheat();
+  else if(a==='pick')startGame(PUZZLES[+b.dataset.i],+b.dataset.i);
+  else if(a==='rand')startGame(randomPuzzle(),'R');
+  else if(a==='next')nextPuzzle();
+  else if(a==='check'){game().checked=true;render();var f=$('#finish');if(f)f.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'})}
+  else if(a==='guess')guess(+b.dataset.n);
+  else if(a==='wnext')wnext();
+  else if(a==='wback')wback();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHow()});
+
+setAngle(0);intro();render({enter:true});
+})();
+</script>
+
+</body></html>

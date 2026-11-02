@@ -1,0 +1,658 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+<title>Unit 2 Jeopardy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: black stage. Home = three stacked panels. Game = sticky scoreboard over a topic-column board
+   (topic rows on phones). Question screen = full-screen overlay with award bar pinned at the bottom. */
+:root{
+  --bg:#000; --panel:#0d0d12; --line:#2a2a34; --ink:#f5f5f7; --dim:#a2a2b0;
+  --bad:#ff5468; --good:#3ddc97; --gold:#ffd23f;
+  --display:'Bricolage Grotesque','Arial Rounded MT Bold',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --c:#ffd23f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:16px 40px;margin:0;overflow-x:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1600px;margin:0 auto}
+h1,h2{font-family:var(--display);margin:0;font-weight:800;text-wrap:balance}
+
+/* buttons */
+.btn{border:2px solid var(--line);background:#14141b;border-radius:999px;padding:.55em 1.1em;font-weight:600;min-height:44px;transition:background .12s,border-color .12s}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--gold);border-color:var(--gold);color:#000}
+.btn.pri:hover{background:#ffe27a}
+.btn.warn{border-color:var(--bad);color:var(--bad)}
+.btn.warn.armed{background:var(--bad);color:#000}
+.btn.sm{min-height:36px;padding:.3em .85em;font-size:.9rem}
+.btn[aria-pressed=true].plus{background:var(--good);border-color:var(--good);color:#000}
+.btn[aria-pressed=true].minus{background:var(--bad);border-color:var(--bad);color:#000}
+
+/* home */
+.brand{padding-block:20px 8px}
+.brand h1{font-size:clamp(2.6rem,9vw,6rem);line-height:.95;letter-spacing:-.02em}
+.brand h1 span{display:inline-block}
+.brand p{color:var(--dim);margin:.6rem 0 0;font-size:1.1rem}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;margin-top:20px;align-items:start}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:20px;min-width:0}
+.panel h2{font-size:1.6rem;margin-bottom:14px}
+.panel.new{grid-column:1/-1}
+label.l{display:block;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.in{width:100%;background:#000;border:2px solid var(--line);border-radius:14px;padding:.6em .8em;min-height:46px}
+textarea.in{min-height:90px;font-family:var(--mono);font-size:.85rem;resize:vertical}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.step{display:flex;align-items:center;gap:0;border:2px solid var(--line);border-radius:999px;overflow:hidden}
+.step button{width:46px;height:44px;border:0;background:#14141b;font-size:1.4rem;font-weight:700}
+.step button:hover{background:#22222c}
+.step output{min-width:48px;text-align:center;font-family:var(--display);font-weight:800;font-size:1.4rem}
+.teams{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:10px;margin-block:16px}
+.msg{color:var(--bad);min-height:1.4em;margin:8px 0 0}
+.saved{display:grid;gap:12px}
+.sc{border:2px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0}
+.sc b{font-family:var(--display);font-size:1.3rem;overflow-wrap:anywhere}
+.sc small{color:var(--dim)}
+.sc .acts{display:flex;gap:8px;flex-wrap:wrap}
+.empty{color:var(--dim)}
+.codebox{width:100%}
+
+/* game header + scoreboard */
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(0,0,0,.94);padding-block:10px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.tc{border:2px solid var(--line);border-radius:16px;padding:8px 10px;background:var(--panel);display:grid;gap:4px;min-width:0}
+.tc.lead{outline:4px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.tc .nm{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dim)}
+.tc .pt{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3vw,2.6rem);line-height:1;font-variant-numeric:tabular-nums}
+.tc .pt.neg{color:var(--bad)}
+.tc .qb{display:flex;gap:6px}
+.tc .qb button{flex:1;border:1px solid var(--line);background:#16161d;border-radius:10px;min-height:32px;font-family:var(--mono);font-size:.8rem;font-weight:600}
+.tc .qb button:hover{border-color:var(--ink)}
+.bar{display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-block:16px}
+.bar h2{font-size:clamp(1.3rem,3vw,2rem)}
+.bar .acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sv{color:var(--dim);font-size:.85rem}
+.sv.bad{color:var(--bad)}
+
+/* board */
+.board{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px}
+.col{display:grid;grid-template-rows:auto repeat(5,1fr);gap:12px;min-width:0}
+.th{background:var(--c);color:#000;border-radius:16px;padding:12px 10px;font-family:var(--display);font-weight:800;font-size:clamp(.95rem,1.6vw,1.45rem);line-height:1.1;text-align:center;display:grid;place-items:center;min-height:5.2em;text-wrap:balance;overflow-wrap:anywhere}
+.tile{background:transparent;border:4px solid var(--c);color:var(--c);border-radius:18px;font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,4vw,3.8rem);min-height:clamp(70px,11.5vh,130px);transition:background .12s,opacity .2s,transform .12s;font-variant-numeric:tabular-nums}
+.tile:hover{background:color-mix(in srgb,var(--c) 20%,transparent);transform:scale(1.03)}
+.tile.done{opacity:.22}
+.tile.done:hover{opacity:.55}
+.tile.blank{visibility:hidden;pointer-events:none}
+
+@media (max-width:700px){
+  body{padding-inline:12px}
+  .score{margin-inline:-12px;padding-inline:12px;padding-block:6px}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:5px}
+  .tc{padding:5px 6px;border-radius:12px;border-width:2px;gap:2px}
+  .tc .nm{font-size:.7rem}
+  .tc .pt{font-size:1.15rem}
+  .tc .qb button{min-height:28px;font-size:.68rem;border-radius:8px}
+  .tc.lead{outline-width:3px}
+  .board{grid-template-columns:1fr;gap:14px}
+  .col{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:auto;gap:6px}
+  .th{grid-column:1/-1;min-height:0;padding:8px 10px;text-align:left;justify-items:start;font-size:1.05rem;border-radius:12px}
+  .tile{font-size:1.15rem;border-width:3px;border-radius:12px;min-height:58px}
+  .panel{padding:16px}
+}
+
+/* question overlay */
+.ov{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.ovh{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:4px solid var(--c);flex-wrap:wrap}
+.ovh .tp{font-family:var(--display);font-weight:800;color:var(--c);font-size:clamp(1.2rem,3vw,2.2rem);min-width:0;overflow-wrap:anywhere}
+.ovh .tp{flex:1 1 auto}
+.ovh .rn{font-family:var(--display);font-weight:700;font-size:clamp(1.1rem,2.6vw,2rem);border:3px solid var(--ink);border-radius:999px;padding:0 .7em;line-height:1.4;white-space:nowrap}
+.ovh .pp{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,4vw,3.4rem);color:#000;background:var(--c);border-radius:999px;padding:0 .6em;line-height:1.3}
+.ovm{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;display:flex;flex-direction:column;gap:18px;align-items:center}
+.ovm>*{width:100%;max-width:1100px}
+.qt{font-size:clamp(1.3rem,2.6vw,2.2rem);line-height:1.4;display:grid;gap:12px}
+.qt p{margin:0}
+.eq{font-family:var(--mono);font-size:clamp(1.5rem,4.2vw,3.2rem);text-align:center;display:grid;gap:14px;padding-block:8px;overflow-wrap:anywhere}
+.eq.tight{font-size:clamp(1.6rem,3.2vw,2.6rem);gap:4px;text-align:left;padding-left:1em}
+.lines{font-family:var(--mono);font-size:clamp(1.15rem,2.6vw,2rem);border:2px solid var(--line);border-radius:16px;padding:14px 18px;display:grid;gap:6px;width:fit-content;max-width:100%}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;font-family:var(--body);font-weight:500;font-size:clamp(1.1rem,2.3vw,1.8rem)}
+.opts .m{font-size:1.05em}
+@media (max-width:420px){.opts{grid-template-columns:1fr}}
+.opts.sy{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+.opt{border:2px solid var(--line);border-radius:14px;padding:12px 18px;overflow-wrap:anywhere}
+.figs{display:grid;gap:14px}
+.fig{margin:0;border:2px solid var(--line);border-radius:14px;padding:8px 12px;background:#050507;min-width:0}
+.fig.hit{border-color:var(--good)}
+.fig figcaption{font-family:var(--mono);font-size:clamp(1.1rem,2.2vw,1.6rem);padding-inline:4px}
+.nlw{overflow-x:auto}
+svg.nl{display:block;width:100%;min-width:560px;height:auto}
+svg.nl text{font-family:var(--mono);font-weight:600;fill:var(--ink)}
+.reveal{align-self:center;width:auto;font-size:1.3rem;padding:.7em 1.8em}
+.ans{border-top:4px solid var(--c);padding:16px 4px 4px;display:grid;gap:18px}
+.ans .lab{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.fin{font-family:var(--mono);font-size:clamp(1.8rem,4.4vw,3.4rem);font-weight:600;color:var(--c);white-space:pre-line;overflow-wrap:anywhere}
+.stp{display:grid;gap:6px}
+.st{display:flex;gap:6px 20px;flex-wrap:wrap;align-items:baseline;border-left:3px solid var(--line);padding-left:12px}
+.st .sm{font-family:var(--mono);font-size:clamp(1.4rem,3.4vw,2.8rem)}
+.st .sn{color:var(--dim);font-size:clamp(.9rem,1.6vw,1.1rem)}
+.work{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 0;font-family:var(--mono);font-size:clamp(1.3rem,3vw,2.4rem);width:fit-content;max-width:100%;overflow-x:auto;align-items:center}
+.chain{display:grid;grid-template-columns:auto auto;gap:12px 0;font-size:clamp(1.7rem,4.2vw,3.4rem);width:fit-content;max-width:100%;overflow-x:auto;align-items:center}
+.pre{font-size:clamp(1.3rem,2.9vw,2.1rem);color:var(--c)}
+.pre .m{font-size:1.2em}
+.chain .ce{padding-right:.5em}
+.chain .cx{white-space:nowrap}
+.chain .wn{font-size:clamp(1.3rem,2.9vw,2.1rem);max-width:20em;color:var(--ink);opacity:.8}
+@media (max-width:640px){.chain{grid-template-columns:auto 1fr}.chain .wn{grid-column:2;padding:0 0 4px}.chain .wn:empty{display:none}}
+.work .wn,.chain .wn{font-family:var(--body);font-size:clamp(.9rem,1.5vw,1.15rem);color:var(--dim);padding-left:1.4em;white-space:normal;max-width:19em}
+@media (max-width:640px){.work{grid-template-columns:1fr auto 1fr}.work .rule{grid-column:1/-1}.work .wn{grid-column:1/-1;padding:0 0 4px;text-align:center;max-width:none}.work .wn:empty{display:none}}
+.work .wl{text-align:right}
+.work .wr{text-align:left}
+.work .op{color:var(--c);font-weight:600;padding-bottom:4px}
+.work .rule{grid-column:1/-1;border-top:3px solid var(--ink);padding:0}
+.work .wl.op{text-align:right}
+.hid{visibility:hidden}
+.work,.chain{scrollbar-width:none}
+.work::-webkit-scrollbar,.chain::-webkit-scrollbar{display:none}
+.ans:empty{display:none}
+.m .tb{border:3px solid var(--gold);border-radius:10px;padding:.02em .22em;margin-inline:.12em;display:inline-block;line-height:1.25}
+.stepbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.work{position:relative}
+.work .ar{align-self:start}
+.work .wl.ar{padding-bottom:2.2em}
+.work svg.arw{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.work .we.flip{color:#000;background:var(--gold);font-weight:700;border-radius:12px;font-size:1.15em;padding-block:0 .05em;margin-inline:.3em;text-align:center}
+.work .wn.flip{color:var(--gold);font-weight:600}
+.work .bx{border:3px solid var(--c);border-left-width:0;border-right-width:0;padding-block:.2em}
+.work .wl.bx{border-left-width:3px;border-radius:14px 0 0 14px}
+.work .wr.bx{border-right-width:3px;border-radius:0 14px 14px 0}
+.work .wr.op{text-align:left}
+.work .wl,.work .wr{white-space:nowrap}
+.work>span{padding-inline:.45em}
+.work .we{min-width:1.6em;text-align:center}
+.why{color:var(--dim);font-size:clamp(1rem,1.8vw,1.25rem)}
+.ovf{border-top:1px solid var(--line);background:#07070a;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;max-height:46vh;overflow-y:auto}
+.aw{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}
+.aw div.t{border:2px solid var(--line);border-radius:14px;padding:6px 8px;display:grid;gap:6px;min-width:0}
+.aw .tn{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:.9rem}
+.aw .tn span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aw .tn .neg{color:var(--bad)}
+.aw .pm{display:flex;gap:6px}
+.aw .pm button{flex:1}
+.ovf .end{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* math */
+.m{font-family:var(--mono)}
+.m i{font-style:italic}
+.m sup{font-size:.8em;line-height:0;position:relative;top:-.15em;vertical-align:super}
+.m .o{margin-inline:.22em}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin-inline:.15em;font-size:.92em}
+.fr>span:first-child{border-bottom:.08em solid currentColor;padding:0 .25em .06em}
+.fr>span:last-child{padding:.06em .25em 0}
+.rad{display:inline-flex;align-items:stretch;vertical-align:middle}
+.rad .rs{flex:none;width:.8em;height:auto;overflow:visible;margin-right:-1px}
+.rad .rb{border-top:.075em solid currentColor;padding:.12em .25em 0 .2em;display:inline-flex;align-items:center}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#000;padding:.6em 1.2em;border-radius:999px;font-weight:600;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div id="ov" hidden></div>
+<div id="toast" role="status"></div>
+
+<script>
+/* ---------- math rendering ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function mathHTML(s){
+  let i=0;
+  const isOp=c=>/[A-Za-z0-9)\]}]/.test(c||'');
+  const ch=c=>/[A-Za-z]/.test(c)?'<i>'+c+'</i>':esc(c);
+  function seq(stop){
+    let out='',prev='';
+    while(i<s.length){
+      const c=s[i];
+      if(stop&&c===stop)break;
+      if(c==='`'){i++;const inner=seq('`');i++;out+='<span class="tb">'+inner+'</span>';prev=')';continue}
+      if(c==='['){i++;const n=seq('|');i++;const d=seq(']');i++;out+='<span class="fr"><span>'+n+'</span><span>'+d+'</span></span>';prev=']';continue}
+      if(c==='^'){i++;let inner;if(s[i]==='{'){i++;inner=seq('}');i++}else{inner=ch(s[i]);i++}out+='<sup>'+inner+'</sup>';prev=')';continue}
+      if(s.startsWith('sqrt{',i)){i+=5;const r=seq('}');i++;out+='<span class="rad'+(r.indexOf('class="fr"')>=0?' tall':'')+'"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0.4 11.5 L2.4 10 L5 18.6 L9.6 0.6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="miter" vector-effect="non-scaling-stroke"/></svg><span class="rb">'+r+'</span></span>';prev=')';continue}
+      if(s.startsWith('<=',i)){out+='<span class="o">&le;</span>';i+=2;prev='=';continue}
+      if(s.startsWith('>=',i)){out+='<span class="o">&ge;</span>';i+=2;prev='=';continue}
+      if(s.startsWith('!=',i)){out+='<span class="o">&ne;</span>';i+=2;prev='=';continue}
+      if(c==='+'&&!isOp(prev)){out+='+';i++;prev='+';continue}
+      if(c==='='||c==='<'||c==='>'||c==='+'){out+='<span class="o">'+esc(c)+'</span>';i++;prev='=';continue}
+      if(c==='-'){out+=isOp(prev)?'<span class="o">&minus;</span>':'&minus;';i++;prev='-';continue}
+      if(c==='*'){out+='<span class="o">&middot;</span>';i++;prev='*';continue}
+      out+=ch(c);prev=c;i++;
+    }
+    return out;
+  }
+  return seq(null);
+}
+function rich(s){return String(s).split('$').map((p,k)=>k%2?'<span class="m">'+mathHTML(p)+'</span>':esc(p)).join('')}
+
+/* ---------- number lines ---------- */
+function numberLine(o){
+  const {min,max,pt=null,closed=false,dir='left',label=''}=o;
+  const span=max-min, U=span<=10?64:span<=14?50:44, pad=48, W=span*U+pad*2, H=88, y=34;
+  const X=v=>pad+(v-min)*U, fs=span>14?19:22;
+  const neg=v=>(v<0?'−'+(-v):''+v);
+  let s='<svg class="nl" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(label||('Number line from '+min+' to '+max))+'">';
+  s+='<line x1="14" x2="'+(W-14)+'" y1="'+y+'" y2="'+y+'" stroke="var(--ink)" stroke-width="3"/>';
+  s+='<polygon points="4,'+y+' 22,'+(y-9)+' 22,'+(y+9)+'" fill="var(--ink)"/>';
+  s+='<polygon points="'+(W-4)+','+y+' '+(W-22)+','+(y-9)+' '+(W-22)+','+(y+9)+'" fill="var(--ink)"/>';
+  for(let v=min;v<=max;v++){
+    s+='<line x1="'+X(v)+'" x2="'+X(v)+'" y1="'+(y-11)+'" y2="'+(y+11)+'" stroke="var(--ink)" stroke-width="3"/>';
+    s+='<text x="'+X(v)+'" y="'+(y+42)+'" text-anchor="middle" font-size="'+fs+'">'+neg(v)+'</text>';
+  }
+  if(pt!==null){
+    const x0=X(pt), end=dir==='left'?4:W-4, tip=dir==='left'?26:W-26;
+    s+='<line x1="'+x0+'" x2="'+tip+'" y1="'+y+'" y2="'+y+'" stroke="var(--c)" stroke-width="10"/>';
+    s+='<polygon points="'+end+','+y+' '+tip+','+(y-17)+' '+tip+','+(y+17)+'" fill="var(--c)"/>';
+    s+='<circle cx="'+x0+'" cy="'+y+'" r="12" fill="'+(closed?'var(--c)':'#000')+'" stroke="var(--c)" stroke-width="5"/>';
+  }
+  return s+'</svg>';
+}
+function figs(list){
+  return '<div class="figs">'+list.map(f=>'<figure class="fig'+(f.hit?' hit':'')+'">'+(f.cap?'<figcaption>'+rich(f.cap)+'</figcaption>':'')+'<div class="nlw">'+numberLine(f)+'</div></figure>').join('')+'</div>';
+}
+
+/* ---------- content ---------- */
+const TOPICS=[
+{name:'Properties of Equality',color:'#ff4d6d',qs:[
+ {q:'State the property:',eq:'3x+4=4+3x',
+  ans:'Commutative Property of Addition',
+  steps:[],why:'Order does not matter when you add.'},
+ {q:'State the property:',eq:'2x^2(x+3)=2x^3+6x^2',
+  ans:'Distributive Property',
+  steps:[],why:'The number outside gets multiplied by everything inside the parentheses.'},
+ {q:'When solving $x^2+6x=-8$, a student wrote $x^2+6x+8=0$ as their first step. Which property justifies it?',
+  opts:['1) Associative property','2) Commutative property','3) Zero property of addition','4) Addition property of equality'],
+  ans:'4) Addition property of equality',
+  work:[['x^2+6x','=','-8'],['+8','','+8','add 8 to both sides'],['x^2+6x+8','=','0']],
+  steps:[],why:'Whatever you do to one side, do to the other.'},
+ {q:'Chloe solves $x^2+5x=3x+3$. Her first step is $x^2+2x-3=0$. Which property justifies it?',
+  opts:['1) The zero-product property','2) The commutative property','3) The distributive property','4) The subtraction property of equality'],
+  ans:'4) The subtraction property of equality',
+  work:[['x^2+5x','=','3x+3'],['-3x-3','','-3x-3','subtract 3x and 3 from both sides'],['x^2+2x-3','=','0']],
+  steps:[],why:'Whatever you do to one side, do to the other.'},
+ {q:['Ryan solved a linear equation as follows.','a) Between which lines did the error occur?','b) The error was in applying the ______ Property of Equality.'],
+  lines:['Line 1: $5(x+2)+3=12$','Line 2: $5x+10+3=12$','Line 3: $5x+13=12$','Line 4: $5x=25$','Line 5: $x=5$'],
+  ans:'a) Lines 3 and 4\nb) Subtraction',
+  work:[['5(x+2)+3','=','12'],['5x`+10``+3`','=','12'],['5x+13','=','12'],['-13','','-13','subtract 13 from both sides (Ryan added)'],['5x','=','-1'],['÷5','','÷5','divide both sides by 5'],['x','=','[-1|5]']],
+  steps:[],why:''}
+]},
+{name:'Exponent Rules',color:'#ffb703',qs:[
+ {q:'Simplify:',eq:'n*n^5',ans:'$n^6$',chain:[['n*n^5'],['n^1*n^5','n is the same as n to the 1st'],['n^{1+5}','same base, add the exponents'],['n^6']],steps:[],why:'Same base, multiply: add the exponents.'},
+ {q:'Simplify:',eq:'[9^8|9^5]',ans:'$9^3$',chain:[['[9^8|9^5]'],['9^{8-5}','same base, subtract the exponents'],['9^3']],steps:[],why:'Same base, divide: subtract the exponents.'},
+ {q:'Simplify:',eq:'(b^4)^3',ans:'$b^{12}$',chain:[['(b^4)^3'],['b^{4*3}','power of a power, multiply the exponents'],['b^{12}']],steps:[],why:'Power of a power: multiply the exponents.'},
+ {q:'Simplify:',eq:'(11^4)^x*11^3',ans:'$11^{4x+3}$',chain:[['(11^4)^x*11^3'],['11^{4x}*11^3','power of a power, multiply the exponents'],['11^{4x+3}','same base, add the exponents']],steps:[],why:'Power of a power first, then same base multiply.'},
+ {q:'Simplify $4^p*64^q$ by writing everything with a base of 4.',
+  opts:['1) $4^{p+3q}$','2) $4^{p+4q}$','3) $4^{2p+q}$','4) $4^{p+6q}$'],
+  ans:'1) $4^{p+3q}$',pre:'Change 64 to a base of 4: $64=4^3$',chain:[['4^p*64^q'],['4^p*(4^3)^q','swap 64 for 4 cubed'],['4^p*4^{3q}','multiply the exponents'],['4^{p+3q}','same base, add the exponents']],steps:[],why:'64 is 4 cubed.'}
+]},
+{name:'Rewriting & Rearranging',color:'#3ddc97',qs:[
+ {q:'If $P=2l+2w$, then $w$ can be expressed as:',
+  opts:['1) $w=[2l-P|2]$','2) $w=[P-2l|2]$','3) $w=[P-l|2]$','4) $w=[P-2w|2l]$'],
+  ans:'2) $w=[P-2l|2]$',work:[['P','=','2l+2w'],['-2l','','-2l','subtract 2l from both sides'],['P-2l','=','2w'],['÷2','','÷2','divide both sides by 2'],['[P-2l|2]','=','w']],steps:[],why:''},
+ {q:'Which expression is equivalent to $3^{x+2y}$?',
+  opts:['1) $3^x*3^2*3^y$','2) $3^x*9^y$','3) $9^{xy}$','4) $9^{x+2y}$'],
+  ans:'2) $3^x*9^y$',chain:[],steps:['1)  $3^x*3^2*3^y=3^{x+2+y}$','2)  $3^x*9^y=3^x*3^{2y}=3^{x+2y}$','3)  $9^{xy}=(3^2)^{xy}=3^{2xy}$','4)  $9^{x+2y}=(3^2)^{x+2y}=3^{2(x+2y)}=3^{2x+4y}$'],why:''},
+ {q:'The distance a free-falling object has fallen is $d=[1|2]at^2$. Solve for $t$ in terms of $a$ and $d$.',
+  ans:'$t=sqrt{[2d|a]}$',work:[['d','=','[1|2]at^2'],['×2','','×2','multiply both sides by 2'],['2d','=','at^2'],['÷a','','÷a','divide both sides by a'],['[2d|a]','=','t^2'],['sqrt{[2d|a]}','=','t','square root both sides (time is positive)']],steps:[],why:''}
+]},
+{name:'Solving Equations',color:'#4cc9f0',qs:[
+ {q:'What is the value of $x$ in the equation',eq:'[3|4]x+2=[5|4]x-6',
+  opts:['1) ${-16}$','2) ${16}$','3) ${-4}$','4) ${4}$'],
+  ans:'2) ${16}$',work:[['[3|4]x+2','=','[5|4]x-6'],['(4)[3|4]x+(4)2','=','(4)[5|4]x-(4)6','multiply every piece by 4 to get rid of the denominators'],['3x+8','=','5x-24','the 4s cancel the denominators'],['-3x','','-3x','subtract 3x from both sides'],['8','=','2x-24'],['+24','','+24','add 24 to both sides'],['32','=','2x'],['÷2','','÷2','divide both sides by 2'],['16','=','x']],steps:[],why:'Check: both sides equal 14.'},
+ {q:'Solve the equation. Describe the solution.',eq:'4(2x+3)-7=8x+2',
+  ans:'No solution',work:[['4(2x+3)-7','=','8x+2'],['8x`+12``-7`','=','8x+2'],['8x+5','=','8x+2','combine like terms. You can already tell: no solution','box'],['-8x','','-8x','subtract 8x from both sides'],['5','=','2','not true, so no solution']],steps:[],why:'The result is false for every x, so no value works.'},
+ {q:'Solve the equation for $x$:',eq:'[3x+3|3]=[7x-1|5]',
+  ans:'$x=3$',work:[['[3x+3|3]','=','[7x-1|5]'],['5(3x+3)','=','3(7x-1)','cross multiply'],['15x+15','=','21x-3','distribute'],['-15x','','-15x','subtract 15x from both sides'],['15','=','6x-3'],['+3','','+3','add 3 to both sides'],['18','=','6x'],['÷6','','÷6','divide both sides by 6'],['3','=','x']],steps:[],why:'Check: both sides equal 4.'},
+ {q:'Find the value of $x$:',eq:'[x|3]+[x+1|2]=x',
+  ans:'$x=3$',work:[['[x|3]+[x+1|2]','=','x'],['(6)[x|3]+(6)[x+1|2]','=','(6)x','multiply every piece by 6 to get rid of the denominators'],['2x+3(x+1)','=','6x'],['`2x``+3x`+3','=','6x'],['5x+3','=','6x'],['-5x','','-5x','subtract 5x from both sides'],['3','=','x']],steps:[],why:'Check: 1 + 2 = 3.'},
+ {q:'Solve for $x$:',eq:'[5|6]([2|3]x-15)=[3|4]([3|2]x-3)',
+  ans:'$x=-18$',work:[['[5|6]([2|3]x-15)','=','[3|4]([3|2]x-3)','','arrows'],['[5|9]x-[25|2]','=','[9|8]x-[9|4]','distribute'],['(72)[5|9]x-(72)[25|2]','=','(72)[9|8]x-(72)[9|4]','multiply every piece by 72 to get rid of the denominators'],['40x-900','=','81x-162','the 72 cancels the denominators'],['-40x','','-40x','subtract 40x from both sides'],['-900','=','41x-162'],['+162','','+162','add 162 to both sides'],['-738','=','41x'],['÷41','','÷41','divide both sides by 41'],['-18','=','x']],steps:[],why:'Check: both sides equal -22.5.'}
+]},
+{name:'Solving Inequalities',color:'#b388ff',qs:[
+ {q:'Describe what each symbol means.',eq:['<','>','<=','>=','!='],tight:1,
+  ans:'$<$ less than\n$>$ greater than\n$<=$ less than or equal to\n$>=$ greater than or equal to\n$!=$ not equal to',
+  steps:[],why:''},
+ {q:'Which value of $x$ is in the solution set of $-3x+8>14$?',
+  opts:['1) $-3$','2) $-2$','3) $0$','4) $3$'],
+  ans:'1) $-3$',work:[['-3x+8','>','14'],['-8','','-8','subtract 8 from both sides'],['-3x','>','6'],['÷-3','','÷-3','divide both sides by -3'],['x','<','-2','dividing by a negative, so flip the sign','flip']],steps:[],why:'Only -3 is less than -2. The value -2 itself gives equality.'},
+ {q:'Solve the inequality:',eq:'13x-2(x+4)>8x+1',
+  ans:'$x>3$',work:[['13x-2(x+4)','>','8x+1','','arrows'],['`13x``-2x`-8','>','8x+1'],['11x-8','>','8x+1'],['-8x','','-8x','subtract 8x from both sides'],['3x-8','>','1'],['+8','','+8','add 8 to both sides'],['3x','>','9'],['÷3','','÷3','divide both sides by 3'],['x','>','3']],steps:[],why:''}
+]},
+{name:'Graphing Inequalities',color:'#ff8a3d',qs:[
+ {q:'Write an inequality for the graph below.',
+  viz:[{min:-7,max:7,pt:1,closed:false,dir:'left',label:'Open circle at 1, ray pointing left'}],
+  ans:'$x<1$',steps:[],why:''},
+ {q:'Graph the inequality.',eq:'a>-3',
+  viz:[{min:-5,max:5}],
+  aviz:[{min:-5,max:5,pt:-3,closed:false,dir:'right'}],
+  ans:'',steps:[],why:''},
+ {q:'Graph the inequality.',eq:'4<=x',
+  viz:[{min:-5,max:5}],
+  aviz:[{min:-5,max:5,pt:4,closed:true,dir:'right'}],
+  ans:'You may find it easier to rewrite it as $x>=4$, then graph.',steps:[],why:''},
+ {q:'Which graph represents the solution set of $2x-5<3$?',
+  viz:[{min:-5,max:5,pt:4,closed:false,dir:'left',cap:'1)'},{min:-5,max:5,pt:4,closed:true,dir:'left',cap:'2)'},{min:-5,max:5,pt:-1,closed:false,dir:'left',cap:'3)'},{min:-5,max:5,pt:1,closed:true,dir:'left',cap:'4)'}],
+  aviz:[{min:-5,max:5,pt:4,closed:false,dir:'left',cap:'1)',hit:true}],
+  ans:'Graph 1',work:[['2x-5','<','3'],['+5','','+5','add 5 to both sides'],['2x','<','8'],['÷2','','÷2','divide both sides by 2'],['x','<','4']],steps:[],why:'Strict inequality gives an open circle. Less than gives a ray to the left.'},
+ {q:'Solve $12>=x+5$ and graph the solution on the number line.',
+  viz:[{min:-10,max:10}],
+  aviz:[{min:-10,max:10,pt:7,closed:true,dir:'left'}],
+  ans:'$x<=7$',work:[['12','>=','x+5'],['-5','','-5','subtract 5 from both sides'],['7','>=','x'],['','~or',''],['x','<=','7']],steps:[],why:''}
+]}
+];
+/* question numbers on the printed Unit 2 review sheet, same order as TOPICS[].qs */
+const NUMS=[['1b','1a','2','3','24'],['4','7','5','6','23'],['8','22','21'],['11','13','10','12','9'],['16','15','14'],['18','17a','17b','19','20']];
+const KEY='unit2-jeopardy-v1';
+const TOTAL=TOPICS.reduce((a,t)=>a+t.qs.length,0);
+
+/* ---------- storage ---------- */
+let db={classes:{}}, saveOK=true;
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.classes&&typeof r.classes==='object')db=r}catch(e){}
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(db));saveOK=true}catch(e){saveOK=false}
+}
+function encode(c){try{return 'U2J1.'+btoa(unescape(encodeURIComponent(JSON.stringify(c))))}catch(e){return ''}}
+function decode(t){
+  t=String(t||'').trim();if(t.indexOf('U2J1.')!==0)throw 0;
+  const c=JSON.parse(decodeURIComponent(escape(atob(t.slice(5)))));
+  if(!c||typeof c.name!=='string'||!c.name.trim()||!Array.isArray(c.teams)||c.teams.length<4||c.teams.length>8)throw 0;
+  c.name=c.name.trim().slice(0,60);c.teams=c.teams.map(x=>String(x).slice(0,30));
+  c.adj=c.teams.map((_,i)=>+((c.adj||[])[i])||0);
+  c.played=(c.played&&typeof c.played==='object')?c.played:{};c.aw=(c.aw&&typeof c.aw==='object')?c.aw:{};
+  c.updated=+c.updated||Date.now();return c;
+}
+const findKey=n=>Object.keys(db.classes).find(k=>k.toLowerCase()===n.trim().toLowerCase());
+
+/* ---------- state ---------- */
+let shown=1, totalSteps=0;
+let cur=null, view='home', openQ=null, revealed=false, armed=null, armTimer=null;
+const home={name:'',n:4,names:Array.from({length:8},(_,i)=>'Team '+(i+1)),msg:'',codeFor:null,loadText:''};
+const $=id=>document.getElementById(id);
+const key=(t,i)=>t+'-'+i;
+function score(c,ti){
+  let s=c.adj[ti]||0;
+  for(const k in c.aw){const a=c.aw[k][ti];if(a){const q=+k.split('-')[1];s+=a*(q+1)*100}}
+  return s;
+}
+function commit(){cur.updated=Date.now();db.classes[cur.name]=cur;save();renderSaveState()}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2200)}
+function arm(id){
+  if(armed===id){clearTimeout(armTimer);armed=null;return true}
+  armed=id;clearTimeout(armTimer);armTimer=setTimeout(()=>{armed=null;refresh()},4000);refresh();return false;
+}
+function refresh(){view==='home'?renderHome():renderBar()}
+
+/* ---------- home ---------- */
+function renderHome(){
+  const ex=findKey(home.name||'\u0000');
+  const names=Object.keys(db.classes).sort((a,b)=>db.classes[b].updated-db.classes[a].updated);
+  $('app').innerHTML=
+  '<div class="brand"><h1>Unit 2 Jeopardy</h1><p>Equations and Inequalities review. Properties, exponents, rearranging, solving, graphing.</p></div>'+
+  '<div class="panels">'+
+  '<section class="panel new"><h2>New game</h2>'+
+   '<div class="row"><div style="flex:1 1 260px"><label class="l" for="cls">Class name</label><input class="in" id="cls" maxlength="60" autocomplete="off" placeholder="Period 3" value="'+esc(home.name)+'" data-in="name"></div>'+
+   '<div><label class="l" id="tl">Teams</label><div class="step" role="group" aria-labelledby="tl"><button data-act="dec" aria-label="Fewer teams">&minus;</button><output>'+home.n+'</output><button data-act="inc" aria-label="More teams">+</button></div></div></div>'+
+   '<div class="teams">'+Array.from({length:home.n},(_,i)=>'<div><label class="l" for="tn'+i+'">Team '+(i+1)+'</label><input class="in" id="tn'+i+'" maxlength="30" value="'+esc(home.names[i])+'" data-in="team" data-i="'+i+'"></div>').join('')+'</div>'+
+   '<div class="row"><button class="btn pri" data-act="start">'+(ex&&armed==='replace'?'Replace saved game? Click again':'Start game')+'</button>'+(ex?'<span class="sv">A saved game named "'+esc(ex)+'" exists. Starting replaces it.</span>':'')+'</div>'+
+   '<p class="msg" role="alert">'+esc(home.msg)+'</p></section>'+
+  '<section class="panel"><h2>Saved classes</h2><div class="saved">'+
+   (names.length?names.map(n=>{const c=db.classes[n];const p=Object.keys(c.played).length;
+     return '<div class="sc"><div><b>'+esc(n)+'</b><br><small>'+c.teams.length+' teams, '+p+' of '+TOTAL+' tiles played, '+new Date(c.updated).toLocaleDateString()+'</small></div>'+
+     '<div class="acts"><button class="btn sm pri" data-act="resume" data-n="'+esc(n)+'">Resume</button><button class="btn sm" data-act="copy" data-n="'+esc(n)+'">Copy code</button><button class="btn sm warn'+(armed==='del:'+n?' armed':'')+'" data-act="del" data-n="'+esc(n)+'">'+(armed==='del:'+n?'Click again to delete':'Delete')+'</button></div>'+
+     (home.codeFor===n?'<textarea class="in codebox" id="cb" readonly aria-label="Save code">'+esc(encode(c))+'</textarea><small>Select all and copy this code.</small>':'')+'</div>'}).join(''):'<p class="empty">No saved classes yet. Your games save in this browser after every action.</p>')+
+   '</div></section>'+
+  '<section class="panel"><h2>Load code</h2><label class="l" for="code">Paste a copied save</label><textarea class="in" id="code" data-in="load" placeholder="U2J1...">'+esc(home.loadText)+'</textarea>'+
+   '<div class="row" style="margin-top:12px"><button class="btn" data-act="load">'+(armed==='loadrep'?'Replace saved class? Click again':'Load')+'</button></div></section>'+
+  '</div>';
+  if(home.codeFor){const cb=$('cb');if(cb){cb.focus();cb.select()}}
+}
+
+/* ---------- game ---------- */
+function startGame(c){cur=c;view='game';openQ=null;renderGame();window.scrollTo(0,0)}
+function renderGame(){
+  $('app').innerHTML='<div class="score" id="score"></div><div class="bar" id="bar"></div><div class="board" id="board" style="--n:'+TOPICS.length+'"></div>';
+  renderScore();renderBar();renderBoard();
+}
+function renderScore(){
+  const sc=cur.teams.map((_,i)=>score(cur,i)), mx=Math.max(...sc), mn=Math.min(...sc);
+  $('score').innerHTML='<div class="cards">'+cur.teams.map((n,i)=>
+    '<div class="tc'+(mx!==mn&&sc[i]===mx?' lead':'')+'"><div class="nm">'+esc(n)+'</div><div class="pt'+(sc[i]<0?' neg':'')+'">'+sc[i]+'</div>'+
+    '<div class="qb"><button data-act="adj" data-i="'+i+'" data-d="-100" aria-label="Subtract 100 from '+esc(n)+'">&minus;100</button><button data-act="adj" data-i="'+i+'" data-d="100" aria-label="Add 100 to '+esc(n)+'">+100</button></div></div>').join('')+'</div>';
+}
+function renderSaveState(){const e=$('sv');if(e){e.textContent=saveOK?'Saved':'Saving is blocked in this browser. Use Copy code on the home screen.';e.className='sv'+(saveOK?'':' bad')}}
+function renderBar(){
+  const b=$('bar');if(!b)return;
+  b.innerHTML='<h2>'+esc(cur.name)+'</h2><div class="acts"><span class="sv" id="sv"></span>'+
+   '<button class="btn warn sm'+(armed==='reset'?' armed':'')+'" data-act="reset">'+(armed==='reset'?'Click again to clear everything':'Reset board')+'</button>'+
+   '<button class="btn sm" data-act="exit">Save &amp; exit</button></div>';
+  renderSaveState();
+}
+function renderBoard(){
+  $('board').innerHTML=TOPICS.map((t,ti)=>
+    '<div class="col" style="--c:'+t.color+'"><div class="th">'+esc(t.name)+'</div>'+
+    [0,1,2,3,4].map(i=>t.qs[i]?'<button class="tile'+(cur.played[key(ti,i)]?' done':'')+'" data-act="open" data-t="'+ti+'" data-i="'+i+'" aria-label="'+esc(t.name)+' '+(i+1)*100+(cur.played[key(ti,i)]?', played':'')+'">'+(i+1)*100+'</button>':'<div class="tile blank" aria-hidden="true"></div>').join('')+'</div>').join('');
+}
+
+/* ---------- question screen ---------- */
+function openQuestion(t,i){openQ={t,i};revealed=false;shown=1;renderOverlay();$('ov').hidden=false;document.body.style.overflow='hidden'}
+function closeQuestion(){openQ=null;$('ov').hidden=true;$('ov').innerHTML='';document.body.style.overflow=''}
+function renderOverlay(){
+  const {t,i}=openQ, T=TOPICS[t], Q=T.qs[i], k=key(t,i), pts=(i+1)*100, aw=cur.aw[k]||{};
+  const qs=Array.isArray(Q.q)?Q.q:[Q.q];
+  const eqs=Q.eq?(Array.isArray(Q.eq)?Q.eq:[Q.eq]):[];
+  const sym=Q.eq&&Q.eq.indexOf('!=')>=0;
+  let h='<div class="ov" style="--c:'+T.color+'" role="dialog" aria-modal="true" aria-label="Question"><div class="ovh"><span class="tp">'+esc(T.name)+'</span><span class="rn">Review sheet #'+NUMS[t][i]+'</span><span class="pp">'+pts+'</span></div><div class="ovm">';
+  h+='<div class="qt">'+qs.map(x=>'<p>'+rich(x)+'</p>').join('')+'</div>';
+  if(eqs.length)h+='<div class="eq'+(Q.tight?' tight':'')+'">'+eqs.map(e=>'<div class="m">'+mathHTML(e)+'</div>').join('')+'</div>';
+  if(Q.lines)h+='<div class="lines">'+Q.lines.map(l=>'<div>'+rich(l)+'</div>').join('')+'</div>';
+  if(Q.opts)h+='<div class="opts'+(sym?' sy':'')+'">'+Q.opts.map(o=>'<div class="opt">'+rich(o)+'</div>').join('')+'</div>';
+  const vz=revealed&&Q.aviz?Q.aviz:Q.viz;
+  if(vz)h+=figs(vz);
+  if(!revealed)h+='<button class="btn pri reveal" data-act="reveal">Reveal answer</button>';
+  else{
+    h+='<div class="ans">'+(Q.ans?'<div class="fin">'+Q.ans.split('\n').map(rich).join('\n')+'</div>':'');
+    let su=0,wk='',ch='',st='';
+    const hd=s=>s>=shown?' hid':'';
+    if(Q.work){
+      let u=0;
+      wk='<div class="work m">'+expandWork(Q.work).map(r=>{
+        const op=!r[1],s=u;if(!op&&r[1]!=='~or')u++;
+        const bx=r[4]==='box'?' bx':(r[4]==='arrows'?' ar':''),d=' data-s="'+s+'"',z=hd(s);
+        return '<span class="wl'+(op?' op':'')+bx+z+'"'+d+'>'+(r[0]?mathHTML(r[0]):'')+'</span><span class="we'+bx+(r[4]==='flip'?' flip':'')+z+'"'+d+'>'+(r[1]?(r[1][0]==='~'?esc(r[1].slice(1)):mathHTML(r[1])):'')+'</span><span class="wr'+(op?' op':'')+bx+z+'"'+d+'>'+(r[2]?mathHTML(r[2]):'')+'</span>'+(op?'<span class="rule'+z+'"'+d+'></span>':'');
+      }).join('')+'</div>';
+      su=u;
+    }
+    if(Q.chain){
+      ch='<div class="chain m">'+Q.chain.map((r,k)=>{const s=su+k,d=' data-s="'+s+'"',z=hd(s);return '<span class="ce'+z+'"'+d+'>'+(k?'=':'')+'</span><span class="cx'+z+'"'+d+'>'+mathHTML(r[0])+'</span>'}).join('')+'</div>';
+      su+=Q.chain.length;
+    }
+    if(Q.steps.length){
+      st='<div class="stp">'+Q.steps.map((s,k)=>{const p=s.split(' ;; '),n=su+k;return '<div class="st'+hd(n)+'" data-s="'+n+'"><span class="sm">'+rich(p[0])+'</span>'+(p[1]?'<span class="sn">'+esc(p[1])+'</span>':'')+'</div>'}).join('')+'</div>';
+      su+=Q.steps.length;
+    }
+    totalSteps=su;
+
+    if(Q.pre)h+='<div class="pre">'+rich(Q.pre)+'</div>';
+    h+=wk+ch+st;
+    if(Q.why&&!Q.work&&!Q.chain)h+='<div class="why">'+rich(Q.why)+'</div>';
+    h+='</div>';
+  }
+  h+='</div><div class="ovf"><div class="end">'+(revealed&&totalSteps>1?'<button class="btn pri" data-act="next" id="nx">Next step</button><span class="sv" id="sc"></span>':'')+'<button class="btn" data-act="done">Done - mark tile played</button><button class="btn" data-act="back">Back to board</button></div><div class="aw" id="aw"></div></div></div>';
+  $('ov').innerHTML=h;
+  renderAwards();
+  if(revealed){alignOps();applySteps()}
+  const m=$('ov').querySelector('.ovm');if(m&&revealed)m.scrollTop=m.scrollHeight>m.clientHeight?m.scrollTop:0;
+}
+/* line each "+8 / -3x" step up under the like term it works on (sign under sign, digit under digit) */
+function charRect(el,idx){
+  const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n,acc=0;
+  while((n=tw.nextNode())){
+    const L=n.nodeValue.length;
+    if(idx<acc+L){const r=document.createRange();r.setStart(n,idx-acc);r.setEnd(n,idx-acc+1);return r.getBoundingClientRect()}
+    acc+=L;
+  }
+  return null;
+}
+/* curved arrows from a multiplier to each term inside its parentheses, on every side marked as an arrows row */
+function drawArrows(){
+  document.querySelectorAll('.work').forEach(w=>{
+    const old=w.querySelector('svg.arw');if(old)old.remove();
+    const cells=w.querySelectorAll('.wl.ar,.wr.ar');if(!cells.length)return;
+    const W=w.getBoundingClientRect();let paths='';
+    const isO=n=>n.nodeType===1&&n.classList.contains('o');
+    cells.forEach(cell=>{
+      const nodes=[...cell.childNodes];
+      const pi=nodes.findIndex(n=>n.nodeType===3&&n.nodeValue.indexOf('(')>=0);if(pi<0)return;
+      const tn=nodes[pi],pos=tn.nodeValue.indexOf('('),prev=nodes[pi-1];
+      const rm=document.createRange();
+      if(pos>0){if(prev&&isO(prev))rm.setStartBefore(prev);else rm.setStart(tn,0);rm.setEnd(tn,pos)}
+      else if(prev)rm.selectNode(prev);else return;
+      let j=pi+1;const t1=[];
+      while(j<nodes.length&&!isO(nodes[j]))t1.push(nodes[j++]);
+      const t2n=nodes[j+1];if(!t1.length||!t2n||t2n.nodeType!==3)return;
+      const r1=document.createRange();r1.setStartBefore(t1[0]);r1.setEndAfter(t1[t1.length-1]);
+      const r2=document.createRange();r2.setStart(t2n,0);r2.setEnd(t2n,t2n.nodeValue.replace(/\)+$/,'').length);
+      const m=rm.getBoundingClientRect(),a=r1.getBoundingClientRect(),b=r2.getBoundingClientRect();
+      const y=Math.max(m.bottom,a.bottom,b.bottom)-W.top+4,sx=(m.left+m.right)/2-W.left;
+      const e1=(a.left+a.right)/2-W.left,e2=(b.left+b.right)/2-W.left;
+      const p=(ex,d)=>'<path d="M'+sx+' '+y+' C'+sx+' '+(y+d)+' '+ex+' '+(y+d)+' '+ex+' '+(y+5)+'" fill="none" stroke="var(--gold)" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arh)"/>';
+      paths+=p(e1,26)+p(e2,46);
+    });
+    if(!paths)return;
+    const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('class','arw');s.setAttribute('width',W.width);s.setAttribute('height',W.height);
+    s.innerHTML='<defs><marker id="arh" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--gold)"/></marker></defs>'+paths;
+    w.appendChild(s);
+  });
+}
+/* reveal worked steps one at a time */
+function applySteps(){
+  document.querySelectorAll('#ov [data-s]').forEach(e=>e.classList.toggle('hid',+e.dataset.s>=shown));
+  const sc=$('sc');if(sc)sc.textContent='Step '+Math.min(shown,totalSteps)+' of '+totalSteps;
+  const nx=$('nx');if(nx)nx.hidden=shown>=totalSteps;
+  const all=document.querySelector('#ov [data-act=all]');if(all)all.hidden=shown>=totalSteps;
+}
+function nextStep(all){
+  shown=all?totalSteps:Math.min(shown+1,totalSteps);applySteps();
+  const last=document.querySelectorAll('#ov [data-s="'+(shown-1)+'"]');
+  if(last.length&&!all)last[last.length-1].scrollIntoView({block:'nearest',behavior:'smooth'});
+}function alignOps(){
+  drawArrows();
+  document.querySelectorAll('.work .op').forEach(op=>{
+    op.style.transform='';op.style.textAlign='';
+    const left=op.classList.contains('wl');
+    let p=op.previousElementSibling;
+    while(p&&!(p.classList.contains(left?'wl':'wr')&&!p.classList.contains('op')))p=p.previousElementSibling;
+    if(!p)return;
+    const pt=p.textContent,ot=op.textContent,sg=/^[+−]/.test(ot),core=sg?ot.slice(1):ot;
+    if(!core)return;
+    const letters=core.replace(/[0-9.]/g,'');
+    let idx=letters?pt.indexOf(letters):pt.lastIndexOf(core);
+    if(idx<0)return;
+    if(letters)while(idx>0&&/[0-9]/.test(pt[idx-1]))idx--;
+    let signed=false;
+    if(idx>0&&/[+−]/.test(pt[idx-1])){idx--;signed=true}
+    const t=charRect(p,idx);if(!t)return;
+    op.style.textAlign='left';
+    const o=charRect(op,(signed||!sg)?0:1);if(!o)return;
+    op.style.transform='translateX('+(t.left-o.left)+'px)';
+  });
+}
+window.addEventListener('resize',()=>{if(openQ&&revealed)alignOps()});
+try{document.fonts.ready.then(()=>{if(openQ&&revealed)alignOps()})}catch(e){}
+/* a "÷n" step becomes a fraction row built from the row above: 6x/6 = 18/6 */
+function expandWork(rows){
+  const out=[];
+  rows.forEach(r=>{
+    if(r[0]&&r[0][0]==='÷'&&out.length){
+      const d=r[0].slice(1),p=out[out.length-1];
+      out.push(['['+p[0]+'|'+d+']',p[1],'['+p[2]+'|'+d+']',r[3]]);
+    }else if(r[0]&&r[0][0]==='×'&&out.length){
+      const m=r[0].slice(1),p=out[out.length-1];
+      const w=s=>/[+\-]/.test(s)?'('+s+')':s;
+      out.push(['('+m+')'+w(p[0]),p[1],'('+m+')'+w(p[2]),r[3]]);
+    }else out.push(r);
+  });
+  return out;
+}
+function renderAwards(){
+  const {t,i}=openQ, pts=(i+1)*100, aw=cur.aw[key(t,i)]||{};
+  $('aw').innerHTML=cur.teams.map((n,ti)=>{const s=score(cur,ti);
+    return '<div class="t"><div class="tn"><span>'+esc(n)+'</span><span class="'+(s<0?'neg':'')+'">'+s+'</span></div><div class="pm">'+
+    '<button class="btn sm plus" data-act="award" data-i="'+ti+'" data-v="1" aria-pressed="'+(aw[ti]===1)+'" aria-label="Award '+pts+' to '+esc(n)+'">+'+pts+'</button>'+
+    '<button class="btn sm minus" data-act="award" data-i="'+ti+'" data-v="-1" aria-pressed="'+(aw[ti]===-1)+'" aria-label="Deduct '+pts+' from '+esc(n)+'">&minus;'+pts+'</button></div></div>'}).join('');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('input',e=>{
+  const d=e.target.dataset;if(!d||!d.in)return;
+  if(d.in==='name'){home.name=e.target.value;home.msg='';
+    const ex=findKey(home.name||'\u0000');if(armed==='replace'&&!ex){armed=null}}
+  else if(d.in==='team')home.names[+d.i]=e.target.value;
+  else if(d.in==='load')home.loadText=e.target.value;
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&openQ){e.preventDefault();closeQuestion()}
+  else if((e.key==='ArrowRight'||e.key==='ArrowDown')&&openQ&&revealed&&shown<totalSteps&&!/INPUT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();nextStep(false)}
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act, d=b.dataset;
+  switch(a){
+   case 'dec':if(home.n>4){home.n--;renderHome()}break;
+   case 'inc':if(home.n<8){home.n++;renderHome()}break;
+   case 'start':{
+     const name=home.name.trim();if(!name){home.msg='Enter a class name first.';renderHome();break}
+     const ex=findKey(name);
+     if(ex&&!arm('replace'))break;
+     if(ex)delete db.classes[ex];
+     armed=null;
+     const teams=home.names.slice(0,home.n).map((n,i)=>(n.trim()||'Team '+(i+1)));
+     cur={name,teams,adj:teams.map(()=>0),played:{},aw:{},created:Date.now(),updated:Date.now()};
+     db.classes[name]=cur;save();startGame(cur);break}
+   case 'resume':{const c=db.classes[d.n];if(c){c.adj=c.teams.map((_,i)=>+c.adj[i]||0);startGame(c)}break}
+   case 'copy':{
+     const c=db.classes[d.n];if(!c)break;const code=encode(c);
+     const fb=()=>{home.codeFor=d.n;renderHome()};
+     try{navigator.clipboard.writeText(code).then(()=>toast('Code copied'),fb)}catch(x){fb()}break}
+   case 'del':if(arm('del:'+d.n)){delete db.classes[d.n];if(home.codeFor===d.n)home.codeFor=null;save();renderHome();toast('Deleted')}break;
+   case 'load':{
+     let c;try{c=decode(home.loadText)}catch(x){home.msg='That code is not valid. Copy the whole code and try again.';renderHome();break}
+     const ex=findKey(c.name);
+     if(ex&&!arm('loadrep'))break;
+     if(ex)delete db.classes[ex];
+     armed=null;db.classes[c.name]=c;save();home.loadText='';home.msg='';renderHome();toast('Loaded '+c.name);break}
+   case 'adj':cur.adj[+d.i]=(cur.adj[+d.i]||0)+(+d.d);commit();renderScore();break;
+   case 'reset':if(arm('reset')){cur.played={};cur.aw={};cur.adj=cur.teams.map(()=>0);commit();renderGame()}break;
+   case 'exit':commit();closeQuestion();view='home';cur=null;home.codeFor=null;renderHome();window.scrollTo(0,0);break;
+   case 'open':openQuestion(+d.t,+d.i);break;
+   case 'reveal':revealed=true;shown=1;renderOverlay();applySteps();break;
+   case 'next':nextStep(false);break;
+   case 'all':nextStep(true);break;
+   case 'award':{
+     const k=key(openQ.t,openQ.i), ti=+d.i, v=+d.v;
+     const o=cur.aw[k]||(cur.aw[k]={});
+     if(o[ti]===v)delete o[ti];else o[ti]=v;
+     if(!Object.keys(o).length)delete cur.aw[k];
+     commit();renderAwards();renderScore();break}
+   case 'done':cur.played[key(openQ.t,openQ.i)]=1;commit();closeQuestion();renderBoard();break;
+   case 'back':closeQuestion();break;
+  }
+});
+load();renderHome();
+</script>
+
+</body></html>

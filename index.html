@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Class Game Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Math review games for class, organized by unit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: graph-paper stage (matches the black game boards). Header, subject tabs, then one band per unit holding a grid of game cards.
+   Single dark look by choice, so the hub feels like the games it opens. */
+:root{
+  --bg:#050507; --grid:#14141c; --panel:#0e0e14; --panel2:#16161f; --line:#2a2a36;
+  --fg:#f5f5f8; --dim:#a3a3b5; --gold:#ffd23f;
+  --c-red:#ff5a4d; --c-orange:#ff9f1c; --c-green:#3ddc97; --c-cyan:#33d6ff; --c-blue:#3d8bff; --c-violet:#b388ff; --c-pink:#ff4fa8;
+  --display:'Bricolage Grotesque','Arial Rounded MT Bold',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;min-height:100vh;background-color:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;background-position:-1px -1px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 28px}
+.brand{min-width:0}
+.eyebrow{font:600 .78rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
+h1{font:800 clamp(2.4rem,7vw,4.6rem)/.95 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .pt{color:var(--gold)}
+.lead{margin:12px 0 0;color:var(--dim);max-width:52ch;font-size:1.08rem}
+.coord{font:600 .95rem var(--mono);color:var(--dim);border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--panel);white-space:nowrap}
+.coord b{color:var(--gold)}
+
+/* subject tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{font:600 1rem var(--body);color:var(--dim);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:44px}
+.tab:hover{color:var(--fg);border-color:var(--dim)}
+.tab[aria-selected=true]{background:var(--fg);border-color:var(--fg);color:#000}
+
+/* unit bands */
+.units{display:flex;flex-direction:column;gap:40px}
+.unit{display:flex;flex-direction:column;gap:16px}
+.uhead{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;border-bottom:2px solid var(--line);padding-bottom:10px}
+.unum{font:600 .85rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#000;background:var(--uc);border-radius:6px;padding:3px 9px;align-self:center}
+.uhead h2{font:800 clamp(1.4rem,3.2vw,2rem)/1.1 var(--display);margin:0;text-wrap:balance}
+.uhead p{margin:0;color:var(--dim);flex-basis:100%}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:14px}
+
+/* game cards */
+.card{--c:var(--c-cyan);position:relative;display:flex;flex-direction:column;gap:10px;min-width:0;text-decoration:none;
+  background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:18px 18px 16px;transition:transform .14s,border-color .14s,background .14s}
+a.card:hover{transform:translateY(-3px);border-color:var(--c);background:var(--panel2)}
+.card .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.kind{font:600 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.mode{font:500 .78rem var(--body);color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.card h3{font:800 1.45rem/1.1 var(--display);margin:0;color:var(--fg);text-wrap:balance}
+.card p{margin:0;color:var(--dim);font-size:.95rem;flex:1}
+.play{align-self:flex-start;font:700 .95rem var(--body);color:#000;background:var(--c);border-radius:999px;padding:7px 16px}
+.card.soon{border-style:dashed}
+.card.soon .play{background:transparent;color:var(--dim);border:1px dashed var(--line)}
+.card .mark{position:absolute;right:16px;bottom:14px;font:600 .8rem var(--mono);color:var(--line)}
+
+.empty{color:var(--dim);border:2px dashed var(--line);border-radius:18px;padding:22px;text-align:center}
+footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <p class="eyebrow">Pick a game &middot; play with your class</p>
+      <h1>Class Game <span class="pt">Room</span></h1>
+      <p class="lead">Review games for class, sorted by unit. Open the one your teacher names and follow the directions on screen.</p>
+    </div>
+    <div class="coord" aria-hidden="true">you are here <b>(0, 0)</b></div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Subjects"></nav>
+  <main class="units" id="units"></main>
+
+  <footer>Games save progress in the browser you play them in. Tap <b>&larr; All games</b> at the bottom of any game to come back here.</footer>
+</div>
+
+<script>
+/* =====================================================================
+   ADD GAMES HERE.
+   Each subject has units; each unit has games.
+   - file: the game's HTML file inside the games/ folder
+   - kind: short label (Bingo, Jeopardy, Practice, Battleship...)
+   - mode: "Whole class" or "On your own"
+   - color: red | orange | green | cyan | blue | violet | pink
+   - soon: true shows the card greyed out until the file is ready
+   ===================================================================== */
+const SUBJECTS = [
+  { name: 'Math', units: [
+    { num: 'Unit 2', name: 'Equations and Inequalities', blurb: 'Properties of equality, multi-step equations, x on both sides, inequalities.', color: 'orange', games: [
+      { title: 'Unit 2 Jeopardy', kind: 'Jeopardy', mode: 'Whole class', color: 'orange', file: 'unit-2-jeopardy.html',
+        about: 'Team review of review pages 75 to 81: properties, exponents, rearranging, solving and graphing.' },
+      { title: 'Multi-Step Equation Bingo', kind: 'Bingo', mode: 'Whole class', color: 'pink', file: 'multi-step-equation-bingo.html',
+        about: '24 equations with distributing and combining like terms. Solve for x and mark your card.' },
+      { title: 'Halloween Fraction Bingo', kind: 'Bingo', mode: 'Whole class', color: 'violet', file: 'halloween-fraction-bingo.html',
+        about: 'Pick a pumpkin and solve equations with fractions, one step at a time.' },
+      { title: 'Keep It Level', kind: 'Practice', mode: 'On your own', color: 'green', file: 'keep-it-level.html',
+        about: 'Warm-up, guided and practice puzzles for equations with x on both sides.' },
+      { title: 'Balance Scale', kind: 'Practice', mode: 'On your own', color: 'blue', file: 'balance-scale.html',
+        about: 'Take away x boxes and ones from both sides until x is alone. Keep the scale level.' }
+    ]},
+    { num: 'Slope', name: 'Slope and Linear Equations', blurb: 'Finding the slope between two points.', color: 'cyan', games: [
+      { title: 'Battle My Math Ship: Slope', kind: 'Battleship', mode: 'Partners, 2 devices', color: 'cyan', file: 'battle-my-math-ship-slope.html',
+        about: 'Hide 12 ships, then find the slope between two points to fire. One partner hosts and shares a code, the other joins.' }
+    ]}
+  ]}
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let cur = 0;
+try { const t = +localStorage.getItem('cg-tab'); if (SUBJECTS[t]) cur = t; } catch (e) {}
+
+function render(){
+  document.getElementById('tabs').innerHTML = SUBJECTS.map((s, i) =>
+    '<button class="tab" role="tab" id="tab-' + i + '" aria-selected="' + (i === cur) + '" data-i="' + i + '">' + esc(s.name) + '</button>').join('');
+  const units = SUBJECTS[cur].units;
+  document.getElementById('units').innerHTML = units.length ? units.map(u =>
+    '<section class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
+      '<div class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2>' + (u.blurb ? '<p>' + esc(u.blurb) + '</p>' : '') + '</div>' +
+      '<div class="games">' + u.games.map(g => {
+        const inner = '<div class="top"><span class="kind">' + esc(g.kind) + '</span><span class="mode">' + esc(g.mode) + '</span></div>' +
+          '<h3>' + esc(g.title) + '</h3><p>' + esc(g.about) + '</p>' +
+          '<span class="play">' + (g.soon ? 'Coming soon' : 'Play') + '</span>';
+        const st = ' style="--c:var(--c-' + (g.color || 'cyan') + ')"';
+        return g.soon || !g.file ? '<div class="card soon"' + st + '>' + inner + '</div>'
+                                 : '<a class="card" href="games/' + esc(g.file) + '"' + st + '>' + inner + '</a>';
+      }).join('') + '</div>' +
+    '</section>').join('') : '<p class="empty">No games in this subject yet.</p>';
+}
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  cur = +b.dataset.i; try { localStorage.setItem('cg-tab', cur); } catch (err) {}
+  render();
+});
+render();
+</script>
+</body>
+</html>

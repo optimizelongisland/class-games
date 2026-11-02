@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battle My Math Ship: Slope</title>
+<style>
+  :root{
+    --navy:#0b2545; --navy2:#13315c; --gold:#f4a261; --ink:#10223a; --card:#fff; --line:#c5d1de;
+    --hit:#d62828; --miss:#6c7a89; --ship:#13315c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(#0b2545,#134074 60%,#1d5a96);color:var(--ink);min-height:100vh}
+  header{color:#fff;text-align:center;padding:14px 12px 4px}
+  header h1{margin:0;font-size:clamp(1.4rem,4vw,2.2rem);letter-spacing:.04em}
+  header h1 small{font-size:.45em;display:block;letter-spacing:.3em;color:var(--gold)}
+  main{max-width:1000px;margin:0 auto;padding:10px 16px 40px}
+  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.25);margin-bottom:14px}
+  .center{max-width:480px;margin:20px auto}
+  label{font-weight:600;display:block;margin:10px 0 4px}
+  input[type=text]{width:100%;padding:12px;font-size:1.1rem;border:2px solid var(--line);border-radius:10px}
+  input[type=text]:focus{outline:none;border-color:var(--navy2)}
+  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 18px;background:var(--navy2);color:#fff;cursor:pointer}
+  button:hover:not(:disabled){background:var(--navy)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.alt{background:var(--gold);color:#3b1f00}
+  button.ghost{background:#e7edf3;color:var(--ink)}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>*{flex:1}
+  .or{text-align:center;color:#667;margin:14px 0 4px;font-weight:600}
+  .code{font-size:3rem;letter-spacing:.3em;font-weight:800;text-align:center;color:var(--navy2);background:#eef2f7;border-radius:12px;padding:10px 0 10px .3em;margin:10px 0}
+  .banner{border-radius:12px;padding:12px 16px;font-weight:700;text-align:center;font-size:1.15rem}
+  .banner.you{background:#d8f3dc;color:#14532d}
+  .banner.opp{background:#fff3cd;color:#664d03}
+  .banner.over{background:var(--navy2);color:#fff}
+  .eventline{color:#fff;text-align:center;min-height:1.4em;margin:8px 0 10px;font-size:.95rem;opacity:.95}
+  .score{display:flex;justify-content:center;gap:10px;margin-bottom:10px;color:#fff;font-weight:700}
+  .score div{background:rgba(255,255,255,.14);border-radius:10px;padding:6px 16px;text-align:center;min-width:140px}
+  .score span{font-size:1.5rem;margin-right:6px}
+  .score small{display:block;font-weight:600;opacity:.85}
+
+  .stage{display:grid;grid-template-columns:1fr 170px;gap:14px;align-items:start}
+  .side{display:flex;flex-direction:column;gap:10px;position:sticky;top:12px}
+  .side button{width:100%;padding:16px 10px;font-size:1.05rem;position:relative;line-height:1.25}
+  .side .dot{position:absolute;top:-8px;right:-8px;background:var(--hit);color:#fff;border-radius:999px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.8rem;padding:0 6px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+  @media (max-width:800px){.stage{grid-template-columns:1fr}.side{order:-1;position:static}}
+
+  h2{margin:0 0 2px;font-size:1.3rem}
+  .sub{margin:0 0 10px;font-size:.92rem;color:#52627a}
+  .boardwrap{overflow-x:auto;container-type:inline-size}
+  table.grid{width:100%;min-width:700px;border-collapse:collapse;table-layout:fixed}
+  .grid th{background:#dfe5ec;font-weight:700;padding:6px 2px;border:1px solid #9aa8b8;font-size:.95rem}
+  .grid th:first-child{width:38px}
+  .grid td{border:1px solid #9aa8b8;text-align:center;padding:2px;height:76px;position:relative;background:#fff}
+  .cin{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:2px}
+  .t{white-space:nowrap;font-size:clamp(11px,1.8cqw,17px);line-height:1.2}
+  .slot svg{display:block;width:52px;height:29px;color:var(--ship)}
+  .slot:empty{display:none}
+  .grid td.hit{background:#fde0e0}
+  .grid td.hit .slot svg{color:var(--hit)}
+  .grid td.miss{background:#e4e8ec;color:#8a96a3}
+  .grid td.pending{background:#e3f0ff}
+  .grid td.pending .mark{color:#2b6cb0}
+  .mark{position:absolute;top:2px;left:5px;font-size:.78rem;font-weight:800;pointer-events:none}
+  .grid td.hit .mark{color:var(--hit)}
+  .grid td.miss .mark{color:var(--miss)}
+  .grid.pickable td{cursor:pointer}
+  .grid.atk td.pick{cursor:pointer}
+  .grid.atk td.pick:hover{background:#fff3cd}
+  .grid td.sel{outline:3px solid var(--gold);outline-offset:-3px;background:#fff3cd}
+  .grid.setup td:hover{background:#eef4fb}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;margin-top:8px;color:#52627a;align-items:center}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+  .legend svg{width:26px;height:14px;vertical-align:-3px;margin-right:4px}
+
+  .ask{background:#fffaf0;border:2px solid var(--gold);border-radius:12px;padding:14px;margin-top:12px}
+  .ask .q{font-size:1.25rem;font-weight:700;margin:4px 0 8px}
+  .msg{margin-top:8px;font-weight:700}
+  .msg.bad{color:var(--hit)} .msg.good{color:#14532d}
+  .hint{font-size:.85rem;color:#52627a;margin-top:6px}
+  .hidden{display:none !important}
+  .big{font-size:2.2rem;font-weight:800;text-align:center;margin:6px 0}
+  .endrow{text-align:center;margin-top:6px}
+  .endrow button{background:transparent;color:#cfe0f3;text-decoration:underline;font-weight:600;padding:8px}
+  .endrow button:hover:not(:disabled){background:transparent;color:#fff}
+
+  /* HIT / MISS pop-up animation */
+  .fx{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,15,30,.55);animation:fxin .2s ease-out}
+  .fx.out{opacity:0;transition:opacity .35s}
+  .fxbox{position:relative;text-align:center;width:min(86vw,420px)}
+  .fxword{font-size:clamp(3.5rem,16vw,6.5rem);font-weight:900;letter-spacing:.06em;color:#fff;text-shadow:0 4px 0 var(--hit),0 0 30px rgba(255,120,40,.9);animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+  .fxsub{color:#fff;font-weight:700;font-size:1.2rem;margin-top:4px;animation:pop .5s .15s both}
+  .fxship{width:min(70vw,300px);height:auto;margin:0 auto;display:block;color:var(--hit);animation:sink 1.7s ease-in both;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+  .fxwave{width:min(86vw,420px);height:34px;margin-top:-26px;color:#4aa3e0;position:relative}
+  .boom{position:absolute;left:50%;top:38%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffd166 30%,#ef476f 60%,rgba(239,71,111,0) 72%);animation:boom .9s ease-out both}
+  .fx.miss .fxword{text-shadow:0 4px 0 #3a6ea5,0 0 30px rgba(120,190,255,.9)}
+  .fx.miss .fxship{display:none}
+  .drop{font-size:5rem;animation:drop .9s ease-in both}
+  @keyframes fxin{from{opacity:0}to{opacity:1}}
+  @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes boom{0%{transform:scale(.2);opacity:1}100%{transform:scale(7);opacity:0}}
+  @keyframes sink{0%{transform:translateY(0) rotate(0)}25%{transform:translateY(-6px) rotate(-3deg)}100%{transform:translateY(55px) rotate(16deg);opacity:.15}}
+  @keyframes drop{0%{transform:translateY(-70px);opacity:0}70%{transform:translateY(0);opacity:1}100%{transform:translateY(0) scale(1.1);opacity:.8}}
+
+  /* how-to-play card */
+  #howModal{z-index:60}
+  #howModal .modal{max-width:520px}
+  .howlist{list-style:none;margin:12px 0 16px;padding:0;display:grid;gap:10px}
+  .howlist li{display:flex;gap:14px;align-items:center;font-size:1.08rem;background:#eef4fb;border-radius:12px;padding:10px 14px}
+  .howlist .n{flex:0 0 38px;height:38px;border-radius:50%;background:var(--navy2);color:#fff;font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+  #btnHow{position:fixed;top:12px;right:12px;width:42px;height:42px;border-radius:50%;padding:0;font-size:1.25rem;background:var(--gold);color:#3b1f00;z-index:20}
+  #btnGot{width:100%;padding:14px;font-size:1.15rem}
+
+  /* ship placement pop-up */
+  .backdrop{position:fixed;inset:0;background:rgba(5,15,30,.72);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
+  .modal{background:#fff;border-radius:16px;width:100%;max-width:880px;max-height:96vh;overflow:auto;padding:20px}
+  .modal h2{font-size:1.5rem}
+  .steps{margin:6px 0 12px;padding:10px 14px;background:#eef4fb;border-radius:10px;font-size:1rem}
+  .counter{font-weight:800;font-size:1.2rem}
+  .modal .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .modal .foot button{padding:14px 28px;font-size:1.1rem}
+</style>
+</head>
+<body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+
+<!-- ship icon used everywhere -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ship" viewBox="0 0 100 56">
+    <path d="M44 3 L62 5 L63 16 L44 13 Z" fill="currentColor"/>
+    <path d="M27 12 L77 19 L79 29 L27 23 Z" fill="currentColor"/>
+    <path d="M3 22 L98 31 L98 40 L90 48 L26 48 Z" fill="currentColor"/>
+    <circle cx="35" cy="34" r="2.6" fill="#fff"/><circle cx="47" cy="35" r="2.6" fill="#fff"/>
+    <circle cx="59" cy="36" r="2.6" fill="#fff"/><circle cx="71" cy="37" r="2.6" fill="#fff"/><circle cx="83" cy="38" r="2.6" fill="#fff"/>
+    <path d="M0 52 q7 -6 14 0 t14 0 t14 0 t14 0 t14 0 t14 0 t14 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+</svg>
+
+<header><h1><small>BATTLE MY MATH SHIP</small>SLOPE</h1></header>
+<main>
+
+<!-- LOBBY -->
+<section id="lobby" class="card center">
+  <label for="name">Your name</label>
+  <input id="name" type="text" maxlength="20" placeholder="First name" autocomplete="off">
+  <div class="or">Start a new game</div>
+  <button id="btnCreate" style="width:100%">Create game (you are Player 1)</button>
+  <div class="or">or join your partner</div>
+  <div class="row">
+    <input id="joinCode" type="text" maxlength="4" placeholder="Game code" style="text-transform:uppercase;letter-spacing:.2em;text-align:center" autocomplete="off">
+    <button id="btnJoin" class="alt" style="flex:0 0 auto">Join (Player 2)</button>
+  </div>
+  <p id="lobbyMsg" class="msg bad"></p>
+  <p class="hint">One partner creates the game and tells the other the 4-letter code. Both players need internet access.</p>
+</section>
+
+<!-- WAITING FOR PARTNER -->
+<section id="waiting" class="card center hidden">
+  <h2 style="text-align:center">Share this code with your partner</h2>
+  <div class="code" id="gameCode">----</div>
+  <p style="text-align:center">Waiting for your partner to join…</p>
+</section>
+
+<!-- GAME -->
+<section id="game" class="hidden">
+  <div class="score">
+    <div><span id="myScore">0</span><small id="myNameLbl">You</small></div>
+    <div><span id="oppScore">0</span><small id="oppNameLbl">Partner</small></div>
+  </div>
+  <div id="banner" class="banner"></div>
+  <div id="eventline" class="eventline"></div>
+
+  <div class="stage">
+    <div>
+      <!-- ATTACK VIEW -->
+      <div id="attackView" class="card">
+        <h2>Attack Board</h2>
+        <p class="sub">Click a square, then find the slope between the two points.</p>
+        <div class="boardwrap"><table class="grid atk" id="atkGrid"></table></div>
+        <div class="legend">
+          <span><svg style="color:var(--hit)"><use href="#ship"/></svg>Ship sunk</span>
+          <span><i style="background:#e4e8ec"></i>Missed</span>
+        </div>
+        <div id="ask" class="ask hidden">
+          <div>Attacking square <b id="askCell"></b></div>
+          <div class="q" id="askQ"></div>
+          <div class="row">
+            <input id="answer" type="text" placeholder="slope, e.g. -3/4, 2, 0 or undefined" autocomplete="off">
+            <button id="btnFire" style="flex:0 0 auto">Fire!</button>
+          </div>
+          <div class="hint">slope = (y₂ − y₁) / (x₂ − x₁). Write fractions like 3/4. Type <b>undefined</b> if there is no slope.</div>
+          <div id="askMsg" class="msg"></div>
+        </div>
+        <div id="result" class="msg"></div>
+      </div>
+
+      <!-- FLEET VIEW -->
+      <div id="fleetView" class="card hidden">
+        <h2>My Fleet Board <span id="boardTag" style="font-weight:500;font-size:.9rem;color:#52627a"></span></h2>
+        <p class="sub">Your ships are hidden here. Your partner's shots show up on this board.</p>
+        <div class="boardwrap"><table class="grid mine" id="myGrid"></table></div>
+        <div class="legend">
+          <span><svg style="color:var(--ship)"><use href="#ship"/></svg>Your ship</span>
+          <span><svg style="color:var(--hit)"><use href="#ship"/></svg>Ship hit</span>
+          <span><i style="background:#e4e8ec"></i>Shot missed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <button id="btnSwitch" class="alt"></button>
+    </div>
+  </div>
+
+  <div class="endrow"><button id="btnEnd">End game now (most ships sunk wins)</button></div>
+</section>
+
+<!-- SHIP PLACEMENT POP-UP -->
+<div id="setupModal" class="backdrop hidden">
+  <div class="modal">
+    <h2>Place your 12 battleships</h2>
+    <div class="steps">
+      <b>1.</b> Click a square to hide a ship there. Click it again to take it off.<br>
+      <b>2.</b> When you have placed <b>12</b> ships, click <b>Done</b>.
+    </div>
+    <div class="boardwrap"><table class="grid setup" id="setupGrid"></table></div>
+    <div class="foot">
+      <div class="counter"><span id="shipCount">0</span> of 12 ships placed</div>
+      <button id="btnReady" disabled>Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO PLAY -->
+<button id="btnHow" class="hidden" title="How to play" aria-label="How to play">?</button>
+<div id="howModal" class="backdrop hidden">
+  <div class="modal">
+    <h2>How to play</h2>
+    <ol class="howlist">
+      <li><span class="n">1</span><span><b>Hide your ships.</b> Place 12 ships on your Fleet Board.</span></li>
+      <li><span class="n">2</span><span><b>Attack at the same time!</b> No waiting for turns. Click a square on the Attack Board and find the slope between the two points.</span></li>
+      <li><span class="n">3</span><span><b>Type your answer, then click Fire.</b> Correct answer = your shot is fired. Wrong answer = wait 20 seconds, then try again.</span></li>
+      <li><span class="n">4</span><span><b>Be the first to sink all 12 ships to win!</b></span></li>
+    </ol>
+    <button id="btnGot">Got it!</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<section id="over" class="card center hidden">
+  <div id="overTitle" class="big"></div>
+  <p id="overDetail" style="text-align:center;font-size:1.1rem"></p>
+  <button id="btnAgain" style="width:100%">Back to start</button>
+</section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script>
+/* ===== Question data (from the Algebra and Beyond worksheet) =====
+   board: slope values hidden under each player's ships.
+   attack: point pairs; the slope of a pair equals the OPPONENT's board value in that square. */
+const COLS = ["A","B","C","D","E"];
+const DATA = {
+  p1: {
+    board: [
+      ["-2","7/3","0","undefined","-1"],
+      ["1/7","1","-1/2","-2/3","3"],
+      ["4","2","2/3","-5","-6"],
+      ["-5/4","-3","1/4","1/2","5/7"],
+      ["4/11","-3/8","3/4","-8","3/2"]],
+    attack: [
+      [[-6,2,3,-1],[2,0,3,2],[-2,-2,3,0],[-3,-3,2,2],[1,4,9,6]],
+      [[0,0,2,7],[-5,-4,-3,10],[-1,3,3,-2],[7,-4,7,-8],[0,4,3,-2]],
+      [[2,4,7,5],[2,6,3,-4],[5,6,6,-1],[3,4,5,3],[-5,3,0,6]],
+      [[3,2,9,-4],[-3,-1,6,-4],[-3,1,3,5],[-5,1,5,-3],[-2,4,4,4]],
+      [[-1,4,1,-2],[4,3,8,4],[0,0,3,30],[-4,8,-3,-6],[-8,3,8,-3]]]
+  },
+  p2: {
+    board: [
+      ["-1/3","2","2/5","1","1/4"],
+      ["7/2","7","-5/4","undefined","-2"],
+      ["1/5","-10","-7","-1/2","3/5"],
+      ["-1","-1/3","2/3","-2/5","0"],
+      ["-3","1/4","10","-14","-3/8"]],
+    attack: [
+      [[3,-6,4,-8],[-6,-6,-3,1],[-9,1,5,1],[-5,4,-5,-7],[1,-3,3,-5]],
+      [[-10,-4,-3,-3],[2,4,3,5],[-6,4,2,0],[-3,4,3,0],[-1,-5,2,4]],
+      [[1,2,2,6],[4,-7,9,3],[-7,-1,5,7],[-4,18,3,-17],[0,13,4,-11]],
+      [[-3,7,1,2],[-10,33,-2,9],[-4,7,0,8],[2,-1,8,2],[2,2,9,7]],
+      [[-9,-8,2,-4],[-5,-4,3,-7],[0,-2,4,1],[0,12,1,4],[12,5,18,14]]]
+  }
+};
+
+/* ===== Slope helpers ===== */
+const SHIPS = 12;
+function trueSlope(q){ // q = [x1,y1,x2,y2] -> {n,d} reduced, or null if undefined
+  const dx=q[2]-q[0], dy=q[3]-q[1];
+  if(dx===0) return null;
+  const g=gcd(Math.abs(dy),Math.abs(dx))||1;
+  let n=dy/g,d=dx/g; if(d<0){n=-n;d=-d;}
+  return {n,d};
+}
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function parseAnswer(s){ // -> 'undef' | {n,d} | {dec} | null (unparseable)
+  s=String(s).toLowerCase().replace(/[−–]/g,"-").replace(/\s+/g,"").replace(/^m=/,"");
+  if(!s) return null;
+  if(/^(undefined|undef|und|dne|nope|noslope)$/.test(s)) return "undef";
+  let m=s.match(/^(-?\d+)\/(-?\d+)$/);
+  if(m){ let n=+m[1],d=+m[2]; if(d===0) return "undef"; if(d<0){n=-n;d=-d;} return {n,d}; }
+  if(/^-?\d+(\.\d+)?$/.test(s)){ return {dec:parseFloat(s)}; }
+  return null;
+}
+function isCorrect(input,q){
+  const a=parseAnswer(input), t=trueSlope(q);
+  if(a===null) return false;
+  if(t===null) return a==="undef";
+  if(a==="undef") return false;
+  if(a.dec!==undefined){ const diff=Math.abs(a.dec - t.n/t.d), places=(String(a.dec).split(".")[1]||"").length; return diff<1e-9 || (places>=2 && diff<0.005); }
+  return a.n*t.d===t.n*a.d;
+}
+function fmtPt(x,y){return "("+x+", "+y+")";}
+
+/* ===== State ===== */
+const $=id=>document.getElementById(id);
+let peer=null, conn=null, isHost=false, myName="", oppName="Partner";
+let myData=null, atkData=null;
+let ships=new Set(), incoming=new Map();      // incoming: cell -> 'hit'|'miss' (partner's shots at me)
+let outgoing=new Map();                       // cell -> 'hit'|'miss' (my shots)
+let myReady=false, oppReady=false, phase="lobby", selected=null, finished=false;
+let pending=new Set();                        // shots I fired that are waiting for the result
+let view="attack", notice=0;                  // notice = news waiting on the other board
+
+function show(id){ ["lobby","waiting","game","over"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); }
+function event(t){ $("eventline").textContent=t; }
+function send(o){ if(conn&&conn.open) conn.send(o); }
+const cellId=(r,c)=>COLS[c]+(r+1);
+const SHIP='<svg viewBox="0 0 100 56"><use href="#ship"/></svg>';
+
+/* ===== Lobby / connection ===== */
+function randCode(){ const L="ABCDEFGHJKMNPQRSTUVWXYZ"; let s=""; for(let i=0;i<4;i++) s+=L[Math.floor(Math.random()*L.length)]; return s; }
+const PREFIX="slope-bms-";
+function needName(){ myName=$("name").value.trim(); if(!myName){ $("lobbyMsg").textContent="Please type your name first."; return false;} $("lobbyMsg").textContent=""; return true; }
+
+$("btnCreate").onclick=()=>{
+  if(!needName()) return;
+  isHost=true; createPeer(randCode());
+};
+function createPeer(code){
+  $("lobbyMsg").textContent="Connecting…";
+  peer=new Peer(PREFIX+code);
+  peer.on("open",()=>{ $("gameCode").textContent=code; $("lobbyMsg").textContent=""; show("waiting"); });
+  peer.on("error",e=>{
+    if(e.type==="unavailable-id"){ createPeer(randCode()); return; }
+    $("lobbyMsg").textContent="Could not connect ("+e.type+"). Check your internet and try again."; show("lobby");
+  });
+  peer.on("connection",c=>{
+    if(conn&&conn.open){ c.close(); return; }
+    conn=c; wire();
+  });
+}
+$("btnJoin").onclick=()=>{
+  if(!needName()) return;
+  const code=$("joinCode").value.trim().toUpperCase();
+  if(code.length!==4){ $("lobbyMsg").textContent="Enter the 4-letter code."; return; }
+  isHost=false; $("lobbyMsg").textContent="Connecting…";
+  peer=new Peer();
+  peer.on("error",e=>{
+    $("lobbyMsg").textContent = e.type==="peer-unavailable" ? "No game found with that code. Check the letters." : "Connection problem ("+e.type+").";
+  });
+  peer.on("open",()=>{
+    conn=peer.connect(PREFIX+code,{reliable:true});
+    wire();
+  });
+};
+function wire(){
+  conn.on("open",()=>{ send({t:"hello",name:myName}); });
+  conn.on("data",onMsg);
+  conn.on("close",()=>{
+    if(finished) return;
+    $("setupModal").classList.add("hidden");
+    banner("over","Your partner disconnected."); event(""); $("btnEnd").disabled=true; phase="over"; renderAll();
+  });
+}
+
+/* ===== Messages ===== */
+function onMsg(m){
+  switch(m.t){
+    case "hello": oppName=m.name||"Partner"; beginGame(); break;
+    case "ready": oppReady=true; maybeStart(); break;
+    case "go": startPlay(); break;
+    case "attack": handleAttack(m.cell); break;
+    case "result": handleResult(m); break;
+    case "end": finish("ended"); break;
+  }
+}
+
+/* ===== Game setup ===== */
+function beginGame(){
+  if(phase!=="lobby") return;
+  myData = isHost ? DATA.p1 : DATA.p2;
+  atkData = isHost ? DATA.p1.attack : DATA.p2.attack;
+  $("myNameLbl").textContent=myName; $("oppNameLbl").textContent=oppName;
+  $("boardTag").textContent="(Player "+(isHost?"1":"2")+")";
+  buildGrid($("setupGrid"),"s"); buildGrid($("myGrid"),"m"); buildGrid($("atkGrid"),"a");
+  phase="setup"; show("game"); setView("fleet");
+  $("setupModal").classList.remove("hidden");
+  $("howModal").classList.remove("hidden"); $("btnHow").classList.remove("hidden");
+  banner("opp","Get ready: hide your ships!");
+  renderAll();
+}
+function buildGrid(t,prefix){
+  t.innerHTML="<tr><th></th>"+COLS.map(c=>"<th>"+c+"</th>").join("")+"</tr>";
+  for(let r=0;r<5;r++){
+    const tr=document.createElement("tr"); tr.innerHTML="<th>"+(r+1)+"</th>";
+    for(let c=0;c<5;c++){
+      const id=cellId(r,c), td=document.createElement("td"); td.id=prefix+id;
+      let txt;
+      if(prefix==="a"){ const q=atkData[r][c]; txt=fmtPt(q[0],q[1])+" and "+fmtPt(q[2],q[3]); }
+      else txt="m = "+myData.board[r][c];
+      td.innerHTML='<div class="cin"><div class="slot"></div><span class="t">'+txt+'</span></div>';
+      if(prefix==="s") td.onclick=()=>toggleShip(id);
+      if(prefix==="a") td.onclick=()=>pickCell(id,r,c);
+      tr.appendChild(td);
+    }
+    t.appendChild(tr);
+  }
+}
+function toggleShip(id){
+  if(phase!=="setup"||myReady) return;
+  if(ships.has(id)) ships.delete(id); else if(ships.size<SHIPS) ships.add(id);
+  renderAll();
+}
+$("btnReady").onclick=()=>{
+  if(ships.size!==SHIPS||myReady) return;
+  myReady=true; $("setupModal").classList.add("hidden");
+  banner("opp", oppReady ? "Starting…" : "Waiting for "+oppName+" to place their ships…");
+  send({t:"ready"}); maybeStart();
+};
+function maybeStart(){
+  if(myReady&&oppReady&&isHost){
+    send({t:"go"}); startPlay();
+  }
+}
+function startPlay(){
+  phase="play"; setView("attack");
+  banner("you","Battle! Sink all "+SHIPS+" of "+oppName+"'s ships first!");
+  event("You both attack at the same time. Go!");
+  renderAll();
+}
+
+$("btnGot").onclick=()=>$("howModal").classList.add("hidden");
+$("btnHow").onclick=()=>$("howModal").classList.remove("hidden");
+
+/* ===== Switching between the two boards ===== */
+function setView(v){
+  view=v; notice=0;
+  $("attackView").classList.toggle("hidden",v!=="attack");
+  $("fleetView").classList.toggle("hidden",v!=="fleet");
+  renderSwitch();
+}
+function renderSwitch(){
+  const b=$("btnSwitch");
+  b.innerHTML=(view==="attack"?"Show My Fleet Board":"Show Attack Board")+" ➜"+(notice?'<span class="dot">!</span>':"");
+}
+$("btnSwitch").onclick=()=>{ setView(view==="attack"?"fleet":"attack"); };
+function news(forView){ if(view!==forView){ notice=1; renderSwitch(); } }
+
+/* ===== Attacking (both players at once) ===== */
+function banner(kind,text){ const b=$("banner"); b.className="banner "+kind; b.textContent=text; }
+function pickCell(id,r,c){
+  if(phase!=="play"||outgoing.has(id)||pending.has(id)) return;
+  selected={id,r,c}; $("askCell").textContent=id;
+  const q=atkData[r][c];
+  $("askQ").textContent="Slope through "+fmtPt(q[0],q[1])+" and "+fmtPt(q[2],q[3]);
+  $("answer").value=""; $("askMsg").textContent=""; $("ask").classList.remove("hidden"); $("answer").focus();
+  renderAll();
+}
+$("btnFire").onclick=fire;
+$("answer").addEventListener("keydown",e=>{ if(e.key==="Enter") fire(); });
+const LOCK_MS=20000; let lockUntil=0;
+function startLock(){
+  const tick=()=>{
+    const s=Math.ceil((lockUntil-Date.now())/1000);
+    if(s>0 && phase==="play"){
+      $("askMsg").className="msg bad"; $("askMsg").textContent="Not quite. Check your work, then try again in "+s+"…";
+      $("btnFire").disabled=true; setTimeout(tick,250);
+    } else { $("btnFire").disabled=false; $("askMsg").className="msg"; $("askMsg").textContent="Ready. Try again!"; }
+  };
+  tick();
+}
+function fire(){
+  if(!selected||phase!=="play"||Date.now()<lockUntil) return;
+  const {id,r,c}=selected, q=atkData[r][c], txt=$("answer").value;
+  if(parseAnswer(txt)===null){ $("askMsg").className="msg bad"; $("askMsg").textContent="Type a number, a fraction like 3/4, or the word undefined."; return; }
+  if(isCorrect(txt,q)){
+    pending.add(id); $("ask").classList.add("hidden"); selected=null;
+    $("result").className="msg good"; $("result").textContent="Correct! Fired at "+id+". Pick your next square!";
+    send({t:"attack",cell:id});
+  } else {
+    lockUntil=Date.now()+LOCK_MS; $("answer").value=""; startLock();
+  }
+  renderAll();
+}
+function handleAttack(id){
+  const hit=ships.has(id);
+  incoming.set(id,hit?"hit":"miss");
+  const lost = hitsOnMe()>=SHIPS;
+  send({t:"result",cell:id,hit,gameOver:lost});
+  event(oppName+" attacked "+id+(hit?" and HIT one of your ships!":" and missed."));
+  news("fleet");
+  if(lost) finish("lost");
+  renderAll();
+}
+function showFx(hit,cell){
+  const old=document.querySelector(".fx"); if(old) old.remove();
+  const d=document.createElement("div"); d.className="fx"+(hit?"":" miss");
+  d.innerHTML='<div class="fxbox">'+
+    (hit?'<div class="boom"></div>':'<div class="drop">💧</div>')+
+    '<svg class="fxship" viewBox="0 0 100 56"><use href="#ship"/></svg>'+
+    '<svg class="fxwave" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M0 6 q6.25 -8 12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 V12 H0 Z" fill="currentColor"/></svg>'+
+    '<div class="fxword">'+(hit?"HIT!":"MISS")+'</div>'+
+    '<div class="fxsub">'+(hit?"You sunk a battleship at "+cell+"!":"Nothing at "+cell+". Splash!")+'</div></div>';
+  const close=()=>{ d.classList.add("out"); setTimeout(()=>d.remove(),350); };
+  d.onclick=close; document.body.appendChild(d); setTimeout(close,hit?2200:1400);
+}
+function handleResult(m){
+  pending.delete(m.cell);
+  outgoing.set(m.cell,m.hit?"hit":"miss");
+  if(!finished) showFx(m.hit,m.cell);
+  $("result").className="msg "+(m.hit?"good":"");
+  $("result").textContent = m.hit ? "HIT! You sunk a battleship at "+m.cell+"!" : "Miss at "+m.cell+".";
+  if(m.gameOver) finish("won");
+  renderAll();
+}
+const hitsOnMe=()=>[...incoming.values()].filter(v=>v==="hit").length;
+const myHits=()=>[...outgoing.values()].filter(v=>v==="hit").length;
+
+/* ===== Rendering ===== */
+function paint(td,st,hasShip,pick,sel){
+  td.className=(st?st+" ":"")+(pick?"pick ":"")+(sel?"sel ":"");
+  const slot=td.querySelector(".slot"); slot.innerHTML = hasShip ? SHIP : "";
+  let mark=td.querySelector(".mark"); if(mark) mark.remove();
+  if(st){ mark=document.createElement("span"); mark.className="mark"; mark.textContent=st==="hit"?"HIT":st==="pending"?"FIRED":"MISS"; td.appendChild(mark); }
+}
+function renderAll(){
+  if(!$("myGrid").rows.length) return;
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++){
+    const id=cellId(r,c), st=incoming.get(id);
+    paint($("s"+id),null,ships.has(id),false,false);
+    paint($("m"+id),st,ships.has(id),false,false);
+    const ao=outgoing.get(id)||(pending.has(id)?"pending":undefined);
+    paint($("a"+id),ao,ao==="hit",!ao&&phase==="play",selected&&selected.id===id);
+  }
+  $("shipCount").textContent=ships.size;
+  $("btnReady").disabled=myReady||ships.size!==SHIPS;
+  $("myScore").textContent=myHits(); $("oppScore").textContent=hitsOnMe();
+}
+
+/* ===== Ending ===== */
+$("btnEnd").onclick=()=>{
+  if(!confirm("End the game now? The player who sunk the most ships wins.")) return;
+  send({t:"end"}); finish("ended");
+};
+function finish(why){
+  if(finished) return; finished=true; phase="over";
+  $("setupModal").classList.add("hidden"); $("howModal").classList.add("hidden"); $("btnHow").classList.add("hidden");
+  $("ask").classList.add("hidden"); selected=null;
+  renderAll(); banner("over","Game over");
+  // wait a moment so any shot still in flight is counted (both players can finish at nearly the same time)
+  setTimeout(()=>{
+    const mine=myHits(), theirs=hitsOnMe();
+    let title;
+    if(mine>=SHIPS && theirs>=SHIPS) title="It's a tie! You both sunk every ship!";
+    else if(mine>=SHIPS) title="🎉 You win! You sunk all "+SHIPS+" ships!";
+    else if(theirs>=SHIPS) title="Your whole fleet was sunk. "+oppName+" wins!";
+    else title = mine>theirs ? "🎉 You win!" : mine<theirs ? oppName+" wins!" : "It's a tie!";
+    $("overTitle").textContent=title;
+    $("overDetail").textContent=myName+": "+mine+" ships sunk   |   "+oppName+": "+theirs+" ships sunk";
+    renderAll(); show("over");
+  }, why==="won"?2400:1500);
+}
+$("btnAgain").onclick=()=>location.reload();
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+<title>Halloween Fraction Bingo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=IBM+Plex+Mono:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: night-sky stage with a pumpkin patch of 26 numbered pumpkins; tapping one opens a question that is worked out one step per click, then the pumpkin vanishes like a ghost. Single dark Halloween look by design. */
+:root{
+  --bg:#0a0612; --bg2:#1a0b2e; --fg:#f4efe4; --muted:#a79bbf; --panel:#150d24; --line:#3a2a5a; --ink:#120a1c;
+  --orange:#ff7a00; --purple:#9b5cff; --lime:#8be04a; --bone:#f4efe4; --blood:#ff3b6b;
+  --display:'Creepster','Bricolage Grotesque',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);background-image:radial-gradient(1200px 500px at 85% -10%,#3b1670 0%,transparent 60%),radial-gradient(900px 500px at 0% 110%,#2a0f45 0%,transparent 60%);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:10px 24px;min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+@media (min-width:700px){.sub{display:none}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,4.8vw,3.1rem);line-height:1;margin:0;color:var(--orange);letter-spacing:.02em;text-shadow:0 0 22px rgba(255,122,0,.45);text-wrap:balance}
+h1 small{display:inline;margin-left:.45em;font-size:.42em;color:var(--purple);text-shadow:0 0 16px rgba(155,92,255,.5);letter-spacing:.08em;margin-top:2px}
+.sub{margin:8px 0 0;color:var(--muted)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 14px;font-weight:600;font-size:.9rem}
+.ghost:hover{color:var(--fg);border-color:var(--muted)}
+.left{color:var(--muted);font-variant-numeric:tabular-nums}
+.moon{position:fixed;right:2.5vw;top:74px;width:clamp(46px,7vw,92px);opacity:.9;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1}
+
+/* patch */
+.patch{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(6px,1.4vw,16px);width:min(100%,calc((100vh - 128px) * 1.04));margin:0 auto}
+.pk{position:relative;aspect-ratio:1/.95;border:0;background:transparent;padding:0;color:var(--pc);container-type:inline-size;transition:transform .15s,opacity 1s ease,filter .15s}
+.pk svg{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 8px 12px rgba(0,0,0,.65))}
+.pk .face{filter:drop-shadow(0 0 3px var(--glow)) drop-shadow(0 0 7px var(--glow));animation:flick 3.4s infinite;animation-delay:var(--fd)}
+@keyframes flick{0%,100%{opacity:1}6%{opacity:.78}9%{opacity:1}44%{opacity:.9}47%{opacity:.7}50%{opacity:1}78%{opacity:.85}}
+.pk span{position:absolute;left:0;right:0;top:61%;transform:translateY(-50%);text-align:center;font:400 max(1.4rem,30cqw)/1 var(--display);color:var(--ink);letter-spacing:.03em;text-shadow:0 0 .12em rgba(255,255,255,.18)}
+.pk:hover{transform:translateY(-6px) rotate(-3deg) scale(1.03);filter:brightness(1.15)}
+.pk:hover .face{animation-duration:.9s}
+.pk.gone{opacity:0;pointer-events:none;transform:translateY(-34px) scale(.8) rotate(8deg);visibility:hidden;transition:opacity 1s ease,transform 1s ease,visibility 0s 1s}
+.fog{position:fixed;left:-20%;width:140%;height:34vh;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 60%,rgba(150,120,200,.20),transparent 60%),radial-gradient(ellipse at 75% 40%,rgba(120,200,140,.12),transparent 60%);filter:blur(18px);animation:drift 38s linear infinite alternate}
+.fog.f1{bottom:0}.fog.f2{bottom:12vh;animation-duration:55s;animation-direction:alternate-reverse;opacity:.7}
+@keyframes drift{from{transform:translateX(-6%)}to{transform:translateX(6%)}}
+.grave{position:fixed;left:0;bottom:0;width:100%;height:16vh;min-height:90px;pointer-events:none;z-index:0}
+.web{position:fixed;left:0;top:0;width:clamp(90px,16vw,200px);opacity:.55;pointer-events:none;z-index:0}
+.bat{position:fixed;top:12vh;left:-80px;width:56px;pointer-events:none;z-index:0;fill:#05030a;animation:fly 24s linear infinite}
+.bat.b2{top:26vh;width:38px;animation-duration:31s;animation-delay:-11s}
+.bat.b3{top:7vh;width:46px;animation-duration:38s;animation-delay:-22s}
+@keyframes fly{0%{transform:translate(0,0) scaleY(1)}12%{transform:translate(14vw,-18px) scaleY(.6)}25%{transform:translate(28vw,10px) scaleY(1)}37%{transform:translate(42vw,-22px) scaleY(.6)}50%{transform:translate(56vw,8px) scaleY(1)}62%{transform:translate(70vw,-16px) scaleY(.6)}75%{transform:translate(84vw,12px) scaleY(1)}100%{transform:translate(112vw,-10px) scaleY(.8)}}
+
+/* question */
+.q{display:flex;flex-direction:column;gap:20px;animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.badge{align-self:flex-start;background:var(--pc);color:var(--ink);font:400 1.5rem var(--display);padding:4px 20px;border-radius:999px;letter-spacing:.05em}
+.prompt{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.eq{font-family:var(--mono);font-weight:600;font-size:64px;line-height:1.2;white-space:nowrap;padding:26px 24px;border-radius:20px;background:var(--panel);border:2px solid var(--pc);box-shadow:0 0 44px -14px var(--pc);text-align:center}
+.eq i,.work i{font-style:italic}
+.btn{border:0;border-radius:14px;padding:14px 26px;font-weight:700;font-size:1.1rem;background:var(--pc);color:var(--ink)}
+.btn.alt{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.newtag{font-size:.78rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.work{display:grid;grid-template-columns:auto auto auto;justify-content:center;align-items:center;column-gap:.55em;row-gap:.25em;font-family:var(--mono);font-weight:600;font-size:40px;line-height:1.2;white-space:nowrap;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 24px}
+.work>span{opacity:0}
+.work>span.show{animation:rise .45s ease forwards}
+.work .l{text-align:right}.work .r{text-align:left}.work .e{text-align:center;color:var(--muted)}
+.work .op{color:var(--orange);font-size:.85em;padding-bottom:.35em;position:relative}
+.work .op.l::after,.work .op.r::after{content:"";position:absolute;left:0;right:0;bottom:.1em;border-bottom:3px solid var(--orange);border-radius:2px}
+.work .ltx,.work .ltc{border-radius:.25em;padding:0 .14em}
+.work .ltx.on{box-shadow:0 0 0 3px var(--lime)}
+.work .ltc.on{box-shadow:0 0 0 3px var(--purple)}
+.work .lcdn{color:var(--orange)}
+.work .fin{background:var(--pc);color:var(--ink);padding:.1em .35em;border-radius:.3em}
+.work .fin.e{background:transparent}
+.work .fin.l{justify-self:end}.work .fin.r{justify-self:start}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 .12em}
+.fr .n{padding:0 .25em .06em;border-bottom:.07em solid currentColor}
+.fr .d{padding:.06em .25em 0}
+.work .fr.big .d{color:var(--orange)}
+@media (prefers-reduced-motion:reduce){.pk,.q,.work>span.show{transition:none;animation:none;opacity:1}.pk.gone{opacity:0}}
+</style>
+
+<svg class="moon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="#f4efe4"/><circle cx="36" cy="40" r="7" fill="#d9d2c2"/><circle cx="60" cy="62" r="9" fill="#d9d2c2"/><circle cx="64" cy="34" r="4" fill="#d9d2c2"/><path d="M8 70c10-6 16-2 22-9 6 6 12 3 18 8 6-8 12-5 18-9 7 6 14 4 26 10-12 8-20 4-26 10-6-6-12-4-18-8-6 6-12 4-22 8-8-4-14-4-18-10z" fill="#0a0612" transform="translate(-14 -24) scale(.6)"/></svg>
+<svg class="web" viewBox="0 0 100 100" aria-hidden="true"><g stroke="#cfc6e6" stroke-width=".8" fill="none"><path d="M0 0L100 0M0 0L0 100M0 0L88 56M0 0L56 88M0 0L96 24M0 0L24 96"/><path d="M14 0Q10 10 0 14M30 0Q24 22 0 30M50 0Q40 40 0 50M72 0Q56 56 0 72M94 0Q72 72 0 94"/></g></svg>
+<svg class="bat" viewBox="0 0 64 32" aria-hidden="true"><path d="M32 12c-3-6-9-9-16-8 4 2 5 5 5 8-4-2-9-1-13 3 5 0 8 2 9 5 3-3 6-2 8 2 1-3 3-5 7-5s6 2 7 5c2-4 5-5 8-2 1-3 4-5 9-5-4-4-9-5-13-3 0-3 1-6 5-8-7-1-13 2-16 8z"/></svg>
+<svg class="bat b2" viewBox="0 0 64 32" aria-hidden="true"><path d="M32 12c-3-6-9-9-16-8 4 2 5 5 5 8-4-2-9-1-13 3 5 0 8 2 9 5 3-3 6-2 8 2 1-3 3-5 7-5s6 2 7 5c2-4 5-5 8-2 1-3 4-5 9-5-4-4-9-5-13-3 0-3 1-6 5-8-7-1-13 2-16 8z"/></svg>
+<svg class="bat b3" viewBox="0 0 64 32" aria-hidden="true"><path d="M32 12c-3-6-9-9-16-8 4 2 5 5 5 8-4-2-9-1-13 3 5 0 8 2 9 5 3-3 6-2 8 2 1-3 3-5 7-5s6 2 7 5c2-4 5-5 8-2 1-3 4-5 9-5-4-4-9-5-13-3 0-3 1-6 5-8-7-1-13 2-16 8z"/></svg>
+<div class="fog f2" aria-hidden="true"></div><div class="fog f1" aria-hidden="true"></div>
+<svg class="grave" viewBox="0 0 1000 160" preserveAspectRatio="none" aria-hidden="true"><g fill="#05030a"><path d="M0 160V118q10-14 20 0v-10h24v10q10-14 20 0V160zM110 160v-60q20-34 40 0v60zM190 160v-44h14v-14h14v14h14v44zM260 160v-52q16-26 32 0v52zM360 160V128l22-48 22 48v32zM450 160v-70q24-34 48 0v70zM540 160v-40h12v-16h12v16h12v40zM620 160v-56q18-30 36 0v56zM700 160v-66h10v-18h10v18h10v66zM770 160v-50q20-30 40 0v50zM850 160v-62q22-32 44 0v62zM930 160V130q8-12 16 0v-14h14v14h14V160z"/><path d="M300 160c4-30 6-52 4-80-8-6-14-14-14-24 8 4 14 8 18 14 0-14 2-26 8-36 2 12 0 24-2 36 8-8 18-12 28-12-6 8-16 14-26 18 0 30 2 54 6 84z" opacity=".95"/><rect x="0" y="146" width="1000" height="14"/></g></svg>
+
+<div class="wrap">
+  <div id="home">
+    <div class="top">
+      <div>
+        <h1>Fraction Equation <small>Halloween Bingo</small></h1>
+        <p class="sub">Pick a pumpkin. Solve for x. Mark your bingo card.</p>
+      </div>
+      <div class="row">
+        <span class="left" id="left"></span>
+        <button class="ghost" id="resetBoard">Bring all pumpkins back</button>
+      </div>
+    </div>
+    <div class="patch" id="patch"></div>
+  </div>
+  <div id="question" class="q" hidden></div>
+</div>
+
+<script>
+const M = '−';
+/* each problem: left terms [numerator, denominator, isX], right [numerator, denominator]; from Problem Set 3C; problems 4 and 15 have a changed right side */
+const P = [
+ [[[2,5,1],[1,1,0]],[13,5]], [[[1,3,1],[-2,5,1]],[-7,15]], [[[1,4,0],[1,2,1]],[4,1]], [[[1,16,1],[1,4,0]],[3,4]],
+ [[[2,3,1],[1,2,0]],[5,6]], [[[1,10,1],[3,5,1]],[7,2]], [[[1,1,1],[-4,3,1]],[-1,1]], [[[2,3,1],[1,6,1]],[5,1]],
+ [[[5,8,1],[1,12,1]],[51,6]], [[[1,2,1],[-1,3,1]],[3,1]], [[[1,3,1],[1,7,1]],[10,1]], [[[3,5,0],[1,3,1]],[7,10]],
+ [[[1,5,1],[1,7,1]],[12,1]], [[[3,4,1],[-5,8,1]],[-1,2]], [[[7,10,1],[-1,5,1]],[1,1]], [[[5,4,0],[1,2,1]],[7,6]]
+];
+const NEWIDX = new Set([3, 14]);   // right-hand sides changed so no two answers match
+
+/* ---------- fractions ---------- */
+const gcd = (a, b) => b ? gcd(b, a % b) : Math.abs(a);
+const lcm = (a, b) => a / gcd(a, b) * b;
+const F = (n, d = 1) => { if (d < 0){ n = -n; d = -d; } const g = gcd(n, d) || 1; return [n / g, d / g]; };
+const fadd = (a, b) => F(a[0] * b[1] + b[0] * a[1], a[1] * b[1]);
+const fmul = (a, b) => F(a[0] * b[0], a[1] * b[1]);
+const fr = (n, d, cls) => '<span class="fr' + (cls ? ' ' + cls : '') + '"><span class="n">' + n + '</span><span class="d">' + d + '</span></span>';
+const numStr = n => (n < 0 ? M : '') + Math.abs(n);
+/* body of a term (no sign): x-term shows x, constant shows the number; fractions are stacked */
+function termBody(f, isX){
+  const a = Math.abs(f[0]), d = f[1], core = isX ? (a === 1 ? '' : a) + '<i>x</i>' : String(a);
+  return d === 1 ? core : fr(core, d);
+}
+function exprHtml(terms, marks){   // terms: [{f, x, lt}]
+  return terms.map((t, i) => {
+    const neg = t.f[0] < 0, body = termBody(t.f, t.x);
+    const sign = i === 0 ? (neg ? M : '') : (neg ? M : '+') + ' ';   // the sign goes inside the box with its term
+    if (t.lt && marks) return (i === 0 ? '' : ' ') + '<span class="' + t.lt + '">' + sign + body + '</span>';
+    return i === 0 ? sign + body : ' ' + sign + body;
+  }).join('');
+}
+const valHtml = f => (f[0] < 0 ? M : '') + (f[1] === 1 ? Math.abs(f[0]) : fr(Math.abs(f[0]), f[1]));
+
+/* ---------- the written work for one problem ---------- */
+function buildWork(p){
+  let L = p[0].map(t => ({ f: F(t[0], t[1]), x: !!t[2] })), R = F(p[1][0], p[1][1]);
+  const rows = [];
+  rows.push({ k: 'eq', l: exprHtml(L), r: valHtml(R) });
+  let lcd = R[1]; L.forEach(t => { lcd = lcm(lcd, t.f[1]); });
+  if (lcd > 1){
+    const lc = '<span class="lcdn">' + lcd + '</span>';
+    const mulL = L.map((t, i) => (i === 0 ? (t.f[0] < 0 ? M : '') : ' ' + (t.f[0] < 0 ? M : '+') + ' ') + lc + '(' + termBody([Math.abs(t.f[0]), t.f[1]], t.x) + ')').join('');
+    rows.push({ k: 'eq', l: mulL, r: lc + '(' + valHtml(R) + ')' });
+    L = L.map(t => ({ f: fmul(t.f, F(lcd)), x: t.x })); R = fmul(R, F(lcd));
+  }
+  const nx = L.filter(t => t.x).length, nc = L.filter(t => !t.x).length;
+  L.forEach(t => { if (t.x && nx > 1) t.lt = 'ltx'; if (!t.x && nc > 1) t.lt = 'ltc'; });
+  if (lcd > 1 || L.some(t => t.lt)) rows.push({ k: 'eq', l: exprHtml(L, true), r: valHtml(R), lt: L.some(t => t.lt) });
+  let xc = F(0), kc = F(0); L.forEach(t => { if (t.x) xc = fadd(xc, t.f); else kc = fadd(kc, t.f); });
+  const comb = [{ f: xc, x: true }]; if (kc[0] !== 0) comb.push({ f: kc, x: false });
+  const combStr = exprHtml(comb);
+  if (combStr !== exprHtml(L)) rows.push({ k: 'eq', l: combStr, r: valHtml(R) });
+  if (kc[0] !== 0){
+    const op = kc[0] > 0 ? M + ' ' + kc[0] : '+ ' + Math.abs(kc[0]);
+    rows.push({ k: 'op', l: op, r: op });
+    R = fadd(R, F(-kc[0], 1));
+    rows.push({ k: 'eq', l: exprHtml([{ f: xc, x: true }]), r: valHtml(R) });
+  }
+  const c = xc[0];
+  if (c !== 1) rows.push({ k: 'frac', l: { n: (c < 0 ? M : '') + (Math.abs(c) === 1 ? '' : Math.abs(c)) + '<i>x</i>', d: numStr(c) }, r: { n: numStr(R[0]), d: numStr(c) } });
+  const X = fmul(R, F(1, c));
+  if (c === 1) rows[rows.length - 1].fin = true;
+  else rows.push({ k: 'eq', l: '<i>x</i>', r: valHtml(X), fin: true });
+  return { rows, answer: X, eqHtml: exprHtml(p[0].map(t => ({ f: F(t[0], t[1]), x: !!t[2] }))) + ' = ' + valHtml(F(p[1][0], p[1][1])) };
+}
+
+/* ---------- pumpkins ---------- */
+const COLORS = ['#ff7a00', '#9b5cff', '#8be04a', '#ff9d2e', '#c58bff'];
+const GLOWS = ['#ffe45c', '#7dffb0', '#fff27a', '#ffe45c', '#7dffb0'];
+/* carved faces: 4 eye styles x 4 mouth styles; the carved shapes glow and flicker */
+const EYES = [
+  '<polygon points="27,50 42,50 34.5,36"/><polygon points="58,50 73,50 65.5,36"/>',
+  '<polygon points="26,38 43,46 28,52"/><polygon points="74,38 57,46 72,52"/>',
+  '<circle cx="35" cy="44" r="7"/><circle cx="65" cy="44" r="7"/>',
+  '<path d="M26 46q9-14 18 0z"/><path d="M56 46q9-14 18 0z"/>'
+];
+const MOUTHS = [
+  '<path d="M26 74l6 8 6-8 6 8 6-8 6 8 6-8 6 8 6-8-2 12q-24 12-48 0z"/>',
+  '<path d="M26 74q24 22 48 0q-6 16-24 16t-24-16z"/>',
+  '<path d="M26 78q6-8 12 0t12 0t12 0t12 0v6q-6 6-12 0t-12 0t-12 0t-12 0z"/>',
+  '<path d="M28 76h44l-6 12h-8l-4-8-4 8h-8l-4-8-4 8h-6z"/>'
+];
+const pumpkin = i => '<svg viewBox="0 0 100 92" aria-hidden="true"><rect x="45" y="1" width="10" height="19" rx="4" fill="#4b8b2b"/><path d="M50 4c10-6 20-2 22 8" fill="none" stroke="#4b8b2b" stroke-width="3" stroke-linecap="round"/><ellipse cx="29" cy="55" rx="26" ry="33" fill="currentColor"/><ellipse cx="71" cy="55" rx="26" ry="33" fill="currentColor"/><ellipse cx="50" cy="55" rx="23" ry="35" fill="currentColor" stroke="rgba(0,0,0,.3)" stroke-width="2"/><path d="M36 22c-8 8-12 20-12 32s4 24 12 36M64 22c8 8 12 20 12 32s-4 24-12 36" fill="none" stroke="rgba(0,0,0,.24)" stroke-width="2.5"/><g class="face" fill="var(--glow)">' + EYES[i % 4] + MOUTHS[(i * 3 + 1) % 4] + '</g></svg>';
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let done = new Set(store.get('hfb-done', []));
+let current = -1, justDone = -1;
+const color = i => COLORS[i % COLORS.length];
+
+function fit(el, max, measure){ let s = max; el.style.fontSize = s + 'px'; while (measure() && s > 12){ s -= 2; el.style.fontSize = s + 'px'; } }
+
+function renderPatch(){
+  const b = $('patch'); b.innerHTML = '';
+  P.forEach((p, i) => {
+    const t = document.createElement('button');
+    t.className = 'pk' + (done.has(i) ? ' gone' : ''); t.style.setProperty('--pc', color(i)); t.style.setProperty('--glow', GLOWS[i % GLOWS.length]); t.style.setProperty('--fd', (-((i * 7) % 11) * 0.31).toFixed(2) + 's');
+    t.innerHTML = pumpkin(i) + '<span>' + (i + 1) + '</span>'; t.setAttribute('aria-label', 'Problem ' + (i + 1));
+    if (done.has(i)) t.tabIndex = -1;
+    t.onclick = () => openQ(i); b.appendChild(t);
+  });
+  $('left').textContent = (P.length - done.size) + ' pumpkins left';
+}
+
+function openQ(i){
+  current = i; const w = buildWork(P[i]), el = $('question');
+  el.style.setProperty('--pc', color(i));
+  el.innerHTML = '<div class="row"><span class="badge">Problem ' + (i + 1) + '</span>' + (i >= 12 ? '<span class="newtag">Set 3C, page 17</span>' : '') + (NEWIDX.has(i) ? '<span class="newtag">changed problem</span>' : '') + '</div>' +
+    '<div class="prompt">Solve the equation for x</div>' +
+    '<div class="eq" id="eqbox"><span id="eqtxt">' + w.eqHtml + '</span></div>' +
+    '<div class="row" id="actions"><button class="btn" id="reveal">Reveal Answer</button><button class="btn alt" id="back">Back</button></div>' +
+    '<div id="workwrap"></div>';
+  $('home').hidden = true; el.hidden = false; window.scrollTo(0, 0);
+  fit($('eqbox'), 64, () => $('eqtxt').offsetWidth > $('eqbox').clientWidth - 60);
+  $('reveal').onclick = reveal; $('back').onclick = goHome; $('reveal').focus();
+}
+
+function reveal(){
+  const w = buildWork(P[current]), box = document.createElement('div'); box.className = 'work';
+  const cell = (cls, html) => { const s = document.createElement('span'); s.className = cls; s.innerHTML = html; return s; };
+  const fracCell = (cls, f) => cell(cls, fr(f.n, f.d, 'big'));
+  const groups = []; let prevCells = null;
+  w.rows.forEach(r => {
+    const fin = r.fin ? ' fin' : '', cells = [];
+    if (r.k === 'op') cells.push(cell('l op', r.l), cell('e', ''), cell('r op', r.r));
+    else if (r.k === 'frac') cells.push(fracCell('l', r.l), cell('e', '='), fracCell('r', r.r));
+    else cells.push(cell('l' + fin, r.l), cell('e', '='), cell('r' + fin, r.r));
+    cells.forEach(c => box.appendChild(c));
+    if (r.k === 'frac') cells.hide = prevCells;
+    groups.push(cells);
+    if (r.k === 'eq') prevCells = cells;
+    if (r.lt){ const lc = cells[0], g = []; g.fn = () => lc.querySelectorAll('.ltx,.ltc').forEach(e => e.classList.add('on')); groups.push(g); }
+  });
+  $('workwrap').appendChild(box);
+  fit(box, 40, () => { box.style.width = 'max-content'; const w2 = box.offsetWidth; box.style.width = ''; return w2 > $('workwrap').clientWidth; });
+  let shown = 0;
+  const showNext = () => {
+    const g = groups[shown];
+    if (g.hide) g.hide.forEach(c => { c.style.display = 'none'; });
+    if (g.fn) g.fn(); else g.forEach(c => c.classList.add('show'));
+    shown++;
+    const btn = $('step');
+    if (shown >= groups.length){ btn.textContent = 'Return Home'; btn.onclick = finish; }
+    btn.focus();
+  };
+  $('actions').innerHTML = '<button class="btn" id="step">Next Step</button>';
+  $('step').onclick = showNext; showNext();
+}
+
+function finish(){ done.add(current); store.set('hfb-done', [...done]); justDone = current; goHome(); }
+function goHome(){
+  $('question').hidden = true; $('home').hidden = false;
+  if (justDone >= 0){
+    const k = justDone; justDone = -1; done.delete(k); renderPatch(); done.add(k);
+    const t = $('patch').children[k];
+    setTimeout(() => { t.classList.add('gone'); t.tabIndex = -1; $('left').textContent = (P.length - done.size) + ' pumpkins left'; }, 350);
+  } else renderPatch();
+  window.scrollTo(0, 0);
+}
+$('resetBoard').onclick = () => { done = new Set(); store.set('hfb-done', []); renderPatch(); };
+renderPatch();
+</script>
+</body></html>
