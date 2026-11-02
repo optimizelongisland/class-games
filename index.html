@@ -67,6 +67,7 @@ a.card:hover{transform:translateY(-3px);border-color:var(--c);background:var(--p
 .kind{font:600 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
 .mode{font:500 .78rem var(--body);color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 9px;white-space:nowrap}
 .card h3{font:800 1.45rem/1.1 var(--display);margin:0;color:var(--fg);text-wrap:balance}
+.card .lesson{font:600 .8rem var(--mono);color:var(--dim);margin-top:-4px}
 .card p{margin:0;color:var(--dim);font-size:.95rem;flex:1}
 .play{align-self:flex-start;font:700 .95rem var(--body);color:#000;background:var(--c);border-radius:999px;padding:7px 16px}
 .card.soon{border-style:dashed}
@@ -110,29 +111,29 @@ const SUBJECTS = [
   { name: 'Algebra', id: 'algebra', note: 'Algebra 1 Honors', units: [
     { num: 'Unit 1', name: 'Exponents and Expressions', blurb: 'Properties of math, exponent rules, simplifying expressions.', color: 'green', games: [
     ]},
-    { num: 'Unit 2', name: 'Equations and Inequalities', blurb: 'Properties of equality, multi-step equations, x on both sides, inequalities.', color: 'orange', games: [
-      { title: 'Unit 2 Jeopardy', kind: 'Jeopardy', mode: 'Whole class', color: 'orange', file: 'unit-2-jeopardy.html',
-        about: 'Team review of review pages 75 to 81: properties, exponents, rearranging, solving and graphing.' },
-      { title: 'Multi-Step Equation Bingo', kind: 'Bingo', mode: 'Whole class', color: 'pink', file: 'multi-step-equation-bingo.html',
-        about: '24 equations with distributing and combining like terms. Solve for x and mark your card.' },
-      { title: 'Halloween Fraction Bingo', kind: 'Bingo', mode: 'Whole class', color: 'violet', file: 'halloween-fraction-bingo.html',
-        about: 'Pick a pumpkin and solve equations with fractions, one step at a time.' },
-      { title: 'Keep It Level', kind: 'Practice', mode: 'On your own', color: 'green', file: 'keep-it-level.html',
-        about: 'Warm-up, guided and practice puzzles for equations with x on both sides.' },
-      { title: 'Balance Scale', kind: 'Practice', mode: 'On your own', color: 'blue', file: 'balance-scale.html',
-        about: 'Take away x boxes and ones from both sides until x is alone. Keep the scale level.' }
+    { num: 'Unit 2', name: 'Equations and Inequalities', blurb: 'Properties of equality, variables on both sides, fractional equations, inequalities, transforming formulas.', color: 'orange', games: [
+      { title: 'Unit 2 Jeopardy', lesson: 'Unit review', kind: 'Jeopardy', mode: 'Whole class', color: 'orange', file: 'unit-2-jeopardy.html',
+        about: 'Team review of review pages 75 to 81: properties, exponents, rearranging, solving and graphing.' }
     ]},
     { num: 'Unit 3', name: 'Linear Equations and Inequalities', blurb: 'Consecutive integers, slope, point-slope and slope-intercept form, graphing inequalities.', color: 'cyan', games: [
-      { title: 'Battle My Math Ship: Slope', kind: 'Battleship', mode: 'Partners, 2 devices', color: 'cyan', file: 'battle-my-math-ship-slope.html',
+      { title: 'Battle My Math Ship: Slope', lesson: 'Lesson 6', kind: 'Battleship', mode: 'Partners, 2 devices', color: 'cyan', file: 'battle-my-math-ship-slope.html',
         about: 'Hide 12 ships, then find the slope between two points to fire. One partner hosts and shares a code, the other joins.' }
     ]}
   ]},
   { name: '8th Grade', id: '8th-grade', note: 'Grade 8 Math', units: [
-    { num: 'Unit 1', name: 'Exponents', blurb: '', color: 'green', games: [
+    { num: 'Unit 1', name: 'Exponents', blurb: 'Exponent rules, zero and negative exponents.', color: 'green', games: [
     ]},
-    { num: 'Unit 2', name: 'Solving Linear Equations', blurb: '', color: 'orange', games: [
+    { num: 'Unit 2', name: 'Solving Linear Equations', blurb: 'Writing expressions, two-step and multi-step equations, variables on both sides.', color: 'orange', games: [
+      { title: 'Multi-Step Equation Bingo', lesson: 'Lessons 2F and 2G', kind: 'Bingo', mode: 'Whole class', color: 'pink', file: 'multi-step-equation-bingo.html',
+        about: '24 equations with distributing and combining like terms. Solve for x and mark your card.' },
+      { title: 'Balance Scale', lesson: 'Lessons 2H to 2K', kind: 'Practice', mode: 'On your own', color: 'blue', file: 'balance-scale.html',
+        about: 'Take away x boxes and ones from both sides until x is alone. Keep the scale level.' },
+      { title: 'Keep It Level', lesson: 'Lessons 2H to 2K', kind: 'Practice', mode: 'On your own', color: 'green', file: 'keep-it-level.html',
+        about: 'Warm-up, guided and practice puzzles for equations with x on both sides.' }
     ]},
-    { num: 'Unit 3', name: 'Fractional Linear Equations and Classification of Solutions', blurb: '', color: 'cyan', games: [
+    { num: 'Unit 3', name: 'Fractional Linear Equations and Classification of Solutions', blurb: 'Solving equations with fractions, number of solutions.', color: 'cyan', games: [
+      { title: 'Halloween Fraction Bingo', lesson: 'Lesson 3C', kind: 'Bingo', mode: 'Whole class', color: 'violet', file: 'halloween-fraction-bingo.html',
+        about: 'Pick a pumpkin and solve equations with fractions, one step at a time.' }
     ]}
   ]}
 ];
@@ -153,7 +154,7 @@ function render(){
       '<div class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2>' + (u.blurb ? '<p>' + esc(u.blurb) + '</p>' : '') + '</div>' +
       (u.games.length ? '<div class="games">' + u.games.map(g => {
         const inner = '<div class="top"><span class="kind">' + esc(g.kind) + '</span><span class="mode">' + esc(g.mode) + '</span></div>' +
-          '<h3>' + esc(g.title) + '</h3><p>' + esc(g.about) + '</p>' +
+          '<h3>' + esc(g.title) + '</h3>' + (g.lesson ? '<span class="lesson">' + esc(g.lesson) + '</span>' : '') + '<p>' + esc(g.about) + '</p>' +
           '<span class="play">' + (g.soon ? 'Coming soon' : 'Play') + '</span>';
         const st = ' style="--c:var(--c-' + (g.color || 'cyan') + ')"';
         return g.soon || !g.file ? '<div class="card soon"' + st + '>' + inner + '</div>'
