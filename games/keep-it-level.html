@@ -100,6 +100,11 @@ i{font-style:italic}
 .mv .amt{width:3.3ch;min-width:2.6rem;height:2.6rem;border:2px solid #000;border-radius:10px;background:#fff;color:#000;font:600 1.35rem var(--mono);text-align:center;padding:0;-moz-appearance:textfield}
 .mv .amt::-webkit-outer-spin-button,.mv .amt::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .mv .amt:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.mv .op{height:2.6rem;border:2px solid #000;border-radius:10px;background:#fff;color:#000;font:700 1rem var(--body);padding:0 .3rem}
+.mv .op:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.bl ellipse{fill:var(--red);fill-opacity:.9;stroke:#000;stroke-width:2}
+.bl line{stroke:#c9c9d6;stroke-width:1.5}
+.bl text{fill:#000;font-family:var(--mono);font-weight:700;text-anchor:middle}
 .mv .go{flex-basis:100%;border:0;border-radius:10px;background:#000;color:var(--fg);font:700 1rem var(--body);min-height:2.4rem;cursor:pointer}
 .mv .go:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
 .mv i{font-family:var(--mono);font-weight:600}
@@ -193,6 +198,7 @@ h2{font:800 clamp(1.7rem,1.2rem + 1.4vw,2.7rem)/1.05 var(--disp);letter-spacing:
       <button class="btn tab" data-act="tab" data-tab="warm"><span>1</span>Warm-up</button>
       <button class="btn tab" data-act="tab" data-tab="guided"><span>2</span>Guided</button>
       <button class="btn tab" data-act="tab" data-tab="practice"><span>3</span>Practice</button>
+      <button class="btn tab" data-act="tab" data-tab="neg"><span>4</span>Negatives</button>
       <button class="btn tab" data-act="how">How this works</button>
     </nav>
   </header>
@@ -226,7 +232,7 @@ h2{font:800 clamp(1.7rem,1.2rem + 1.4vw,2.7rem)/1.05 var(--disp);letter-spacing:
   <div class="card" role="dialog" aria-modal="true" aria-label="How this works">
     <h2>How this works</h2>
     <div id="howsteps"></div>
-    <p class="small">Whole numbers only for now. Negative numbers are the next level.</p>
+    <p class="small">Tabs 1 to 3 use whole numbers. Tab 4 adds negative numbers: a red balloon pulls its pan up, so it counts as negative.</p>
     <div class="row"><button class="btn fill yellow big" data-act="close">Got it</button></div>
   </div>
 </div>
@@ -238,7 +244,8 @@ var $=function(s,r){return (r||document).querySelector(s)};
 var mn=Math.min;
 var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 var X='<i>x</i>';
-function xt(n){return (n===1?'':n)+X}
+function xt(n){var g=n<0?'−':'';n=Math.abs(n);return g+(n===1?'':n)+X}
+function num(n){return n<0?'−'+(-n):String(n)}
 
 /* ---------- puzzles ---------- */
 var GUIDED={a:3,b:2,c:1,d:8,v:3};
@@ -252,6 +259,26 @@ var PUZZLES=[
   {a:7,b:3,c:4,d:24,v:7},
   {a:8,b:4,c:5,d:19,v:5}
 ];
+var NEG=[
+  {a:3,b:-4,c:1,d:6,v:5},
+  {a:2,b:5,c:4,d:-3,v:4},
+  {a:4,b:9,c:1,d:-3,v:-4},
+  {a:-2,b:5,c:1,d:-4,v:3,note:'Heads up: there is a negative x on the left.'},
+  {a:5,b:-2,c:2,d:-11,v:-3},
+  {a:-3,b:-4,c:-1,d:6,v:-5},
+  {a:6,b:1,c:2,d:-7,v:-2},
+  {a:-4,b:3,c:-7,d:-9,v:-4}
+];
+function randomNeg(){
+  var r=function(lo,hi){return lo+Math.floor(Math.random()*(hi-lo+1))};
+  for(;;){
+    var a=r(-6,6),c=r(-6,6),v=r(-6,6),b=r(-9,9);
+    if(!a||!c||!v||a===c)continue;
+    var d=b+(a-c)*v;
+    if(Math.abs(d)>15||d===0||b===0)continue;
+    return {a:a,b:b,c:c,d:d,v:v};
+  }
+}
 var WARM=[
   {s:{a:0,b:4,c:0,d:4},v:1},
   {s:{a:1,b:2,c:0,d:5},v:3},
@@ -266,9 +293,10 @@ function randomPuzzle(){
   }
 }
 function mkGame(p,idx){return {start:{a:p.a,b:p.b,c:p.c,d:p.d},v:p.v,idx:idx,note:p.note,hist:[],cheat:null,checked:false}}
-var G={guided:mkGame(GUIDED,'g'),practice:mkGame(PUZZLES[0],0)};
+var G={guided:mkGame(GUIDED,'g'),practice:mkGame(PUZZLES[0],0),neg:mkGame(NEG[0],0)};
 var S={tab:'warm',beat:0,guessOk:false,guessBad:null,done:{},busy:false,fresh:false,hintMv:null,msg:{t:'',k:'info'}};
 function game(){return G[S.tab]}
+function isNeg(){return S.tab==='neg'}
 function cur(g){return g.hist.length?g.hist[g.hist.length-1].to:g.start}
 function view(g){
   var s=cur(g),c=g.cheat;if(!c)return s;
@@ -295,6 +323,8 @@ function nextMove(s){
 function applyMove(t,s,k){
   if(t==='subx')return {m:k,to:{a:s.a-k,b:s.b,c:s.c-k,d:s.d}};
   if(t==='subc')return {m:k,to:{a:s.a,b:s.b-k,c:s.c,d:s.d-k}};
+  if(t==='addx')return {m:k,to:{a:s.a+k,b:s.b,c:s.c+k,d:s.d}};
+  if(t==='addc')return {m:k,to:{a:s.a,b:s.b+k,c:s.c,d:s.d+k}};
   return {m:k,to:{a:s.a/k,b:s.b/k,c:s.c/k,d:s.d/k}};
 }
 /* the student picks the amount; return a message if it does not work, or '' if it does */
@@ -320,6 +350,32 @@ function notReady(t,s){
   if(t==='subc')return (s.b===0&&s.d===0)?'No ones left to take.':'One side has no ones. Nothing to take from both.';
   return 'Get <i>x</i> alone on one side first.';
 }
+function negNext(s){
+  if(s.a!==0&&s.c!==0)return 'x';
+  var xl=s.a!==0,k=xl?s.b:s.d;
+  if(k!==0)return 'c';
+  if((s.a||s.c)!==1)return 'div';
+  return null;
+}
+function negBad(t,s,k){
+  if(t==='div'){
+    if(!k&&k!==0||isNaN(k))return 'Type the number to divide both sides by, then press Go. It can be negative.';
+    if(k===0)return 'You can\'t divide by 0. Try another number.';
+    if(k===1)return 'Dividing by 1 changes nothing. Try another number.';
+    if(s.a%k||s.b%k||s.c%k||s.d%k)return 'Every number on both sides has to divide evenly by '+num(k)+'. Try another number.';
+    return '';
+  }
+  if(isNaN(k)||k<1)return 'Type how many, then press Go. Use Add or Subtract to choose the direction.';
+  if(k>40)return 'That is a lot. Try a smaller number.';
+  return '';
+}
+function negHint(s){
+  var n=negNext(s);
+  if(n==='x')return 'Clear the <i>x</i>\'s off one side. If a side has +'+xt(2)+', subtract '+xt(2)+'. If it has '+xt(-2)+', add '+xt(2)+'.';
+  if(n==='c')return 'Now clear the number next to <i>x</i>. Subtract it if it is positive. Add it if it is negative.';
+  if(n==='div')return 'Divide both sides by the number in front of <i>x</i>. Keep its sign.';
+  return 'You are done. Plug it back in to check.';
+}
 function hintText(mv,s){
   if(mv==='subx')return 'Look at the <i>x</i>\'s. Which side has fewer? Take away that many from both sides to clear the <i>x</i>\'s off one side.';
   if(mv==='subc')return 'Look at the ones. Which side has fewer? Take away that many from both sides.';
@@ -328,8 +384,10 @@ function hintText(mv,s){
 
 /* ---------- written work ---------- */
 function sideCells(a,b){
-  return [a>0?xt(a):'',(a>0&&b>0)?'<span class="pl">+</span>':'',(b>0||a===0)?String(b):''];
+  if(a===0)return ['','',num(b)];
+  return [xt(a),b!==0?'<span class="pl">'+(b<0?'−':'+')+'</span>':'',b!==0?String(Math.abs(b)):''];
 }
+function sideText(a,b){var c=sideCells(a,b);return [c[0],c[1].replace(/<[^>]+>/g,''),c[2]].filter(Boolean).join(' ')}
 function cells(s,eq){
   var L=sideCells(s.a,s.b),R=sideCells(s.c,s.d);
   return [L[0],L[1],L[2],eq?'<span class="neq">'+eq+'</span>':'=',R[0],R[1],R[2]];
@@ -338,13 +396,16 @@ function frac(n,d){return '<span class="frac"><span class="n">'+n+'</span><span 
 function opCells(st){
   var o=['','','','','','',''];
   if(st.type==='subx'){o[0]='−'+xt(st.m);o[4]=o[0]}
+  else if(st.type==='addx'){o[0]='+'+xt(st.m);o[4]=o[0]}
+  else if(st.type==='addc'){o[2]='+'+st.m;o[6]=o[2]}
   else{o[2]='−'+st.m;o[6]=o[2]}
   return o;
 }
 function fracCells(s,k){
   var o=['','','','=','','',''];
-  if(s.a>1){o[0]=frac(xt(s.a),k);o[6]=frac(String(s.d),k)}
-  else{o[2]=frac(String(s.b),k);o[4]=frac(xt(s.c),k)}
+  var L=frac(sideText(s.a,s.b),num(k)),R=frac(sideText(s.c,s.d),num(k));
+  if(s.a!==0)o[0]=L;else o[2]=L;
+  if(s.c!==0)o[4]=R;else o[6]=R;
   return o;
 }
 function cheatOpCells(c){
@@ -381,7 +442,20 @@ function workHTML(g){
   }
   return b.html();
 }
+function negCheckHTML(g){
+  var v=g.v,st=g.start,P=function(n){return '<span class="plug">('+num(v)+')</span>'};
+  function line(a,b){
+    var t1=(a===1?'':a===-1?'−':num(a))+P(),pr=a*v,tot=pr+b;
+    return t1+(b<0?' − ':' + ')+Math.abs(b)+' = '+num(pr)+(b<0?' − ':' + ')+Math.abs(b)+' = <b>'+num(tot)+'</b>';
+  }
+  var wl=st.a*v+st.b,wr=st.c*v+st.d;
+  return '<div class="check"><p class="cap2">Put <i>x</i> = '+num(v)+' into the original</p>'+
+    '<p class="cap2 new" style="font-family:var(--mono);font-size:1.15rem;color:var(--pink)">Left: '+line(st.a,st.b)+'</p>'+
+    '<p class="cap2 new" style="font-family:var(--mono);font-size:1.15rem;color:var(--green);animation-delay:500ms">Right: '+line(st.c,st.d)+'</p>'+
+    '<p class="match new" style="animation-delay:1000ms"><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>'+num(wl)+' = '+num(wr)+'. Both sides match.</p></div>';
+}
 function checkHTML(g){
+  if(isNeg())return negCheckHTML(g);
   var a=g.start.a,b=g.start.b,c=g.start.c,d=g.start.d,v=g.v,wl=a*v+b,wr=c*v+d;
   var pl=function(n){return '<span class="plug">'+n+'</span>'};
   function mk(a,b,f){return [a>0?f(a):'',(a>0&&b>0)?'<span class="pl">+</span>':'',(b>0||a===0)?String(b):'']}
@@ -396,7 +470,7 @@ function checkHTML(g){
     '<p class="match new" style="animation-delay:1600ms"><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>'+wl+' = '+wr+'. Both sides match.</p></div>';
 }
 function finishHTML(g){
-  var s=cur(g),v=g.v,h='<div class="card finish" id="finish"><div class="ans"><i>x</i> = '+v+'</div>';
+  var s=cur(g),v=num(g.v),h='<div class="card finish" id="finish"><div class="ans"><i>x</i> = '+v+'</div>';
   if(s.a===0)h+='<p class="sm">'+v+' = <i>x</i> says the same thing.</p>';
   h+=g.checked?checkHTML(g):'<button class="btn fill violet big" data-act="check">Plug it back in</button>';
   h+='<div class="next">';
@@ -429,12 +503,26 @@ function tween(target,ms){
 }
 function exprSvg(a,b){
   var s='';
-  if(a>0)s+=(a>1?a:'')+'<tspan class="xi">x</tspan>';
-  if(a>0&&b>0)s+=' + ';
-  if(b>0||a===0)s+=b;
+  if(a!==0)s+=(a<0?'−':'')+(Math.abs(a)>1?Math.abs(a):'')+'<tspan class="xi">x</tspan>';
+  if(a!==0&&b!==0)s+=(b<0?' − ':' + ')+Math.abs(b);
+  else if(a===0)s+=num(b);
   return s;
 }
+function balloons(nx,nu,enter){
+  var items=[],i,out='';
+  for(i=0;i<-nx;i++)items.push('x');
+  for(i=0;i<-nu;i++)items.push('1');
+  if(!items.length)return '';
+  var per=6,sp=40;
+  items.forEach(function(k,j){
+    var r=Math.floor(j/per),inRow=mn(per,items.length-r*per),col=j%per;
+    var x=-((inRow-1)*sp)/2+col*sp,y=-150-r*44;
+    out+='<g class="it bl'+(enter?' enter':'')+'" style="animation-delay:'+(enter?mn(j,12)*35:0)+'ms"><line x1="'+x+'" y1="'+(y+20)+'" x2="'+(x*0.4)+'" y2="-6"/><ellipse cx="'+x+'" cy="'+y+'" rx="17" ry="20"/><text x="'+x+'" y="'+(y+6)+'" font-size="'+(k==='x'?17:15)+'">'+(k==='x'?'−x':'−1')+'</text></g>';
+  });
+  return out;
+}
 function panHTML(nx,nu,label,word,enter){
+  var negs=balloons(nx,nu,enter);nx=Math.max(0,nx);nu=Math.max(0,nu);
   var W=250,bs=nx>4?40:46,bg=6,us=nu>12?19:23,ug=3;
   var px=Math.floor((W+bg)/(bs+bg)),pu=Math.floor((W+ug)/(us+ug));
   var out='<line class="str" x1="0" y1="'+(-STR)+'" x2="-122" y2="2"/><line class="str" x1="0" y1="'+(-STR)+'" x2="122" y2="2"/>';
@@ -450,7 +538,7 @@ function panHTML(nx,nu,label,word,enter){
     w=inRow*us+(inRow-1)*ug;x=-w/2+col*(us+ug);y=base-(r+1)*us-r*ug;
     out+='<g class="it ub'+(enter?' enter':'')+'" data-k="u" data-i="'+i+'" style="animation-delay:'+(enter?mn(i,20)*25+120:0)+'ms"><rect x="'+x+'" y="'+y+'" width="'+us+'" height="'+us+'" rx="5"/></g>';
   }
-  out+='<path class="bowl" d="M-135 0 H135 L110 18 H-110 Z"/>';
+  out+=negs+'<path class="bowl" d="M-135 0 H135 L110 18 H-110 Z"/>';
   out+='<text class="plabel" x="0" y="58">'+label+'</text><text class="pside" x="0" y="84">'+word+'</text>';
   return out;
 }
@@ -480,15 +568,29 @@ function stepsHTML(){
   '<li><b style="--k:var(--yellow)">2</b><div><h3>Get <i>x</i> on one side</h3><p>Take away <i>x</i>\'s, then take away ones.</p></div></li>'+
   '<li><b style="--k:var(--orange)">3</b><div><h3>Divide, then check</h3><p>Get <i>x</i> alone. Plug it back in.</p></div></li></ol>';
 }
+function list(){return isNeg()?NEG:PUZZLES}
+function dkey(i){return (isNeg()?'n':'')+i}
 function barHTML(){
-  if(S.tab!=='practice')return '';
-  var g=G.practice;
-  return '<div class="chips"><span class="lab">Puzzle</span>'+PUZZLES.map(function(p,i){
-    return '<button class="chip'+(g.idx===i?' on':'')+(S.done[i]?' ok':'')+'" data-act="pick" data-i="'+i+'" aria-label="Puzzle '+(i+1)+'">'+(i+1)+'</button>';
+  if(S.tab!=='practice'&&S.tab!=='neg')return '';
+  var g=game();
+  return '<div class="chips"><span class="lab">Puzzle</span>'+list().map(function(p,i){
+    return '<button class="chip'+(g.idx===i?' on':'')+(S.done[dkey(i)]?' ok':'')+'" data-act="pick" data-i="'+i+'" aria-label="Puzzle '+(i+1)+'">'+(i+1)+'</button>';
   }).join('')+'<button class="chip rand'+(g.idx==='R'?' on':'')+'" data-act="rand">Random</button></div>';
+}
+function negCtlHTML(){
+  var g=game(),s=cur(g),solved=isSolved(s),nx=negNext(s),on=!solved;
+  function tile(t,cls,after,name){
+    var co=on&&S.hintMv===t?' coach':'';
+    var sel=t==='div'?'<span>Divide by</span>':'<select class="op" id="op-'+t+'" aria-label="Add or subtract"><option value="add">Add</option><option value="sub">Subtract</option></select>';
+    var inp='<input class="amt" id="amt-'+t+'" data-t="'+t+'" type="number" inputmode="numeric" step="1" aria-label="'+name+'">';
+    return '<div class="mv fill '+cls+co+'" data-ready="'+(on?1:0)+'">'+sel+inp+(after?'<span>'+after+'</span>':'')+'<button class="go" data-act="n'+t+'">Go</button></div>';
+  }
+  return '<p class="lab">Do it to both sides. You choose how many.</p><div class="moves">'+tile('x','cyan','<i>x</i>\'s','How many x\'s')+tile('c','yellow','','How many ones')+tile('div','orange','','Number to divide by')+'</div>'+
+    '<div class="tools"><button class="btn line violet" data-act="hint">Hint</button><button class="btn line" data-act="undo">Undo</button><button class="btn line" data-act="reset">Start over</button><button class="btn line" data-act="rand">New random</button></div>';
 }
 function ctlHTML(){
   if(S.tab==='warm')return '';
+  if(isNeg())return negCtlHTML();
   var g=game(),s=cur(g),solved=isSolved(s),mv=nextMove(s),on=!g.cheat&&!solved;
   function m(t,cls,before,after,name){
     var co=on&&((S.tab==='guided'&&mv===t)||S.hintMv===t)?' coach':'';
@@ -511,7 +613,7 @@ function warmHTML(){
     if(S.guessOk)h+='<button class="btn fill yellow big" data-act="wnext">Next</button>';
     h+='</div>';
   }else{
-    h+='<h2>Now <i style="font-family:var(--mono)">x</i> is on both sides.</h2>'+stepsHTML()+'<div class="row"><button class="btn line big" data-act="wback">Back</button><button class="btn fill yellow big" data-act="tab" data-tab="guided">Start solving</button></div><p class="small">Whole numbers only for now. Negative numbers are the next level.</p>';
+    h+='<h2>Now <i style="font-family:var(--mono)">x</i> is on both sides.</h2>'+stepsHTML()+'<div class="row"><button class="btn line big" data-act="wback">Back</button><button class="btn fill yellow big" data-act="tab" data-tab="guided">Start solving</button></div><p class="small">Whole numbers first. Negative numbers are in tab 4.</p>';
   }
   return h+'</div>';
 }
@@ -536,6 +638,7 @@ function render(o){
 function intro(){
   if(S.tab==='warm')say(['Count each side. Same weight on both.','Pick a number for <i>x</i>.','<i>x</i> is on both sides this time.'][S.beat],'info');
   else if(S.tab==='guided')say('Type a number in the glowing box, then press Go. It acts on both sides.','info');
+  else if(isNeg()){var gn=G.neg;say(gn.note||'Red balloons are negative: they pull the pan up. Choose Add or Subtract, type how many, then press Go.','info')}
   else{var g=G.practice;say(g.note||'Pick a move, type how many, then press Go. It happens on both sides.','info')}
 }
 function setTab(t){
@@ -570,11 +673,31 @@ function move(t){
     if(done){var f=$('#finish');if(f)setTimeout(function(){f.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'})},350)}
   },reduce?60:520);
 }
+function negMove(t){
+  if(S.busy)return;
+  var g=game(),s=cur(g);
+  if(isSolved(s)){say('<i>x</i> is already alone. Plug it back in.','good');return}
+  var box=$('#amt-'+t),k=box?parseInt(box.value,10):NaN,why=negBad(t,s,k);
+  if(why){say(why,'warn');flashBtn('n'+t);if(box){box.focus();box.select()}return}
+  var type=t==='div'?'div':(($('#op-'+t)||{}).value==='sub'?'sub':'add')+(t==='x'?'x':'c');
+  var r=applyMove(type,s,k);
+  if(type!=='div'&&r.to.a===0&&r.to.c===0){say('That would remove every <i>x</i>. Try a different amount.','warn');flashBtn('n'+t);return}
+  S.hintMv=null;
+  g.hist.push({type:type,m:k,from:s,to:r.to});g.checked=false;
+  var done=isSolved(r.to);
+  if(done&&typeof g.idx==='number')S.done[dkey(g.idx)]=true;
+  var what=t==='x'?xt(k).replace(/^1/,''):String(k);
+  var txt=type==='div'?'Divided both sides by '+num(k)+'. Still level.':(type.slice(0,3)==='add'?'Added ':'Subtracted ')+(t==='x'?xt(k):k)+(type.slice(0,3)==='add'?' to':' from')+' both sides. Still level.';
+  say(done?'<i>x</i> is alone. Now plug it back in.':txt,done?'good':'info');
+  S.fresh=true;render({nudge:true});S.fresh=false;
+  if(done){var f=$('#finish');if(f)setTimeout(function(){f.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'})},350)}
+}
 function hint(){
   if(S.busy)return;
   var g=game(),s=cur(g);
   if(g.cheat){say('Put it back first. Then follow the glow.','warn');S.hintMv=null;return}
   if(isSolved(s)){say('You are done. Plug it back in to check.','good');return}
+  if(isNeg()){S.hintMv=negNext(s);say(negHint(s),'hint');el.ctl.innerHTML=ctlHTML();return}
   var mv=nextMove(s);S.hintMv=mv;say(hintText(mv,s),'hint');
   el.ctl.innerHTML=ctlHTML();
 }
@@ -613,12 +736,12 @@ function cheat(){
 }
 function startGame(p,idx){
   if(S.busy)return;
-  G.practice=mkGame(p,idx);S.hintMv=null;intro();render({enter:true});
+  G[isNeg()?'neg':'practice']=mkGame(p,idx);S.hintMv=null;intro();render({enter:true});
 }
 function nextPuzzle(){
-  var i=G.practice.idx;
-  if(typeof i==='number'&&i<PUZZLES.length-1)startGame(PUZZLES[i+1],i+1);
-  else startGame(randomPuzzle(),'R');
+  var i=game().idx,L=list();
+  if(typeof i==='number'&&i<L.length-1)startGame(L[i+1],i+1);
+  else startGame(isNeg()?randomNeg():randomPuzzle(),'R');
 }
 function guess(n){
   if(S.guessOk)return;
@@ -644,15 +767,16 @@ document.addEventListener('click',function(e){
   else if(a==='undo')undo();
   else if(a==='reset')reset();
   else if(a==='cheat')cheat();
-  else if(a==='pick')startGame(PUZZLES[+b.dataset.i],+b.dataset.i);
-  else if(a==='rand')startGame(randomPuzzle(),'R');
+  else if(a==='nx'||a==='nc'||a==='ndiv')negMove(a.slice(1));
+  else if(a==='pick')startGame(list()[+b.dataset.i],+b.dataset.i);
+  else if(a==='rand')startGame(isNeg()?randomNeg():randomPuzzle(),'R');
   else if(a==='next')nextPuzzle();
   else if(a==='check'){game().checked=true;render();var f=$('#finish');if(f)f.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'})}
   else if(a==='guess')guess(+b.dataset.n);
   else if(a==='wnext')wnext();
   else if(a==='wback')wback();
 });
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHow();else if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('amt')){e.preventDefault();move(e.target.dataset.t)}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHow();else if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('amt')){e.preventDefault();if(isNeg())negMove(e.target.dataset.t);else move(e.target.dataset.t)}});
 
 setAngle(0);intro();render({enter:true});
 })();
