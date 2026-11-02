@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Class Game Room</title>
+<title>Mrs. Kalinowski's Math Website</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Math review games for class, organized by unit.">
+<meta name="description" content="Mrs. Kalinowski's math games for Algebra and 8th Grade, organized by unit.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -42,10 +42,13 @@ h1 .pt{color:var(--gold)}
 .coord b{color:var(--gold)}
 
 /* subject tabs */
-.tabs{display:flex;flex-wrap:wrap;gap:8px}
-.tab{font:600 1rem var(--body);color:var(--dim);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:44px}
-.tab:hover{color:var(--fg);border-color:var(--dim)}
-.tab[aria-selected=true]{background:var(--fg);border-color:var(--fg);color:#000}
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.tab{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;color:var(--fg);background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:16px 20px;cursor:pointer;min-height:44px;transition:border-color .14s,background .14s}
+.tab b{font:800 clamp(1.5rem,4vw,2.1rem)/1.05 var(--display)}
+.tab span{font:500 .92rem var(--body);color:var(--dim)}
+.tab:hover{border-color:var(--dim)}
+.tab[aria-selected=true]{background:var(--gold);border-color:var(--gold);color:#000}
+.tab[aria-selected=true] span{color:#3a2f00}
 
 /* unit bands */
 .units{display:flex;flex-direction:column;gap:40px}
@@ -80,14 +83,14 @@ footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding
 <div class="wrap">
   <header>
     <div class="brand">
-      <p class="eyebrow">Pick a game &middot; play with your class</p>
-      <h1>Class Game <span class="pt">Room</span></h1>
-      <p class="lead">Review games for class, sorted by unit. Open the one your teacher names and follow the directions on screen.</p>
+      <p class="eyebrow">Pick your class &middot; pick a game</p>
+      <h1>Mrs. Kalinowski's <span class="pt">Math Website</span></h1>
+      <p class="lead">Choose Algebra or 8th Grade, then find your unit. Open the game Mrs. Kalinowski names and follow the directions on screen.</p>
     </div>
     <div class="coord" aria-hidden="true">you are here <b>(0, 0)</b></div>
   </header>
 
-  <nav class="tabs" id="tabs" role="tablist" aria-label="Subjects"></nav>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Classes"></nav>
   <main class="units" id="units"></main>
 
   <footer>Games save progress in the browser you play them in. Tap <b>&larr; All games</b> at the bottom of any game to come back here.</footer>
@@ -104,7 +107,7 @@ footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding
    - soon: true shows the card greyed out until the file is ready
    ===================================================================== */
 const SUBJECTS = [
-  { name: 'Math', units: [
+  { name: 'Algebra', id: 'algebra', note: 'Algebra 1', units: [
     { num: 'Unit 2', name: 'Equations and Inequalities', blurb: 'Properties of equality, multi-step equations, x on both sides, inequalities.', color: 'orange', games: [
       { title: 'Unit 2 Jeopardy', kind: 'Jeopardy', mode: 'Whole class', color: 'orange', file: 'unit-2-jeopardy.html',
         about: 'Team review of review pages 75 to 81: properties, exponents, rearranging, solving and graphing.' },
@@ -121,16 +124,21 @@ const SUBJECTS = [
       { title: 'Battle My Math Ship: Slope', kind: 'Battleship', mode: 'Partners, 2 devices', color: 'cyan', file: 'battle-my-math-ship-slope.html',
         about: 'Hide 12 ships, then find the slope between two points to fire. One partner hosts and shares a code, the other joins.' }
     ]}
+  ]},
+  { name: '8th Grade', id: '8th-grade', note: 'Grade 8 Math', units: [
   ]}
 ];
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let cur = 0;
 try { const t = +localStorage.getItem('cg-tab'); if (SUBJECTS[t]) cur = t; } catch (e) {}
+const fromHash = () => { const i = SUBJECTS.findIndex(x => '#' + x.id === location.hash); if (i >= 0) cur = i; };
+fromHash();
+window.addEventListener('hashchange', () => { fromHash(); render(); });
 
 function render(){
   document.getElementById('tabs').innerHTML = SUBJECTS.map((s, i) =>
-    '<button class="tab" role="tab" id="tab-' + i + '" aria-selected="' + (i === cur) + '" data-i="' + i + '">' + esc(s.name) + '</button>').join('');
+    '<button class="tab" role="tab" id="tab-' + i + '" aria-selected="' + (i === cur) + '" data-i="' + i + '"><b>' + esc(s.name) + '</b><span>' + esc(s.note || '') + '</span></button>').join('');
   const units = SUBJECTS[cur].units;
   document.getElementById('units').innerHTML = units.length ? units.map(u =>
     '<section class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
@@ -143,11 +151,12 @@ function render(){
         return g.soon || !g.file ? '<div class="card soon"' + st + '>' + inner + '</div>'
                                  : '<a class="card" href="games/' + esc(g.file) + '"' + st + '>' + inner + '</a>';
       }).join('') + '</div>' +
-    '</section>').join('') : '<p class="empty">No games in this subject yet.</p>';
+    '</section>').join('') : '<p class="empty">No games here yet. Check back soon.</p>';
 }
 document.getElementById('tabs').addEventListener('click', e => {
   const b = e.target.closest('.tab'); if (!b) return;
   cur = +b.dataset.i; try { localStorage.setItem('cg-tab', cur); } catch (err) {}
+  try { history.replaceState(null, '', '#' + SUBJECTS[cur].id); } catch (err) {}
   render();
 });
 render();
