@@ -94,8 +94,14 @@ i{font-style:italic}
 #ctl{margin-top:1rem}
 #ctl:empty{display:none}
 .moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}
-.mv{min-height:4.6rem;font-size:1.3rem;line-height:1.15;font-family:var(--disp);font-weight:800}
+.mv{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.35rem .45rem;min-height:4.6rem;padding:.6rem .7rem;border-radius:14px;color:#000;font-size:1.25rem;line-height:1.15;font-family:var(--disp);font-weight:800;text-align:center}
 .mv[data-ready="0"]{filter:saturate(.3) brightness(.55)}
+.mv i{font-family:var(--mono);font-weight:600}
+.mv .amt{width:3.3ch;min-width:2.6rem;height:2.6rem;border:2px solid #000;border-radius:10px;background:#fff;color:#000;font:600 1.35rem var(--mono);text-align:center;padding:0;-moz-appearance:textfield}
+.mv .amt::-webkit-outer-spin-button,.mv .amt::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.mv .amt:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.mv .go{flex-basis:100%;border:0;border-radius:10px;background:#000;color:var(--fg);font:700 1rem var(--body);min-height:2.4rem;cursor:pointer}
+.mv .go:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
 .mv i{font-family:var(--mono);font-weight:600}
 .coach{animation:glow 1.15s ease-out infinite}
 @keyframes glow{0%{box-shadow:0 0 0 0 var(--glow,#fff)}75%,100%{box-shadow:0 0 0 .8rem rgba(255,255,255,0)}}
@@ -286,12 +292,28 @@ function nextMove(s){
   if(canDiv(s))return 'div';
   return null;
 }
-function applyMove(t,s){
-  if(t==='subx'){var m=mn(s.a,s.c);return {m:m,to:{a:s.a-m,b:s.b,c:s.c-m,d:s.d}}}
-  if(t==='subc'){var n=mn(s.b,s.d);return {m:n,to:{a:s.a,b:s.b-n,c:s.c,d:s.d-n}}}
-  var k=canDiv(s);
-  if(s.a>1)return {m:k,to:{a:1,b:0,c:0,d:s.d/k}};
-  return {m:k,to:{a:0,b:s.b/k,c:1,d:0}};
+function applyMove(t,s,k){
+  if(t==='subx')return {m:k,to:{a:s.a-k,b:s.b,c:s.c-k,d:s.d}};
+  if(t==='subc')return {m:k,to:{a:s.a,b:s.b-k,c:s.c,d:s.d-k}};
+  return {m:k,to:{a:s.a/k,b:s.b/k,c:s.c/k,d:s.d/k}};
+}
+/* the student picks the amount; return a message if it does not work, or '' if it does */
+function badAmount(t,s,k){
+  var pl=function(n,w){return n+' '+w+(n===1?'':'s')};
+  if(!(k>=1))return t==='div'?'Type the number to divide both sides by, then press Go.':'Type how many to take away, then press Go.';
+  if(t==='subx'){
+    var lack=s.a<k?['left',s.a]:s.c<k?['right',s.c]:null;
+    if(lack)return 'The '+lack[0]+' side only has '+lack[1]+' <i>x</i>'+(lack[1]===1?'':'\'s')+'. You can\'t take away '+k+' from both sides.';
+    return '';
+  }
+  if(t==='subc'){
+    var lk=s.b<k?['left',s.b]:s.d<k?['right',s.d]:null;
+    if(lk)return 'The '+lk[0]+' side only has '+pl(lk[1],'one')+'. You can\'t take away '+k+' from both sides.';
+    return '';
+  }
+  if(k===1)return 'Dividing by 1 changes nothing. Try another number.';
+  if(s.a%k||s.b%k||s.c%k||s.d%k)return 'Both sides have to split into '+k+' equal piles with nothing left over. Try another number.';
+  return '';
 }
 function notReady(t,s){
   if(t==='subx')return (s.a===0&&s.c===0)?'No x\'s left to take.':'Only one side has <i>x</i>. Nothing to take from both.';
@@ -299,9 +321,9 @@ function notReady(t,s){
   return 'Get <i>x</i> alone on one side first.';
 }
 function hintText(mv,s){
-  if(mv==='subx'){var m=mn(s.a,s.c);return 'Take away '+m+' <i>x</i>'+(m>1?'\'s':'')+' from both sides. Clear the <i>x</i>\'s off one side.'}
-  if(mv==='subc'){return 'Take away '+mn(s.b,s.d)+' from both sides.'}
-  return 'Split both sides into '+canDiv(s)+' equal piles. Divide.';
+  if(mv==='subx')return 'Look at the <i>x</i>\'s. Which side has fewer? Take away that many from both sides to clear the <i>x</i>\'s off one side.';
+  if(mv==='subc')return 'Look at the ones. Which side has fewer? Take away that many from both sides.';
+  return '<i>x</i> is on one side. What number is in front of <i>x</i>? Divide both sides by it.';
 }
 
 /* ---------- written work ---------- */
@@ -468,11 +490,12 @@ function barHTML(){
 function ctlHTML(){
   if(S.tab==='warm')return '';
   var g=game(),s=cur(g),solved=isSolved(s),mv=nextMove(s),on=!g.cheat&&!solved;
-  function m(t,cls,label){
+  function m(t,cls,before,after,name){
     var co=on&&((S.tab==='guided'&&mv===t)||S.hintMv===t)?' coach':'';
-    return '<button class="btn mv fill '+cls+co+'" data-act="'+t+'" data-ready="'+((on&&ready(t,s))?1:0)+'">'+label+'</button>';
+    var inp='<input class="amt" id="amt-'+t+'" data-t="'+t+'" type="number" inputmode="numeric" min="1" step="1" aria-label="'+name+'">';
+    return '<div class="mv fill '+cls+co+'" data-ready="'+((on&&ready(t,s))?1:0)+'"><span>'+before+'</span>'+inp+(after?'<span>'+after+'</span>':'')+'<button class="go" data-act="'+t+'">Go</button></div>';
   }
-  return '<p class="lab">Do it to both sides</p><div class="moves">'+m('subx','cyan','Take away <i>x</i>\'s')+m('subc','yellow','Take away ones')+m('div','orange','Divide')+'</div>'+
+  return '<p class="lab">Do it to both sides. You choose how many.</p><div class="moves">'+m('subx','cyan','Take away','<i>x</i>\'s','How many x\'s to take away')+m('subc','yellow','Take away','ones','How many ones to take away')+m('div','orange','Divide by','','Number to divide by')+'</div>'+
     '<div class="tools"><button class="btn line violet" data-act="hint">Hint</button><button class="btn line" data-act="undo">Undo</button><button class="btn line" data-act="reset">Start over</button>'+
     '<button class="btn line red" data-act="cheat">'+(g.cheat?'Put it back':'Try cheating')+'</button></div>';
 }
@@ -512,8 +535,8 @@ function render(o){
 }
 function intro(){
   if(S.tab==='warm')say(['Count each side. Same weight on both.','Pick a number for <i>x</i>.','<i>x</i> is on both sides this time.'][S.beat],'info');
-  else if(S.tab==='guided')say('Tap the glowing button. It acts on both sides.','info');
-  else{var g=G.practice;say(g.note||'Pick a move. It happens on both sides.','info')}
+  else if(S.tab==='guided')say('Type a number in the glowing box, then press Go. It acts on both sides.','info');
+  else{var g=G.practice;say(g.note||'Pick a move, type how many, then press Go. It happens on both sides.','info')}
 }
 function setTab(t){
   if(S.busy)return;
@@ -531,8 +554,10 @@ function move(t){
   if(g.cheat){say('Put it back first.','warn');flashBtn('cheat');return}
   if(isSolved(s)){say('<i>x</i> is already alone. Plug it back in.','good');return}
   if(!ready(t,s)){say(notReady(t,s),'warn');flashBtn(t);return}
+  var box=$('#amt-'+t),k=box?parseInt(box.value,10):NaN,why=badAmount(t,s,k);
+  if(why){say(why,'warn');flashBtn(t);if(box){box.focus();box.select()}return}
   S.busy=true;S.hintMv=null;
-  var r=applyMove(t,s);popTo(s,r.to);
+  var r=applyMove(t,s,k);popTo(s,r.to);
   setTimeout(function(){
     g.hist.push({type:t,m:r.m,from:s,to:r.to});g.checked=false;
     var done=isSolved(r.to);
@@ -627,7 +652,7 @@ document.addEventListener('click',function(e){
   else if(a==='wnext')wnext();
   else if(a==='wback')wback();
 });
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHow()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHow();else if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('amt')){e.preventDefault();move(e.target.dataset.t)}});
 
 setAngle(0);intro();render({enter:true});
 })();
