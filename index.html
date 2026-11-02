@@ -107,7 +107,9 @@ footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding
    - soon: true shows the card greyed out until the file is ready
    ===================================================================== */
 const SUBJECTS = [
-  { name: 'Algebra', id: 'algebra', note: 'Algebra 1', units: [
+  { name: 'Algebra', id: 'algebra', note: 'Algebra 1 Honors', units: [
+    { num: 'Unit 1', name: 'Exponents and Expressions', blurb: 'Properties of math, exponent rules, simplifying expressions.', color: 'green', games: [
+    ]},
     { num: 'Unit 2', name: 'Equations and Inequalities', blurb: 'Properties of equality, multi-step equations, x on both sides, inequalities.', color: 'orange', games: [
       { title: 'Unit 2 Jeopardy', kind: 'Jeopardy', mode: 'Whole class', color: 'orange', file: 'unit-2-jeopardy.html',
         about: 'Team review of review pages 75 to 81: properties, exponents, rearranging, solving and graphing.' },
@@ -120,7 +122,7 @@ const SUBJECTS = [
       { title: 'Balance Scale', kind: 'Practice', mode: 'On your own', color: 'blue', file: 'balance-scale.html',
         about: 'Take away x boxes and ones from both sides until x is alone. Keep the scale level.' }
     ]},
-    { num: 'Unit 3', name: 'Slope', blurb: 'Finding the slope between two points.', color: 'cyan', games: [
+    { num: 'Unit 3', name: 'Linear Equations and Inequalities', blurb: 'Consecutive integers, slope, point-slope and slope-intercept form, graphing inequalities.', color: 'cyan', games: [
       { title: 'Battle My Math Ship: Slope', kind: 'Battleship', mode: 'Partners, 2 devices', color: 'cyan', file: 'battle-my-math-ship-slope.html',
         about: 'Hide 12 ships, then find the slope between two points to fire. One partner hosts and shares a code, the other joins.' }
     ]}
@@ -143,14 +145,14 @@ function render(){
   document.getElementById('units').innerHTML = units.length ? units.map(u =>
     '<section class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
       '<div class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2>' + (u.blurb ? '<p>' + esc(u.blurb) + '</p>' : '') + '</div>' +
-      '<div class="games">' + u.games.map(g => {
+      (u.games.length ? '<div class="games">' + u.games.map(g => {
         const inner = '<div class="top"><span class="kind">' + esc(g.kind) + '</span><span class="mode">' + esc(g.mode) + '</span></div>' +
           '<h3>' + esc(g.title) + '</h3><p>' + esc(g.about) + '</p>' +
           '<span class="play">' + (g.soon ? 'Coming soon' : 'Play') + '</span>';
         const st = ' style="--c:var(--c-' + (g.color || 'cyan') + ')"';
         return g.soon || !g.file ? '<div class="card soon"' + st + '>' + inner + '</div>'
                                  : '<a class="card" href="games/' + esc(g.file) + '"' + st + '>' + inner + '</a>';
-      }).join('') + '</div>' +
+      }).join('') + '</div>' : '<p class="empty">No games for this unit yet.</p>') +
     '</section>').join('') : '<p class="empty">No games here yet. Check back soon.</p>';
 }
 document.getElementById('tabs').addEventListener('click', e => {
