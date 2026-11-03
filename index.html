@@ -85,11 +85,19 @@ a.card:hover{transform:translateY(-3px);border-color:var(--c);background:var(--p
 .empty{color:var(--dim);border:2px dashed var(--line);border-radius:18px;padding:22px;text-align:center}
 footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
 
+.xres{display:flex;width:fit-content;align-items:center;gap:10px;margin:14px 0 0;font:800 clamp(1.05rem,2.6vw,1.3rem)/1.1 var(--display);color:var(--fg);text-decoration:none;
+  background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:10px 18px;transition:background .14s,color .14s,transform .14s}
+.xres:hover{background:var(--gold);color:#000;transform:translateY(-2px)}
+.brand .row{display:flex;flex-direction:column;align-items:flex-start}
 /* seasonal theme (set by script from today's date) */
-.greet{display:inline-flex;align-items:center;gap:12px;margin:18px 0 0;font:800 clamp(1.25rem,3.4vw,1.7rem)/1.1 var(--display);color:#000;
+.greet{display:flex;width:fit-content;align-items:center;gap:12px;margin:18px 0 0;font:800 clamp(1.25rem,3.4vw,1.7rem)/1.1 var(--display);color:#000;
   background:linear-gradient(100deg,var(--gold),var(--gold2));border-radius:16px;padding:10px 22px 10px 14px;box-shadow:0 0 0 3px rgba(0,0,0,.4),0 8px 30px var(--glow);
   animation:wiggle 4s ease-in-out infinite}
 .greet:empty{display:none}
+a.greet{text-decoration:none;transition:transform .14s,box-shadow .14s}
+a.greet:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 0 3px rgba(0,0,0,.4),0 12px 40px var(--glow)}
+.greet .gt{display:flex;flex-direction:column;gap:6px}
+.greet small{font:700 clamp(.95rem,2.4vw,1.1rem)/1 var(--body);background:rgba(0,0,0,.82);color:var(--gold);border-radius:999px;padding:6px 12px;width:fit-content}
 .greet .gi{font-size:1.6em;line-height:1;display:inline-block;animation:hop 1.6s ease-in-out infinite}
 @keyframes hop{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-6px) rotate(8deg)}}
 @keyframes wiggle{0%,92%,100%{transform:rotate(0)}94%{transform:rotate(-2deg)}96%{transform:rotate(2deg)}98%{transform:rotate(-1deg)}}
@@ -113,7 +121,7 @@ h1 .pt{text-shadow:0 0 28px var(--glow)}
     <div class="brand">
       <h1>Mrs. Kalinowski's <span class="pt">Math Website</span></h1>
       <p class="lead">Choose Algebra or 8th Grade, then find your unit.</p>
-      <p class="greet" id="greet"></p>
+      <a class="greet" id="greet" href="resources.html"></a>
     </div>
   </header>
 
@@ -170,7 +178,8 @@ function seasonFor(t){
   r.setProperty('--gold', t.accent); r.setProperty('--gold2', t.accent2); r.setProperty('--glow', t.accent + '55');
   r.setProperty('--bg', t.bg); r.setProperty('--grid', t.grid);
   document.documentElement.dataset.season = key;
-  document.getElementById('greet').innerHTML = '<span class="gi">' + t.greet[0] + '</span>' + t.greet[1];
+  const g = document.getElementById('greet');
+  g.innerHTML = '<span class="gi">' + t.greet[0] + '</span><span class="gt">' + t.greet[1] + (g.tagName === 'A' ? '<small>📚 Extra Resources &rarr;</small>' : '') + '</span>';
   const spots = [[3,8,-12],[89,4,10],[2,48,8],[93,38,-8],[4,84,14],[88,78,-14],[50,92,6],[72,20,12]];
   let h = spots.map((p, i) =>
     '<span class="big" style="left:' + p[0] + '%;top:' + p[1] + '%;--r:' + p[2] + 'deg;animation-delay:' + (-i * 0.9) + 's">' + t.icons[i % t.icons.length] + '</span>').join('');

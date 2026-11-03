@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Extra Resources</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Unit packets, reviews and solo games for Mrs. Kalinowski's Algebra and 8th Grade classes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: graph-paper stage (matches the black game boards). Header, subject tabs, then one band per unit holding a grid of game cards.
+   Single dark look by choice, so the hub feels like the games it opens. */
+:root{
+  --bg:#050507; --grid:#14141c; --panel:#0e0e14; --panel2:#16161f; --line:#2a2a36;
+  --fg:#f5f5f8; --dim:#a3a3b5; --gold:#ffd23f; --gold2:#ff9f1c; --glow:#ffd23f55;
+  --c-red:#ff5a4d; --c-orange:#ff9f1c; --c-green:#3ddc97; --c-cyan:#33d6ff; --c-blue:#3d8bff; --c-violet:#b388ff; --c-pink:#ff4fa8;
+  --display:'Bricolage Grotesque','Arial Rounded MT Bold',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;min-height:100vh;background-color:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  background-image:radial-gradient(ellipse 90% 55% at 50% -8%,var(--glow),transparent 70%),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:100% 100%,32px 32px,32px 32px;background-position:0 0,-1px -1px,-1px -1px;background-repeat:no-repeat,repeat,repeat;background-attachment:fixed,scroll,scroll;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 28px}
+.brand{min-width:0}
+.eyebrow{font:600 .78rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
+h1{font:800 clamp(2.4rem,7vw,4.6rem)/.95 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .pt{color:var(--gold)}
+.lead{margin:12px 0 0;color:var(--dim);max-width:52ch;font-size:1.08rem}
+.coord{font:600 .95rem var(--mono);color:var(--dim);border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--panel);white-space:nowrap}
+.coord b{color:var(--gold)}
+
+/* subject tabs */
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.tab{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;color:var(--fg);background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:16px 20px;cursor:pointer;min-height:44px;transition:border-color .14s,background .14s}
+.tab b{font:800 clamp(1.5rem,4vw,2.1rem)/1.05 var(--display)}
+.tab span{font:500 .92rem var(--body);color:var(--dim)}
+.tab:hover{border-color:var(--dim)}
+.tab[aria-selected=true]{background:var(--gold);border-color:var(--gold);color:#000}
+.tab[aria-selected=true] span{color:#3a2f00}
+
+/* unit bands */
+.units{display:flex;flex-direction:column;gap:14px}
+.unit{background:var(--panel);border:2px solid var(--line);border-radius:18px;transition:border-color .14s}
+.unit[open]{border-color:var(--uc)}
+.uhead{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:16px 56px 16px 18px;cursor:pointer;list-style:none;position:relative;min-height:44px}
+.uhead::-webkit-details-marker{display:none}
+.uhead::after{content:"";position:absolute;right:22px;top:50%;width:12px;height:12px;border-right:3px solid var(--dim);border-bottom:3px solid var(--dim);transform:translateY(-70%) rotate(45deg);transition:transform .18s}
+.unit[open] .uhead::after{transform:translateY(-30%) rotate(-135deg)}
+.uhead:hover h2{color:var(--uc)}
+.ucount{font:600 .8rem var(--mono);color:var(--dim);margin-left:auto}
+@media (max-width:560px){.ucount{flex-basis:100%;margin-left:0}}
+.ubody{padding:0 18px 18px;display:flex;flex-direction:column;gap:14px}
+.unum{font:600 .85rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#000;background:var(--uc);border-radius:6px;padding:3px 9px;align-self:center}
+.uhead h2{font:800 clamp(1.4rem,3.2vw,2rem)/1.1 var(--display);margin:0;text-wrap:balance}
+.blurb{margin:0;color:var(--dim)}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:14px}
+
+/* game cards */
+.card{--c:var(--c-cyan);position:relative;display:flex;flex-direction:column;gap:10px;min-width:0;text-decoration:none;
+  background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:18px 18px 16px;transition:transform .14s,border-color .14s,background .14s}
+a.card:hover{transform:translateY(-3px);border-color:var(--c);background:var(--panel2)}
+.card .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.kind{font:600 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.mode{font:500 .78rem var(--body);color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.card h3{font:800 1.45rem/1.1 var(--display);margin:0;color:var(--fg);text-wrap:balance}
+.card .lesson{font:600 .8rem var(--mono);color:var(--dim);margin-top:-4px}
+.card p{margin:0;color:var(--dim);font-size:.95rem;flex:1}
+.play{align-self:flex-start;font:700 .95rem var(--body);color:#000;background:var(--c);border-radius:999px;padding:7px 16px}
+.card.soon{border-style:dashed}
+.card.soon .play{background:transparent;color:var(--dim);border:1px dashed var(--line)}
+.card .mark{position:absolute;right:16px;bottom:14px;font:600 .8rem var(--mono);color:var(--line)}
+
+.empty{color:var(--dim);border:2px dashed var(--line);border-radius:18px;padding:22px;text-align:center}
+footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
+
+.xres{display:flex;width:fit-content;align-items:center;gap:10px;margin:14px 0 0;font:800 clamp(1.05rem,2.6vw,1.3rem)/1.1 var(--display);color:var(--fg);text-decoration:none;
+  background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:10px 18px;transition:background .14s,color .14s,transform .14s}
+.xres.back{margin:0 0 18px;font-size:1rem;padding:8px 14px}
+.rsec{display:flex;flex-direction:column;gap:10px}
+.rsec h3{font:800 1.2rem/1.1 var(--display);margin:0;display:flex;align-items:center;gap:8px}
+.rlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px}
+.ritem{display:flex;flex-direction:column;gap:4px;text-decoration:none;background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+a.ritem:hover{border-color:var(--uc)}
+.ritem b{font:700 1.05rem var(--body)}
+.ritem span{color:var(--dim);font-size:.9rem}
+.rsec .empty{padding:12px;font-size:.92rem;text-align:left}
+.xres:hover{background:var(--gold);color:#000;transform:translateY(-2px)}
+.brand .row{display:flex;flex-direction:column;align-items:flex-start}
+/* seasonal theme (set by script from today's date) */
+.greet{display:flex;width:fit-content;align-items:center;gap:12px;margin:18px 0 0;font:800 clamp(1.25rem,3.4vw,1.7rem)/1.1 var(--display);color:#000;
+  background:linear-gradient(100deg,var(--gold),var(--gold2));border-radius:16px;padding:10px 22px 10px 14px;box-shadow:0 0 0 3px rgba(0,0,0,.4),0 8px 30px var(--glow);
+  animation:wiggle 4s ease-in-out infinite}
+.greet:empty{display:none}
+a.greet{text-decoration:none;transition:transform .14s,box-shadow .14s}
+a.greet:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 0 3px rgba(0,0,0,.4),0 12px 40px var(--glow)}
+.greet .gt{display:flex;flex-direction:column;gap:6px}
+.greet small{font:700 clamp(.95rem,2.4vw,1.1rem)/1 var(--body);background:rgba(0,0,0,.82);color:var(--gold);border-radius:999px;padding:6px 12px;width:fit-content}
+.greet .gi{font-size:1.6em;line-height:1;display:inline-block;animation:hop 1.6s ease-in-out infinite}
+@keyframes hop{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-6px) rotate(8deg)}}
+@keyframes wiggle{0%,92%,100%{transform:rotate(0)}94%{transform:rotate(-2deg)}96%{transform:rotate(2deg)}98%{transform:rotate(-1deg)}}
+h1 .pt{text-shadow:0 0 28px var(--glow)}
+.tab[aria-selected=true]{background:linear-gradient(110deg,var(--gold),var(--gold2));box-shadow:0 6px 26px var(--glow)}
+.deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deco .big{position:absolute;font-size:clamp(3rem,7vw,5.5rem);opacity:.38;transform:rotate(var(--r,0deg));animation:bob 6s ease-in-out infinite alternate}
+.deco .drop{position:absolute;top:-10vh;font-size:var(--s,1.6rem);opacity:.75;animation:fall var(--t,12s) linear infinite;animation-delay:var(--dl,0s)}
+.deco .walker{position:absolute;bottom:2vh;left:0;font-size:clamp(4rem,9vw,7rem);opacity:.9;animation:strut 18s linear infinite}
+@keyframes strut{0%{transform:translateX(-20vw) scaleX(-1)}48%{transform:translateX(100vw) scaleX(-1)}50%{transform:translateX(100vw) scaleX(1)}98%{transform:translateX(-20vw) scaleX(1)}100%{transform:translateX(-20vw) scaleX(-1)}}
+@keyframes bob{to{translate:0 -18px}}
+@keyframes fall{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(28px,30vh) rotate(90deg)}50%{transform:translate(-22px,60vh) rotate(180deg)}75%{transform:translate(24px,90vh) rotate(270deg)}100%{transform:translate(0,120vh) rotate(360deg)}}
+.wrap{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.deco .big,.greet,.greet .gi{animation:none}.deco .drop{display:none}.deco .walker{animation:none;right:3vw;left:auto}}
+</style>
+</head>
+<body>
+<div class="deco" id="deco" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <a class="xres back" href="index.html"><span aria-hidden="true">&larr;</span> Back to games</a>
+      <h1>Extra <span class="pt">Resources</span></h1>
+      <p class="lead">Unit packets, reviews and solo games. Choose your class, then open a unit.</p>
+      <p class="greet" id="greet"></p>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Classes"></nav>
+  <main class="units" id="units"></main>
+
+  <footer>More resources are added through the year. Tap <b>&larr; Back to games</b> at the top to return to the games.</footer>
+</div>
+
+<script>
+/* =====================================================================
+   ADD GAMES HERE.
+   Each subject has units; each unit has games.
+   - file: the game's HTML file inside the games/ folder
+   - kind: short label (Bingo, Jeopardy, Practice, Battleship...)
+   - mode: "Whole class" or "On your own"
+   - color: red | orange | green | cyan | blue | violet | pink
+   - soon: true shows the card greyed out until the file is ready
+   ===================================================================== */
+/* ---------- Seasonal theme: changes the hub's colors and decorations by date. Add ?season=halloween (etc.) to preview one. ---------- */
+const SEASONS = {
+  halloween:   {accent:'#ff8c1a', accent2:'#c77dff', bg:'#07040a', grid:'#1d1226', icons:['🎃','👻','🦇','🕸️'], fall:['🦇','🍬','👻','🍂'], greet:['🎃','Happy Halloween!']},
+  fall:        {accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🍂','🍁','🌰','🥧'], fall:['🍂','🍁','🍁','🍂'], greet:['🍁','Happy fall!']},
+  thanksgiving:{accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🦃','🥧','🦃','🌽'], fall:['🦃','🍂','🦃','🍁'], walker:'🦃', greet:['🦃','Happy Thanksgiving!']},
+  winterholiday:{accent:'#ff5a5f', accent2:'#3ddc97', bg:'#030806', grid:'#0f2219', icons:['🎄','⛄','🎁','🦌'], fall:['❄️','❄️','✨','❄️'], greet:['🎄','Happy holidays!']},
+  newyear:     {accent:'#ffd23f', accent2:'#c77dff', bg:'#04040a', grid:'#16162a', icons:['🎉','🥳','🎊','✨'], fall:['🎊','✨','🎉','⭐'], greet:['🎉','Happy New Year!']},
+  winter:      {accent:'#8fd3ff', accent2:'#e0f4ff', bg:'#03060b', grid:'#101c2a', icons:['⛄','🧣','🧤','☃️'], fall:['❄️','❄️','❄️','✨'], greet:['⛄','Stay warm!']},
+  valentine:   {accent:'#ff6fae', accent2:'#ff3b5c', bg:'#0a0407', grid:'#26101b', icons:['💌','💘','🌹','🧸'], fall:['❤️','💕','💖','❤️'], greet:['💘','Happy Valentine\'s Day!']},
+  stpatrick:   {accent:'#4fdc7a', accent2:'#ffd23f', bg:'#030805', grid:'#0f2216', icons:['🌈','🪙','🎩','🍀'], fall:['☘️','🍀','☘️','🪙'], greet:['🍀','Happy St. Patrick\'s Day!']},
+  spring:      {accent:'#b6f26b', accent2:'#ff8fc7', bg:'#050805', grid:'#152216', icons:['🌷','🐣','🦋','🌼'], fall:['🌸','🌸','🦋','🌼'], greet:['🌷','Happy spring!']},
+  summer:      {accent:'#ffd23f', accent2:'#33d6ff', bg:'#03070a', grid:'#0f1f26', icons:['☀️','🏖️','😎','🍉'], fall:['🫧','🫧','🌊','⭐'], greet:['😎','Happy summer!']},
+  backtoschool:{accent:'#ff5a4d', accent2:'#ffd23f', bg:'#060505', grid:'#1d1515', icons:['🍎','📚','📐','🎒'], fall:['✏️','📏','🍎','➕'], greet:['🍎','Welcome back!']}
+};
+function seasonFor(t){
+  const m = t.getMonth() + 1, d = t.getDate();
+  if (m === 10) return 'halloween';
+  if (m === 11) {
+    const first = new Date(t.getFullYear(), 10, 1).getDay();
+    const thanks = 1 + ((4 - first + 7) % 7) + 21; // 4th Thursday
+    return d > thanks ? 'winterholiday' : d >= thanks - 14 ? 'thanksgiving' : 'fall';
+  }
+  if (m === 12) return 'winterholiday';
+  if (m === 1) return d <= 7 ? 'newyear' : 'winter';
+  if (m === 2) return d <= 14 ? 'valentine' : 'winter';
+  if (m === 3) return d <= 17 ? 'stpatrick' : 'spring';
+  if (m <= 5) return 'spring';
+  if (m <= 8) return 'summer';
+  return 'backtoschool';
+}
+(function applySeason(){
+  let key = seasonFor(new Date());
+  try { const q = new URLSearchParams(location.search).get('season'); if (q && SEASONS[q]) key = q; } catch (err) {}
+  const t = SEASONS[key], r = document.documentElement.style;
+  r.setProperty('--gold', t.accent); r.setProperty('--gold2', t.accent2); r.setProperty('--glow', t.accent + '55');
+  r.setProperty('--bg', t.bg); r.setProperty('--grid', t.grid);
+  document.documentElement.dataset.season = key;
+  const g = document.getElementById('greet');
+  g.innerHTML = '<span class="gi">' + t.greet[0] + '</span><span class="gt">' + t.greet[1] + (g.tagName === 'A' ? '<small>📚 Extra Resources &rarr;</small>' : '') + '</span>';
+  const spots = [[3,8,-12],[89,4,10],[2,48,8],[93,38,-8],[4,84,14],[88,78,-14],[50,92,6],[72,20,12]];
+  let h = spots.map((p, i) =>
+    '<span class="big" style="left:' + p[0] + '%;top:' + p[1] + '%;--r:' + p[2] + 'deg;animation-delay:' + (-i * 0.9) + 's">' + t.icons[i % t.icons.length] + '</span>').join('');
+  for (let i = 0; i < 22; i++) {
+    const x = (i * 47 + 13) % 100, dur = 10 + (i * 7) % 9, sz = 1.1 + ((i * 5) % 7) / 5;
+    h += '<span class="drop" style="left:' + x + '%;--t:' + dur + 's;--dl:' + (-(i * 1.7) % dur).toFixed(1) + 's;--s:' + sz.toFixed(2) + 'rem">' + t.fall[i % t.fall.length] + '</span>';
+  }
+  if (t.walker) h += '<span class="walker">' + t.walker + '</span>';
+  document.getElementById('deco').innerHTML = h;
+})();
+
+/* Extra resources. Each unit has three lists: packets, reviews, solo.
+   Add an item like { title: 'Unit 2 Packet', note: 'PDF', href: 'resources/algebra-unit-2-packet.pdf' }.
+   Never put answer keys here: this site is public. */
+const SUBJECTS = [
+  { name: 'Algebra', id: 'algebra', note: 'Algebra 1 Honors', units: [
+    { num: 'Unit 1', name: 'Exponents and Expressions', color: 'green', packets: [], reviews: [], solo: [] },
+    { num: 'Unit 2', name: 'Equations and Inequalities', color: 'orange', packets: [], reviews: [], solo: [] },
+    { num: 'Unit 3', name: 'Linear Equations and Inequalities', color: 'cyan', packets: [], reviews: [], solo: [] }
+  ]},
+  { name: '8th Grade', id: '8th-grade', note: 'Grade 8 Math', units: [
+    { num: 'Unit 1', name: 'Exponents', color: 'green', packets: [], reviews: [], solo: [] },
+    { num: 'Unit 2', name: 'Solving Linear Equations', color: 'orange', packets: [], reviews: [], solo: [] },
+    { num: 'Unit 3', name: 'Fractional Linear Equations and Classification of Solutions', color: 'cyan', packets: [], reviews: [], solo: [] }
+  ]}
+];
+const SECTIONS = [['packets', '📘', 'Unit Packet'], ['reviews', '📝', 'Reviews'], ['solo', '🎮', 'Solo Games']];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let cur = 0;
+try { const t = +localStorage.getItem('cg-tab'); if (SUBJECTS[t]) cur = t; } catch (e) {}
+const fromHash = () => { const i = SUBJECTS.findIndex(x => '#' + x.id === location.hash); if (i >= 0) cur = i; };
+fromHash();
+window.addEventListener('hashchange', () => { fromHash(); render(); });
+
+function render(){
+  document.getElementById('tabs').innerHTML = SUBJECTS.map((s, i) =>
+    '<button class="tab" role="tab" id="tab-' + i + '" aria-selected="' + (i === cur) + '" data-i="' + i + '"><b>' + esc(s.name) + '</b><span>' + esc(s.note || '') + '</span></button>').join('');
+  document.getElementById('units').innerHTML = SUBJECTS[cur].units.map(u => {
+    const n = SECTIONS.reduce((t, s) => t + u[s[0]].length, 0);
+    return '<details class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
+      '<summary class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2><span class="ucount">' + (n ? n + (n === 1 ? ' resource' : ' resources') : 'Coming soon') + '</span></summary><div class="ubody">' +
+      SECTIONS.map(s => '<section class="rsec"><h3><span aria-hidden="true">' + s[1] + '</span>' + s[2] + '</h3>' +
+        (u[s[0]].length ? '<div class="rlist">' + u[s[0]].map(it =>
+          (it.href ? '<a class="ritem" href="' + esc(it.href) + '" target="_blank" rel="noopener">' : '<div class="ritem">') +
+          '<b>' + esc(it.title) + '</b>' + (it.note ? '<span>' + esc(it.note) + '</span>' : '') + (it.href ? '</a>' : '</div>')).join('') + '</div>'
+          : '<p class="empty">Nothing here yet.</p>') + '</section>').join('') +
+      '</div></details>';
+  }).join('');
+}
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  cur = +b.dataset.i; try { localStorage.setItem('cg-tab', cur); } catch (err) {}
+  try { history.replaceState(null, '', '#' + SUBJECTS[cur].id); } catch (err) {}
+  render();
+});
+render();
+</script>
+</body>
+</html>
