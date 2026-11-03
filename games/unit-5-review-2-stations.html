@@ -82,6 +82,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .g-lab{fill:var(--fg);font:italic 600 17px var(--body)}
 .g-curve{stroke:var(--cyan);stroke-width:4;fill:none;stroke-linecap:round}
 .g-dot{fill:var(--cyan)} .g-dot.open{fill:#000;stroke:var(--cyan);stroke-width:3}
+.g-num{fill:var(--mute);font:500 15px var(--body)}.g-title{fill:var(--mute);font:600 15px var(--body)}.rt{white-space:nowrap}.rt>span{border-top:2px solid currentColor;padding:0 .1em;margin-left:.05em}
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
 
@@ -237,7 +238,7 @@ function renderStation() {
   if (p.t === 'mc') {
     const tried = (st.wa[S.part] || []).map(Number);
     inp = '<div class="chs" id="chs">' + p.choices.map((c, i) => {
-      const L = p.letters ? String.fromCharCode(97 + i) : String.fromCharCode(65 + i), bad = tried.includes(i);
+      const L = (p.labels || 'ABCDEF')[i], bad = tried.includes(i);
       return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + '><span class="k">' + L + '</span><span>' + c + '</span></button>';
     }).join('') + '</div>';
   } else {

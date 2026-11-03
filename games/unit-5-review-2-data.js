@@ -28,20 +28,44 @@ function curvePath(pts, X, Y) {             // Catmull-Rom through the points, a
   }
   return d;
 }
+/* g: { x:[min,max], y:[min,max] (default -10..10), gx/gy: units per grid square (default 1),
+        ticks: {x:step, y:step} to print numbers on the axes, xTitle/yTitle,
+        curves: [ [[x,y],...] or {p:[[x,y],...], arrow:true} ], dots: [[x,y,open?]] } */
 function graph(g) {
-  const n = g.size || 10, cell = 20, pad = 26, W = 2 * n * cell + 2 * pad;
-  const X = x => pad + (x + n) * cell, Y = y => pad + (n - y) * cell;
-  let s = '<svg class="graph" viewBox="0 0 ' + W + ' ' + W + '" role="img" aria-label="' + (g.label || 'graph') + '">';
-  for (let i = -n; i <= n; i++) {
-    s += '<line class="g-grid" x1="' + X(i) + '" y1="' + Y(n) + '" x2="' + X(i) + '" y2="' + Y(-n) + '"/>';
-    s += '<line class="g-grid" x1="' + X(-n) + '" y1="' + Y(i) + '" x2="' + X(n) + '" y2="' + Y(i) + '"/>';
+  const [x0, x1] = g.x || [-10, 10], [y0, y1] = g.y || [-10, 10], gx = g.gx || 1, gy = g.gy || 1;
+  const nx = (x1 - x0) / gx, ny = (y1 - y0) / gy, cell = 400 / Math.max(nx, ny);
+  const pl = g.yTitle ? 80 : g.ticks ? 40 : 26, pr = 30, pt = 30, pb = g.xTitle ? 70 : g.ticks ? 44 : 30;
+  const W = nx * cell + pl + pr, H = ny * cell + pt + pb;
+  const X = x => pl + (x - x0) / gx * cell, Y = y => pt + (y1 - y) / gy * cell;
+  const ax = x0 <= 0 && 0 <= x1 ? 0 : x0, ay = y0 <= 0 && 0 <= y1 ? 0 : y0;
+  const f = n => +n.toFixed(1);
+  let s = '<svg class="graph" viewBox="0 0 ' + f(W) + ' ' + f(H) + '" role="img" aria-label="' + (g.label || 'graph') + '">';
+  for (let i = 0; i <= nx; i++) s += '<line class="g-grid" x1="' + f(X(x0 + i * gx)) + '" y1="' + Y(y1) + '" x2="' + f(X(x0 + i * gx)) + '" y2="' + f(Y(y0)) + '"/>';
+  for (let i = 0; i <= ny; i++) s += '<line class="g-grid" x1="' + X(x0) + '" y1="' + f(Y(y0 + i * gy)) + '" x2="' + f(X(x1)) + '" y2="' + f(Y(y0 + i * gy)) + '"/>';
+  const e = 16, a = 10;
+  const L = X(x0) - (x0 < 0 ? e : 0), R = X(x1) + e, T = Y(y1) - e, B = Y(y0) + (y0 < 0 ? e : 0);
+  s += '<path class="g-axis" d="M' + f(L) + ' ' + f(Y(ay)) + 'H' + f(R) + 'M' + f(X(ax)) + ' ' + f(B) + 'V' + f(T) + '"/>';
+  let ar = 'M' + f(R) + ' ' + f(Y(ay)) + 'l-' + a + ' -5.5v11zM' + f(X(ax)) + ' ' + f(T) + 'l-5.5 ' + a + 'h11z';
+  if (x0 < 0) ar += 'M' + f(L) + ' ' + f(Y(ay)) + 'l' + a + ' -5.5v11z';
+  if (y0 < 0) ar += 'M' + f(X(ax)) + ' ' + f(B) + 'l-5.5 -' + a + 'h11z';
+  s += '<path class="g-arrow" d="' + ar + '"/>';
+  s += '<text class="g-lab" x="' + f(R - 2) + '" y="' + f(Y(ay) + 24) + '">x</text><text class="g-lab" x="' + f(X(ax) + 10) + '" y="' + f(T + 6) + '">y</text>';
+  if (g.ticks) {
+    const lab = (v) => v < 0 ? '−' + -v : String(v);
+    for (let v = Math.ceil(x0 / g.ticks.x) * g.ticks.x; v <= x1 + 1e-9; v += g.ticks.x) if (v) s += '<text class="g-num" text-anchor="middle" x="' + f(X(v)) + '" y="' + f(Y(ay) + 20) + '">' + lab(v) + '</text>';
+    for (let v = Math.ceil(y0 / g.ticks.y) * g.ticks.y; v <= y1 + 1e-9; v += g.ticks.y) if (v || y0 === 0) s += '<text class="g-num" text-anchor="end" x="' + f(X(ax) - 7) + '" y="' + f(Y(v) + 5) + '">' + lab(v) + '</text>';
   }
-  const a = 9, L = pad - 14, R = W - pad + 14;
-  s += '<path class="g-axis" d="M' + L + ' ' + Y(0) + 'H' + R + 'M' + X(0) + ' ' + L + 'V' + R + '"/>';
-  s += '<path class="g-arrow" d="M' + R + ' ' + Y(0) + 'l-' + a + ' -5v10zM' + L + ' ' + Y(0) + 'l' + a + ' -5v10zM' + X(0) + ' ' + L + 'l-5 ' + a + 'h10zM' + X(0) + ' ' + R + 'l-5 -' + a + 'h10z"/>';
-  s += '<text class="g-lab" x="' + (R - 4) + '" y="' + (Y(0) + 22) + '">x</text><text class="g-lab" x="' + (X(0) + 10) + '" y="' + (L + 6) + '">y</text>';
-  (g.curves || []).forEach(c => { s += '<path class="g-curve" d="' + curvePath(c, X, Y) + '"/>'; });
-  (g.dots || []).forEach(p => { s += '<circle class="g-dot' + (p[2] ? ' open' : '') + '" cx="' + X(p[0]) + '" cy="' + Y(p[1]) + '" r="6"/>'; });
+  if (g.xTitle) s += '<text class="g-title" text-anchor="middle" x="' + f((X(x0) + X(x1)) / 2) + '" y="' + f(H - 14) + '">' + g.xTitle + '</text>';
+  if (g.yTitle) s += '<text class="g-title" text-anchor="middle" transform="translate(22 ' + f((Y(y0) + Y(y1)) / 2) + ') rotate(-90)">' + g.yTitle + '</text>';
+  (g.curves || []).forEach(c => {
+    const P = Array.isArray(c) ? c : c.p;
+    s += '<path class="g-curve" d="' + curvePath(P, X, Y) + '"/>';
+    if (c.arrow) {
+      const [p, q] = [P[P.length - 2], P[P.length - 1]], ang = Math.atan2(Y(q[1]) - Y(p[1]), X(q[0]) - X(p[0])) * 180 / Math.PI;
+      s += '<path class="g-arrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';
+    }
+  });
+  (g.dots || []).forEach(p => { s += '<circle class="g-dot' + (p[2] ? ' open' : '') + '" cx="' + f(X(p[0])) + '" cy="' + f(Y(p[1])) + '" r="6"/>'; });
   return s + '</svg>';
 }
 
@@ -52,13 +76,56 @@ function graph(g) {
      expr : answer = expression in variable `vr` (any equivalent form is accepted)
      seq  : answer = list of numbers (the first terms)
      aseq : arithmetic sequence that starts at `first` with difference `d` (at least `min` terms)
+   `noprint: true` leaves a part off the printed sheet; `pc: false` prints it without its choices.
    `pq` (optional) replaces the part's wording on the printed station sheet; '' leaves it off.
    `hints` are shown one at a time on the hint page and on the device. */
 const Q = [
-  { n: 1, ready: false, title: 'Is it a function?', text: 'Marcel claims that the graph below represents a function. State whether Marcel is correct. Justify your answer.', parts: [] },
-  { n: 2, ready: false, title: 'Which relation is a function?', text: 'Which relation is a function?', parts: [] },
-  { n: 3, ready: false, title: 'Evaluate a function', text: 'If f(x) = ?, then f(?) = ?   Choices: a) 1  b) −2  c) −1  d) −13/3', parts: [] },
-  { n: 4, ready: false, title: 'Evaluate a function', text: 'A function is defined as ?. The value of ? is   Choices: a) 54  b) 36  c) 0  d) −18', parts: [] },
+  { n: 1, ready: true, title: 'Is it a function?',
+    text: 'Marcel claims that the graph below represents a function.',
+    graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 },
+      label: 'A V shape from (-4, 3) down to (-1, 0) and up to a closed dot at (2, 3); a second piece starts at a closed dot at (2, -1) and curves up through (3, 0) to (4, 3).',
+      curves: [[[-4, 3], [-1, 0]], [[-1, 0], [2, 3]], [[2, -1], [2.55, -0.65], [3, 0], [3.45, 0.9], [3.8, 2], [4, 3]]],
+      dots: [[2, 3], [2, -1]] },
+    parts: [
+      { t: 'mc', q: 'State whether Marcel is correct.', pq: 'State whether Marcel is correct. Justify your answer.', pc: false, choices: ['Yes, Marcel is correct. It is a function.', 'No, Marcel is not correct. It is not a function.'], answer: 1,
+        hints: ['A graph is a function if every x-value has only ONE y-value.',
+                'Use the vertical line test: slide a pencil held straight up and down across the graph. Does it ever touch the graph in two places at once?',
+                'Look closely at the two closed dots.'] },
+      { t: 'num', noprint: true, q: 'Justify: at what x-value does a vertical line hit the graph in two places?', answer: 2, prefix: v('x') + ' =',
+        hints: ['Find the two closed dots. What x-value is each one at?', 'Both dots sit on the same vertical line. Read the x-value of that line.'] },
+      { t: 'mc', noprint: true, q: 'Which statement justifies your answer?',
+        choices: ['The graph fails the vertical line test: ' + v('x') + ' = 2 is paired with two y-values, 3 and ' + M + '1.',
+                  'The graph passes the vertical line test, so every ' + v('x') + ' has one y-value.',
+                  'The graph is not a function because it has a V shape.',
+                  'The graph is not a function because it crosses the x-axis.'], answer: 0,
+        hints: ['A function cannot have one x-value paired with two different y-values.', 'Which choice talks about the vertical line test and the x-value you just found?'] }
+    ] },
+  { n: 2, ready: true, title: 'Which relation is a function?',
+    text: 'Which relation is a function?',
+    parts: [
+      { t: 'mc', q: 'Choose the relation that is a function.', pq: '', labels: '1234',
+        choices: ['{(2, 1), (3, 1), (4, 1), (5, 1)}', '{(1, 2), (1, 3), (1, 4), (1, 5)}', '{(2, 3), (3, 2), (4, 2), (2, 4)}', '{(1, 6), (2, 8), (3, 9), (3, 12)}'], answer: 0,
+        hints: ['In a function, each x-value (the first number in each pair) shows up only ONCE.',
+                'Look at the first number of every ordered pair. Does any first number repeat?',
+                'Repeating y-values is OK! Only repeating x-values with different y-values breaks a function.'] }
+    ] },
+  { n: 3, ready: true, title: 'Evaluate a function',
+    text: 'If ' + v('f') + '(' + v('x') + ') = ' + fr('<span class="rt">√<span>2' + v('x') + ' + 3</span></span>', '6' + v('x') + ' ' + M + ' 5') + ', then ' + v('f') + '(' + fr('1', '2') + ') =',
+    parts: [
+      { t: 'mc', q: 'Choose the value.', pq: '', labels: 'abcd',
+        choices: ['1', M + '2', M + '1', M + fr('13', '3')], answer: 2,
+        hints: ['Replace EVERY ' + v('x') + ' with ' + fr('1', '2') + '.',
+                'Top: 2(' + fr('1', '2') + ') + 3 = 1 + 3. Bottom: 6(' + fr('1', '2') + ') ' + M + ' 5 = 3 ' + M + ' 5.',
+                'Take the square root of the top, then divide by the bottom.'] }
+    ] },
+  { n: 4, ready: true, title: 'Evaluate a function',
+    text: 'A function is defined as ' + v('K') + '(' + v('x') + ') = 2' + v('x') + sup(2) + ' ' + M + ' 5' + v('x') + ' + 3. The value of ' + v('K') + '(' + M + '3) is',
+    parts: [
+      { t: 'mc', q: 'Choose the value.', pq: '', labels: 'abcd', choices: ['54', '36', '0', M + '18'], answer: 1,
+        hints: ['Replace every ' + v('x') + ' with (' + M + '3). Keep the parentheses!',
+                '2(' + M + '3)' + sup(2) + ' ' + M + ' 5(' + M + '3) + 3. Do the exponent first: (' + M + '3)' + sup(2) + ' = 9, not ' + M + '9.',
+                M + '5 times ' + M + '3 is positive 15.'] }
+    ] },
   { n: 5, ready: true, title: 'Reading a graph',
     text: 'The graph below represents the function ' + v('y') + ' = ' + v('f') + '(' + v('x') + ').',
     graph: { label: 'Curve starting at the closed point (-5, -3), rising to a high point at (0, 2), crossing the x-axis at 4, dipping to about -1.7 near x = 7, and ending at the closed point (8, -1).',
@@ -91,8 +158,32 @@ const Q = [
                 '(' + v('x') + ' ' + M + ' 4)' + sup(2) + ' means (' + v('x') + ' ' + M + ' 4)(' + v('x') + ' ' + M + ' 4). Multiply it out first. It is NOT ' + v('x') + sup(2) + ' + 16.',
                 'Put the expanded square in parentheses, then distribute the subtraction to EVERY term before combining like terms.'] }
     ] },
-  { n: 7, ready: false, title: 'Domain from a graph', text: 'What is the domain of the function shown below?', parts: [] },
-  { n: 8, ready: false, title: 'Range of data', text: 'Data collected during an experiment are shown in the accompanying graph. What is the range of this set of data?', parts: [] },
+  { n: 7, ready: true, title: 'Domain from a graph',
+    text: 'What is the domain of the function shown below?',
+    graph: { x: [-4, 9], y: [-5, 7],
+      label: 'A curve that starts at a closed dot at (-1, 1), dips to (0, -1), rises to a peak at (3, 5), and falls to a closed dot at (6, -2).',
+      curves: [[[-1, 1], [-0.75, 0], [-0.4, -0.65], [0, -1], [0.35, -0.5], [0.7, 1.6], [1.2, 3], [2.2, 4.5], [3, 5], [3.5, 4.3], [4.4, 1.8], [5, 0], [6, -2]]],
+      dots: [[-1, 1], [6, -2]] },
+    parts: [
+      { t: 'mc', q: 'Choose the domain.', pq: '', labels: '1234',
+        choices: [M + '1 ≤ ' + v('x') + ' ≤ 6', M + '1 ≤ ' + v('y') + ' ≤ 6', M + '2 ≤ ' + v('x') + ' ≤ 5', M + '2 ≤ ' + v('y') + ' ≤ 5'], answer: 0,
+        hints: ['Domain is about x-values, so the answer uses ' + v('x') + ', not ' + v('y') + '.',
+                'Find the leftmost point of the graph and the rightmost point.',
+                'Read the x-value of each endpoint dot. Count the grid boxes carefully from the y-axis.'] }
+    ] },
+  { n: 8, ready: true, title: 'Range of data',
+    text: 'Data collected during an experiment are shown in the accompanying graph.',
+    graph: { x: [0, 10], y: [0, 100], gy: 12.5, ticks: { x: 1, y: 25 }, xTitle: 'pH', yTitle: 'Percent Maximum Activity of Trypsin',
+      label: 'Percent maximum activity of trypsin versus pH. The curve starts at (2.5, 0), rises to a peak of 100 near pH 6.3, then falls to about 8 at pH 9.5.',
+      curves: [[[2.5, 0], [3.2, 8], [3.9, 26], [4.9, 59], [5.7, 88], [6.3, 100], [6.8, 92], [7.4, 72], [8.0, 55], [8.3, 40], [8.5, 22], [9, 13], [9.5, 8]]],
+      dots: [[2.5, 0], [9.5, 8]] },
+    parts: [
+      { t: 'mc', q: 'What is the range of this set of data?', labels: '1234',
+        choices: ['2.5 ≤ ' + v('y') + ' ≤ 9.5', '2.5 ≤ ' + v('x') + ' ≤ 9.5', '0 ≤ ' + v('y') + ' ≤ 100', '1 ≤ ' + v('x') + ' ≤ 10'], answer: 2,
+        hints: ['Range is about the y-values (up and down), so the answer uses ' + v('y') + '.',
+                'Find the lowest point and the highest point of the curve on the y-axis.',
+                'Read the y-axis numbers: the y-axis shows Percent Maximum Activity, not pH.'] }
+    ] },
   { n: 9, ready: true, title: 'Terms from a formula',
     text: 'Find the first 5 terms given the formula ' + v('f') + '(' + v('n') + ') = 3(' + v('n') + ' ' + M + ' 1) + 4',
     parts: [
@@ -156,12 +247,41 @@ const Q = [
       { t: 'num', q: 'Determine the 7th term.', answer: 1 / 729, key: '1/729', prefix: v('a') + '<sub>7</sub> =',
         hints: ['Replace ' + v('n') + ' with 7 in your rule.', '(' + fr('1', '3') + ')' + sup('6') + ' = ' + fr('1' + sup('6'), '3' + sup('6')) + '. Type it as a fraction like 1/100.'] }
     ] },
-  { n: 15, ready: false, title: 'Domain and range', text: 'State the domain and range of the function.', parts: [] },
-  { n: 16, ready: false, title: 'Domain and range', text: 'State the domain and range of the function.', parts: [] },
+  { n: 15, ready: true, title: 'Domain and range',
+    text: 'State the domain and range of the function.',
+    graph: { x: [-5, 5], y: [-5, 5], ticks: { x: 1, y: 1 },
+      label: 'A downward parabola starting at a closed dot at (-3, -5), rising to a high point at (0, 4), and ending at an open circle at (2, 0).',
+      curves: [[[-3, -5], [-2.5, -2.25], [-2, 0], [-1, 3], [0, 4], [1, 3], [1.5, 1.75], [2, 0]]],
+      dots: [[-3, -5], [2, 0, 1]] },
+    parts: [
+      { t: 'mc', q: 'Choose the domain and range.', pq: '',
+        choices: ['Domain: ' + M + '3 ≤ ' + v('x') + ' &lt; 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 4',
+                  'Domain: ' + M + '3 ≤ ' + v('x') + ' ≤ 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 4',
+                  'Domain: ' + M + '5 ≤ ' + v('x') + ' ≤ 4<br>Range: ' + M + '3 ≤ ' + v('y') + ' &lt; 2',
+                  'Domain: ' + M + '3 ≤ ' + v('x') + ' &lt; 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 0'], answer: 0,
+        hints: ['Domain: read the x-values from the left end to the right end. Range: read the y-values from the lowest point to the highest point.',
+                'An OPEN circle means that point is NOT included, so use &lt; instead of ≤ on that side.',
+                'The highest point is the top of the curve, not an endpoint.'] }
+    ] },
+  { n: 16, ready: true, title: 'Domain and range',
+    text: 'State the domain and range of the function.',
+    graph: { x: [-5, 5], y: [-5, 5],
+      label: 'A square-root shaped curve starting at a closed point at (-3, 0) and rising slowly to the right, with an arrow showing it keeps going.',
+      curves: [{ p: [[-3, 0], [-2.85, 0.39], [-2.5, 0.71], [-2, 1], [-1, 1.41], [0, 1.73], [1, 2], [2.5, 2.35], [4, 2.65], [5.3, 2.88]], arrow: true }] },
+    parts: [
+      { t: 'mc', q: 'Choose the domain and range.', pq: '',
+        choices: ['Domain: ' + v('x') + ' ≥ ' + M + '3<br>Range: ' + v('y') + ' ≥ 0',
+                  'Domain: ' + v('x') + ' ≥ 0<br>Range: ' + v('y') + ' ≥ ' + M + '3',
+                  'Domain: ' + M + '3 ≤ ' + v('x') + ' ≤ 5<br>Range: 0 ≤ ' + v('y') + ' ≤ 3',
+                  'Domain: all real numbers<br>Range: ' + v('y') + ' ≥ 0'], answer: 0,
+        hints: ['Where does the graph start? Find its x-value and y-value.',
+                'The arrow means the graph keeps going forever to the right AND keeps going up (slowly).',
+                'So x starts at the starting point and never stops, and y starts at the starting point and never stops.'] }
+    ] },
   { n: 17, ready: true, title: 'Common ratio of −2',
     text: 'A geometric sequence with a common ratio of ' + M + '2 is',
     parts: [
-      { t: 'mc', q: 'Choose the sequence.', pq: '', letters: true,
+      { t: 'mc', q: 'Choose the sequence.', pq: '', labels: 'abcd',
         choices: ['6, 4, 2, 0, …', '5, 7, 9, 11, …', M + '3, 6, ' + M + '12, 24, …', M + '10, ' + M + '8, ' + M + '6, ' + M + '4, …'], answer: 2,
         hints: ['Common ratio ' + M + '2 means you MULTIPLY by ' + M + '2 to get the next term.',
                 'Multiplying by a negative flips the sign every time, so the signs should alternate.',
@@ -278,7 +398,7 @@ function check(part, input) {
 }
 function keyOf(part) {
   if (part.key) return part.key;
-  if (part.t === 'mc') return String.fromCharCode(65 + part.answer) + ') ' + part.choices[part.answer].replace(/<br>/g, ', ').replace(/<[^>]+>/g, '');
+  if (part.t === 'mc') return (part.labels || 'ABCDEF')[part.answer] + ') ' + part.choices[part.answer].replace(/<br>/g, ', ').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<');
   if (part.t === 'seq') return part.answer.join(', ');
   if (part.t === 'num') return String(part.answer).replace('-', '\u2212');
   return String(part.answer);

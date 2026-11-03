@@ -12,7 +12,7 @@ dump = r"""
 global.window = {}; global.location = { search: '' }; global.localStorage = { getItem: () => null };
 require(process.argv[1]); const U = window.U5R2;
 console.log(JSON.stringify(U.Q.map(q => ({ n: q.n, ready: q.ready, title: q.title, text: q.text, graph: q.graph ? U.graph(q.graph) : '',
-  hint: U.hintURL(q.n), parts: q.parts.map(p => ({ q: p.pq !== undefined ? p.pq : p.q, t: p.t, letters: !!p.letters, choices: p.choices || null })) }))));
+  hint: U.hintURL(q.n), parts: q.parts.filter(p => !p.noprint).map(p => ({ q: p.pq !== undefined ? p.pq : p.q, t: p.t, labels: p.labels || 'ABCDEF', choices: p.pc === false ? null : p.choices || null })) }))));
 """
 qs = json.loads(subprocess.check_output(['node', '-e', dump, os.path.join(ROOT, 'games', 'unit-5-review-2-data.js')]))
 
@@ -32,7 +32,7 @@ for q in qs:
         h = '<div class="part">' + ('<p>' + lead + p['q'] + '</p>' if p['q'] else '')
         if p['choices']:
             h += '<ol class="chs' + (' wide' if any(len(c) > 30 for c in p['choices']) else '') + '">' + ''.join(
-                '<li><b>' + ('abcd'[k] if p['letters'] else 'ABCD'[k]) + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
+                '<li><b>' + p['labels'][k] + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
         parts.append(h + '</div>')
     pages.append(f'''<section class="page{' dense' if q['graph'] and len(q['parts']) > 1 else ''}">
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>
@@ -63,6 +63,7 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .graph{width:3.9in;height:3.9in}
 .g-grid{stroke:#9a9a9a;stroke-width:1}.g-axis{stroke:#111;stroke-width:2.6;fill:none}.g-arrow{fill:#111}
 .g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.g-curve{stroke:#111;stroke-width:3.6;fill:none}.g-dot{fill:#111}
+.g-num{fill:#222;font:500 15px 'IBM Plex Sans',Arial}.g-title{fill:#222;font:600 15px 'IBM Plex Sans',Arial}.g-dot.open{fill:#fff;stroke:#111;stroke-width:3}.rt{white-space:nowrap}.rt>span{border-top:2px solid currentColor;padding:0 .1em;margin-left:.05em}
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
 .parts{font-size:19pt;line-height:1.35}
