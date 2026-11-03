@@ -85,15 +85,24 @@ a.card:hover{transform:translateY(-3px);border-color:var(--c);background:var(--p
 .empty{color:var(--dim);border:2px dashed var(--line);border-radius:18px;padding:22px;text-align:center}
 footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* seasonal theme (set by script from today's date) */
+.greet{display:inline-flex;align-items:center;gap:8px;margin:14px 0 0;font:700 1rem var(--body);color:#000;background:var(--gold);border-radius:999px;padding:6px 14px}
+.greet:empty{display:none}
+.deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deco span{position:absolute;font-size:clamp(2.2rem,5vw,4rem);opacity:.16;transform:rotate(var(--r,0deg));animation:bob 7s ease-in-out infinite alternate}
+@keyframes bob{to{translate:0 -14px}}
+.wrap{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.deco span{animation:none}}
 </style>
 </head>
 <body>
+<div class="deco" id="deco" aria-hidden="true"></div>
 <div class="wrap">
   <header>
     <div class="brand">
       <h1>Mrs. Kalinowski's <span class="pt">Math Website</span></h1>
       <p class="lead">Choose Algebra or 8th Grade, then find your unit.</p>
+      <p class="greet" id="greet"></p>
     </div>
   </header>
 
@@ -113,6 +122,48 @@ footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding
    - color: red | orange | green | cyan | blue | violet | pink
    - soon: true shows the card greyed out until the file is ready
    ===================================================================== */
+/* ---------- Seasonal theme: changes the hub's colors and decorations by date. Add ?season=halloween (etc.) to preview one. ---------- */
+const SEASONS = {
+  halloween:   {accent:'#ff8c1a', bg:'#07040a', grid:'#1d1226', icons:['🎃','👻','🦇','🕸️'], greet:'🎃 Happy Halloween!'},
+  fall:        {accent:'#f4a259', bg:'#080503', grid:'#21170e', icons:['🍂','🍁','🌰','🥧'], greet:'🍂 Happy fall!'},
+  thanksgiving:{accent:'#f4a259', bg:'#080503', grid:'#21170e', icons:['🦃','🍂','🥧','🌽'], greet:'🦃 Happy Thanksgiving!'},
+  winterholiday:{accent:'#ff5a5f', bg:'#030806', grid:'#0f2219', icons:['❄️','🎄','⛄','🎁'], greet:'❄️ Happy holidays!'},
+  newyear:     {accent:'#ffd23f', bg:'#04040a', grid:'#16162a', icons:['🎉','✨','🥳','🎊'], greet:'🎉 Happy New Year!'},
+  winter:      {accent:'#8fd3ff', bg:'#03060b', grid:'#101c2a', icons:['❄️','⛄','🧣','🧤'], greet:'❄️ Stay warm!'},
+  valentine:   {accent:'#ff6fae', bg:'#0a0407', grid:'#26101b', icons:['❤️','💌','💕','💘'], greet:'❤️ Happy Valentine\'s Day!'},
+  stpatrick:   {accent:'#4fdc7a', bg:'#030805', grid:'#0f2216', icons:['☘️','🍀','🌈','🪙'], greet:'☘️ Happy St. Patrick\'s Day!'},
+  spring:      {accent:'#b6f26b', bg:'#050805', grid:'#152216', icons:['🌷','🌸','🐣','🦋'], greet:'🌷 Happy spring!'},
+  summer:      {accent:'#ffd23f', bg:'#03070a', grid:'#0f1f26', icons:['☀️','🌊','😎','🏖️'], greet:'☀️ Happy summer!'},
+  backtoschool:{accent:'#ff5a4d', bg:'#060505', grid:'#1d1515', icons:['🍎','✏️','📚','📐'], greet:'🍎 Welcome back!'}
+};
+function seasonFor(t){
+  const m = t.getMonth() + 1, d = t.getDate();
+  if (m === 10) return 'halloween';
+  if (m === 11) {
+    const first = new Date(t.getFullYear(), 10, 1).getDay();
+    const thanks = 1 + ((4 - first + 7) % 7) + 21; // 4th Thursday
+    return d >= thanks - 7 && d <= thanks ? 'thanksgiving' : 'fall';
+  }
+  if (m === 12) return 'winterholiday';
+  if (m === 1) return d <= 7 ? 'newyear' : 'winter';
+  if (m === 2) return d <= 14 ? 'valentine' : 'winter';
+  if (m === 3) return d <= 17 ? 'stpatrick' : 'spring';
+  if (m <= 5) return 'spring';
+  if (m <= 8) return 'summer';
+  return 'backtoschool';
+}
+(function applySeason(){
+  let key = seasonFor(new Date());
+  try { const q = new URLSearchParams(location.search).get('season'); if (q && SEASONS[q]) key = q; } catch (err) {}
+  const t = SEASONS[key], r = document.documentElement.style;
+  r.setProperty('--gold', t.accent); r.setProperty('--bg', t.bg); r.setProperty('--grid', t.grid);
+  document.documentElement.dataset.season = key;
+  document.getElementById('greet').textContent = t.greet;
+  const spots = [[4,10,-12],[88,6,10],[10,52,8],[92,40,-8],[6,86,14],[84,80,-14],[48,94,6],[70,24,12]];
+  document.getElementById('deco').innerHTML = spots.map((p, i) =>
+    '<span style="left:' + p[0] + '%;top:' + p[1] + '%;--r:' + p[2] + 'deg;animation-delay:' + (-i * 0.9) + 's">' + t.icons[i % t.icons.length] + '</span>').join('');
+})();
+
 const SUBJECTS = [
   { name: 'Algebra', id: 'algebra', note: 'Algebra 1 Honors', units: [
     { num: 'Unit 1', name: 'Exponents and Expressions', blurb: 'Properties of math, exponent rules, simplifying expressions.', color: 'green', games: [
