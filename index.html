@@ -153,7 +153,7 @@ function seasonFor(t){
   if (m === 11) {
     const first = new Date(t.getFullYear(), 10, 1).getDay();
     const thanks = 1 + ((4 - first + 7) % 7) + 21; // 4th Thursday
-    return d >= thanks - 7 && d <= thanks ? 'thanksgiving' : 'fall';
+    return d > thanks ? 'winterholiday' : d >= thanks - 14 ? 'thanksgiving' : 'fall';
   }
   if (m === 12) return 'winterholiday';
   if (m === 1) return d <= 7 ? 'newyear' : 'winter';
