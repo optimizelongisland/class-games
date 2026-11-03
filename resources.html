@@ -90,6 +90,7 @@ footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding
 .xres.back{margin:0 0 18px;font-size:1rem;padding:8px 14px}
 .rsec{display:flex;flex-direction:column;gap:10px}
 .rsec h3{font:800 1.2rem/1.1 var(--display);margin:0;display:flex;align-items:center;gap:8px}
+.rgrp{font:700 1rem var(--body);margin:4px 0 -2px;color:var(--uc)}
 .rlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px}
 .ritem{display:flex;flex-direction:column;gap:4px;text-decoration:none;background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
 a.ritem:hover{border-color:var(--uc)}
@@ -203,6 +204,7 @@ function seasonFor(t){
 
 /* Extra resources. Each unit has three lists: packets, reviews, solo.
    Add an item like { title: 'Unit 2 Packet', note: 'PDF', href: 'resources/algebra-unit-2-packet.pdf' }.
+   Items with the same group (e.g. 'Unit 2 Quiz Review #1') are listed together under that heading.
    Never put answer keys here: this site is public. */
 const SUBJECTS = [
   { name: 'Algebra', id: 'algebra', note: 'Algebra 1 Honors', units: [
@@ -212,9 +214,9 @@ const SUBJECTS = [
   ]},
   { name: '8th Grade', id: '8th-grade', note: 'Grade 8 Math', units: [
     { num: 'Unit 1', name: 'Exponents', color: 'green', packets: [], reviews: [
-      { title: 'Quiz 2 Practice Quiz', note: 'PDF, 2 pages', href: 'resources/8th-grade/unit-1-quiz-2-practice-quiz.pdf' },
-      { title: 'Quiz 3 Practice Quiz', note: 'PDF, 2 pages', href: 'resources/8th-grade/unit-1-quiz-3-practice-quiz.pdf' },
-      { title: 'Quiz 3 Review: Extra Help', note: 'PDF, 2 pages', href: 'resources/8th-grade/unit-1-quiz-3-review-extra-help.pdf' }
+      { group: 'Unit 1 Quiz Review #2', title: 'Practice Quiz', note: 'PDF, 2 pages', href: 'resources/8th-grade/unit-1-quiz-2-practice-quiz.pdf' },
+      { group: 'Unit 1 Quiz Review #3', title: 'Practice Quiz', note: 'PDF, 2 pages', href: 'resources/8th-grade/unit-1-quiz-3-practice-quiz.pdf' },
+      { group: 'Unit 1 Quiz Review #3', title: 'Extra Help', note: 'PDF, 2 pages', href: 'resources/8th-grade/unit-1-quiz-3-review-extra-help.pdf' }
     ], solo: [] },
     { num: 'Unit 2', name: 'Solving Linear Equations', color: 'orange', packets: [], reviews: [], solo: [] },
     { num: 'Unit 3', name: 'Fractional Linear Equations and Classification of Solutions', color: 'cyan', packets: [], reviews: [], solo: [] }
@@ -228,6 +230,15 @@ const fromHash = () => { const i = SUBJECTS.findIndex(x => '#' + x.id === locati
 fromHash();
 window.addEventListener('hashchange', () => { fromHash(); render(); });
 
+function groups(list){
+  const out = [];
+  list.forEach(it => { const k = it.group || ''; let g = out.find(x => x.name === k); if (!g) out.push(g = { name: k, items: [] }); g.items.push(it); });
+  return out;
+}
+function item(it){
+  return (it.href ? '<a class="ritem" href="' + esc(it.href) + '" target="_blank" rel="noopener">' : '<div class="ritem">') +
+    '<b>' + esc(it.title) + '</b>' + (it.note ? '<span>' + esc(it.note) + '</span>' : '') + (it.href ? '</a>' : '</div>');
+}
 function render(){
   document.getElementById('tabs').innerHTML = SUBJECTS.map((s, i) =>
     '<button class="tab" role="tab" id="tab-' + i + '" aria-selected="' + (i === cur) + '" data-i="' + i + '"><b>' + esc(s.name) + '</b><span>' + esc(s.note || '') + '</span></button>').join('');
@@ -236,9 +247,7 @@ function render(){
     return '<details class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
       '<summary class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2><span class="ucount">' + (n ? n + (n === 1 ? ' resource' : ' resources') : 'Coming soon') + '</span></summary><div class="ubody">' +
       SECTIONS.map(s => '<section class="rsec"><h3><span aria-hidden="true">' + s[1] + '</span>' + s[2] + '</h3>' +
-        (u[s[0]].length ? '<div class="rlist">' + u[s[0]].map(it =>
-          (it.href ? '<a class="ritem" href="' + esc(it.href) + '" target="_blank" rel="noopener">' : '<div class="ritem">') +
-          '<b>' + esc(it.title) + '</b>' + (it.note ? '<span>' + esc(it.note) + '</span>' : '') + (it.href ? '</a>' : '</div>')).join('') + '</div>'
+        (u[s[0]].length ? groups(u[s[0]]).map(g => (g.name ? '<h4 class="rgrp">' + esc(g.name) + '</h4>' : '') + '<div class="rlist">' + g.items.map(item).join('') + '</div>').join('')
           : '<p class="empty">Nothing here yet.</p>') + '</section>').join('') +
       '</div></details>';
   }).join('');
