@@ -98,10 +98,12 @@ h1 .pt{text-shadow:0 0 28px var(--glow)}
 .deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .deco .big{position:absolute;font-size:clamp(3rem,7vw,5.5rem);opacity:.38;transform:rotate(var(--r,0deg));animation:bob 6s ease-in-out infinite alternate}
 .deco .drop{position:absolute;top:-10vh;font-size:var(--s,1.6rem);opacity:.75;animation:fall var(--t,12s) linear infinite;animation-delay:var(--dl,0s)}
+.deco .walker{position:absolute;bottom:2vh;left:0;font-size:clamp(4rem,9vw,7rem);opacity:.9;animation:strut 18s linear infinite}
+@keyframes strut{0%{transform:translateX(-20vw) scaleX(-1)}48%{transform:translateX(100vw) scaleX(-1)}50%{transform:translateX(100vw) scaleX(1)}98%{transform:translateX(-20vw) scaleX(1)}100%{transform:translateX(-20vw) scaleX(-1)}}
 @keyframes bob{to{translate:0 -18px}}
 @keyframes fall{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(28px,30vh) rotate(90deg)}50%{transform:translate(-22px,60vh) rotate(180deg)}75%{transform:translate(24px,90vh) rotate(270deg)}100%{transform:translate(0,120vh) rotate(360deg)}}
 .wrap{position:relative;z-index:1}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}.deco .big,.greet,.greet .gi{animation:none}.deco .drop{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.deco .big,.greet,.greet .gi{animation:none}.deco .drop{display:none}.deco .walker{animation:none;right:3vw;left:auto}}
 </style>
 </head>
 <body>
@@ -135,7 +137,7 @@ h1 .pt{text-shadow:0 0 28px var(--glow)}
 const SEASONS = {
   halloween:   {accent:'#ff8c1a', accent2:'#c77dff', bg:'#07040a', grid:'#1d1226', icons:['🎃','👻','🦇','🕸️'], fall:['🦇','🍬','👻','🍂'], greet:['🎃','Happy Halloween!']},
   fall:        {accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🍂','🍁','🌰','🥧'], fall:['🍂','🍁','🍁','🍂'], greet:['🍁','Happy fall!']},
-  thanksgiving:{accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🦃','🍂','🥧','🌽'], fall:['🍂','🍁','🍁','🍂'], greet:['🦃','Happy Thanksgiving!']},
+  thanksgiving:{accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🦃','🥧','🦃','🌽'], fall:['🦃','🍂','🦃','🍁'], walker:'🦃', greet:['🦃','Happy Thanksgiving!']},
   winterholiday:{accent:'#ff5a5f', accent2:'#3ddc97', bg:'#030806', grid:'#0f2219', icons:['🎄','⛄','🎁','🦌'], fall:['❄️','❄️','✨','❄️'], greet:['🎄','Happy holidays!']},
   newyear:     {accent:'#ffd23f', accent2:'#c77dff', bg:'#04040a', grid:'#16162a', icons:['🎉','🥳','🎊','✨'], fall:['🎊','✨','🎉','⭐'], greet:['🎉','Happy New Year!']},
   winter:      {accent:'#8fd3ff', accent2:'#e0f4ff', bg:'#03060b', grid:'#101c2a', icons:['⛄','🧣','🧤','☃️'], fall:['❄️','❄️','❄️','✨'], greet:['⛄','Stay warm!']},
@@ -176,6 +178,7 @@ function seasonFor(t){
     const x = (i * 47 + 13) % 100, dur = 10 + (i * 7) % 9, sz = 1.1 + ((i * 5) % 7) / 5;
     h += '<span class="drop" style="left:' + x + '%;--t:' + dur + 's;--dl:' + (-(i * 1.7) % dur).toFixed(1) + 's;--s:' + sz.toFixed(2) + 'rem">' + t.fall[i % t.fall.length] + '</span>';
   }
+  if (t.walker) h += '<span class="walker">' + t.walker + '</span>';
   document.getElementById('deco').innerHTML = h;
 })();
 
