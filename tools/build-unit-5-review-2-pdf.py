@@ -1,0 +1,96 @@
+"""Builds resources/algebra/unit-5-review-2-stations.pdf: one station per page, each with a
+"Need a hint?" QR code. Questions come from games/unit-5-review-2-data.js, so edit them there.
+Needs: python3 with `pip install qrcode`, node, and Playwright (Chromium).
+Run from the repo root:  python3 tools/build-unit-5-review-2-pdf.py"""
+import json, os, subprocess, sys, tempfile, io
+import qrcode, qrcode.image.svg
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, 'resources', 'algebra', 'unit-5-review-2-stations.pdf')
+
+dump = r"""
+global.window = {}; global.location = { search: '' }; global.localStorage = { getItem: () => null };
+require(process.argv[1]); const U = window.U5R2;
+console.log(JSON.stringify(U.READY.map(q => ({ n: q.n, title: q.title, text: q.text, graph: q.graph ? U.graph(q.graph) : '',
+  hint: U.hintURL(q.n), parts: q.parts.map(p => ({ q: p.pq !== undefined ? p.pq : p.q, t: p.t, letters: !!p.letters, choices: p.choices || null })) }))));
+"""
+qs = json.loads(subprocess.check_output(['node', '-e', dump, os.path.join(ROOT, 'games', 'unit-5-review-2-data.js')]))
+
+def qr(url):
+    img = qrcode.make(url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10, border=1)
+    buf = io.BytesIO(); img.save(buf)
+    s = buf.getvalue().decode()
+    return s[s.index('<svg'):]
+
+pages = []
+for q in qs:
+    parts = []
+    many = len(q['parts']) > 1
+    for i, p in enumerate(q['parts']):
+        lead = '<span class="pl">' + 'abcdefg'[i] + ')</span> ' if many else ''
+        if not p['q'] and not p['choices']: continue
+        h = '<div class="part">' + ('<p>' + lead + p['q'] + '</p>' if p['q'] else '')
+        if p['choices']:
+            h += '<ol class="chs' + (' wide' if any(len(c) > 30 for c in p['choices']) else '') + '">' + ''.join(
+                '<li><b>' + ('abcd'[k] if p['letters'] else 'ABCD'[k]) + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
+        parts.append(h + '</div>')
+    pages.append(f'''<section class="page{' dense' if q['graph'] and len(q['parts']) > 1 else ''}">
+  <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>
+  <div class="q">{q['text']}</div>
+  {('<div class="g">' + q['graph'] + '</div>') if q['graph'] else ''}
+  <div class="parts">{''.join(parts)}</div>
+  <footer>
+    <div class="jobs"><b>Writer</b> shows all work on paper &nbsp;&middot;&nbsp; <b>Explainer</b> talks it through &nbsp;&middot;&nbsp; <b>Typer</b> enters the answer on your group's computer</div>
+    <div class="qr">{qr(q['hint'])}<div><b>Need a hint?</b><span>Scan me</span></div></div>
+  </footer>
+</section>''')
+
+css = """
+@page{size:letter;margin:0}
+*{box-sizing:border-box}
+body{margin:0;font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif;color:#111}
+i{font-style:italic} sup{font-size:.7em}
+.page{width:8.5in;height:11in;padding:.55in .6in .5in;display:flex;flex-direction:column;page-break-after:always;overflow:hidden}
+header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;padding-bottom:.18in}
+.num{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:1.45in;height:1.45in;background:#111;color:#fff;border-radius:.2in;font:800 72pt/1 'Bricolage Grotesque',Arial,sans-serif}
+.num small{font:700 12pt 'IBM Plex Sans',Arial;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.04in}
+.ttl small{display:block;font-size:12pt;letter-spacing:.16em;text-transform:uppercase;color:#555;font-weight:600}
+.ttl b{font:800 28pt/1.1 'Bricolage Grotesque',Arial,sans-serif}
+.q{font-size:22pt;line-height:1.4;margin:.3in 0 .1in}
+.page.dense .q{margin-top:.18in}.page.dense .graph{width:3.1in;height:3.1in}.page.dense .parts{font-size:17pt}.page.dense .part{margin-top:.12in}
+.g{display:flex;justify-content:center;margin:.05in 0}
+.graph{width:3.9in;height:3.9in}
+.g-grid{stroke:#9a9a9a;stroke-width:1}.g-axis{stroke:#111;stroke-width:2.6;fill:none}.g-arrow{fill:#111}
+.g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.g-curve{stroke:#111;stroke-width:3.6;fill:none}.g-dot{fill:#111}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
+.parts{font-size:19pt;line-height:1.35}
+.part{margin-top:.2in}
+.part p{margin:0}
+.pl{font-weight:700}
+.chs{list-style:none;margin:.12in 0 0;padding:0 0 0 .3in;display:grid;grid-template-columns:1fr 1fr;gap:.12in .4in}
+.chs.wide{grid-template-columns:1fr 1fr;font-size:15pt;line-height:1.25}
+.chs li{display:flex;gap:.08in}
+footer{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:.3in;border-top:2px solid #111;padding-top:.15in}
+.jobs{font-size:11.5pt;color:#333;max-width:4.6in}
+.qr{display:flex;align-items:center;gap:.15in;border:3px dashed #111;border-radius:.15in;padding:.1in .16in}
+.qr svg{width:1.45in;height:1.45in}
+.qr b{display:block;font:800 19pt 'Bricolage Grotesque',Arial,sans-serif}
+.qr span{font-size:12pt;color:#333}
+"""
+html = ('<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800'
+        '&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap"><style>' + css + '</style></head><body>' + ''.join(pages) + '</body></html>')
+
+tmp = tempfile.mkdtemp()
+src = os.path.join(tmp, 'stations.html')
+open(src, 'w').write(html)
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
+render = """
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage();
+  await p.goto('file://' + process.argv[1], { waitUntil: 'load' }).catch(() => {}); await p.waitForTimeout(800);
+  await p.pdf({ path: process.argv[2], format: 'Letter', printBackground: true, preferCSSPageSize: true }); await b.close(); })();
+"""
+subprocess.check_call(['node', '-e', render, src, OUT])
+print('wrote', OUT, len(qs), 'stations')
+if '--html' in sys.argv: print(src)

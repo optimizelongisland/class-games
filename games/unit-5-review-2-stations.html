@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Unit 5 Review #2 Stations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Mono:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
+<style>
+:root{
+  --bg:#000; --panel:#0d0d12; --panel2:#15151c; --line:#2a2a35;
+  --fg:#f5f5f8; --mute:#a2a2b6;
+  --pink:#ff4fa8; --green:#35f09a; --cyan:#33d6ff; --yellow:#ffd23d; --orange:#ff8a3a; --violet:#b9a0ff; --red:#ff5a5a;
+  --disp:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(17px,.8vw + 11px,24px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.45;
+  padding-inline:clamp(16px,2.4vw,44px);padding-block:.8rem 4rem;overflow-x:hidden}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+i{font-family:var(--body);font-style:italic}
+sup{font-size:.7em}
+.app{max-width:1200px;margin:0 auto}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.4rem;padding-block:.3rem 1rem}
+.top h1{font:800 clamp(1.8rem,1.1rem + 2vw,3rem)/1 var(--disp);letter-spacing:-.02em;margin:0}
+.top h1 .c{color:var(--cyan)}
+.top p{margin:.3rem 0 0;color:var(--mute)}
+.pill{display:inline-flex;align-items:center;gap:.4rem;border:2px solid var(--line);border-radius:999px;padding:.25rem .8rem;font-weight:600;font-size:.9rem}
+.meta{margin-inline-start:auto;display:flex;flex-wrap:wrap;gap:.5rem}
+.dot{width:.6rem;height:.6rem;border-radius:50%;background:var(--mute)}
+.dot.on{background:var(--green)} .dot.off{background:var(--red)}
+
+.card{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:clamp(1rem,2vw,1.6rem);margin-bottom:1rem}
+.lab{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:0 0 .6rem;font-weight:600}
+h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
+
+.btn{font-weight:600;font-size:1.05rem;min-height:3.2rem;padding:.55rem 1.2rem;border-radius:14px;border:2px solid var(--line);
+  background:var(--panel2);cursor:pointer;transition:transform .08s,filter .15s}
+.btn:active{transform:translateY(2px) scale(.98)}
+.btn:focus-visible,.num:focus-visible,.ch:focus-visible,input:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+.btn.fill{border-color:transparent;color:#000}
+.fill.cyan{background:var(--cyan)} .fill.green{background:var(--green)} .fill.yellow{background:var(--yellow)} .fill.violet{background:var(--violet)}
+.btn.line{background:transparent}
+.btn.line.violet{border-color:var(--violet);color:var(--violet)}
+.btn.big{font-size:1.25rem;min-height:3.8rem;padding-inline:1.8rem}
+.btn:disabled{opacity:.45;cursor:default}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;padding:.3rem;font-size:.95rem}
+
+.nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(4.2rem,1fr));gap:.6rem}
+.num{min-height:4.2rem;border-radius:14px;border:2px solid var(--line);background:var(--panel2);font:600 1.5rem var(--mono);cursor:pointer;position:relative}
+.num.on{background:var(--yellow);border-color:var(--yellow);color:#000}
+.num.done{border-color:var(--green);color:var(--green)}
+.num.done::after{content:"\2713";position:absolute;top:2px;right:7px;font-size:.8rem}
+.num:disabled{opacity:.3;cursor:default}
+.num small{display:block;font:500 .6rem var(--body);letter-spacing:.08em;text-transform:uppercase}
+.row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.field{display:flex;flex-direction:column;gap:.35rem;flex:1 1 14rem}
+.field input{min-height:3.2rem;border-radius:12px;border:2px solid var(--line);background:#000;padding:0 .9rem;font-size:1.1rem}
+
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}
+.role{border-radius:14px;padding:.8rem;border:2px solid var(--c);color:var(--fg)}
+.role b{display:block;font:800 1.15rem var(--disp);color:var(--c)}
+.role span{font-size:.92rem;color:var(--mute)}
+.r1{--c:var(--pink)} .r2{--c:var(--cyan)} .r3{--c:var(--green)}
+@media (max-width:640px){.roles{grid-template-columns:1fr}}
+
+/* station */
+.stn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(14px,2vw,32px);align-items:start}
+@media (max-width:900px){.stn{grid-template-columns:1fr}}
+.qhead{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem}
+.qnum{display:grid;place-items:center;min-width:3.6rem;height:3.6rem;border-radius:14px;background:var(--cyan);color:#000;font:800 1.9rem var(--disp)}
+.qtext{font-size:1.2rem}
+.graph{display:block;width:100%;max-width:460px;margin:.8rem auto 0}
+.g-grid{stroke:#2c2c3a;stroke-width:1}
+.g-axis{stroke:var(--fg);stroke-width:2.5;fill:none}
+.g-arrow{fill:var(--fg)}
+.g-lab{fill:var(--fg);font:italic 600 17px var(--body)}
+.g-curve{stroke:var(--cyan);stroke-width:4;fill:none;stroke-linecap:round}
+.g-dot{fill:var(--cyan)} .g-dot.open{fill:#000;stroke:var(--cyan);stroke-width:3}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
+
+.steps{display:flex;gap:.4rem;margin-bottom:.8rem}
+.steps span{flex:1;height:.5rem;border-radius:9px;background:var(--line)}
+.steps span.ok{background:var(--green)} .steps span.now{background:var(--yellow)}
+.part{border:2px solid var(--line);border-radius:16px;padding:1rem;margin-bottom:.8rem;background:var(--panel)}
+.part.now{border-color:var(--yellow)}
+.part.ok{border-color:rgba(53,240,154,.5)}
+.part.sk{border-color:rgba(255,138,58,.5)}
+.part .pq{font-size:1.15rem;font-weight:500;margin:0 0 .8rem}
+.part.ok .pq,.part.sk .pq{margin:0;color:var(--mute);font-size:1rem}
+.part .got{font:600 1.05rem var(--mono);color:var(--green);margin-top:.3rem}
+.part.sk .got{color:var(--orange)}
+.chs{display:grid;gap:.6rem}
+.ch{display:flex;gap:.8rem;align-items:center;text-align:left;min-height:3.4rem;padding:.6rem .9rem;border-radius:14px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-size:1.08rem}
+.ch .k{flex:none;display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:10px;background:var(--line);font:600 1rem var(--mono)}
+.ch.bad{border-color:var(--red);opacity:.55;cursor:default;text-decoration:line-through}
+.ch.bad .k{background:var(--red);color:#000}
+.ans{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.ans .pre{font-size:1.25rem;white-space:nowrap}
+.ans input{flex:1 1 10rem;min-width:0;min-height:3.4rem;border-radius:12px;border:2px solid var(--line);background:#000;padding:0 .9rem;font:600 1.3rem var(--mono)}
+.keys{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.keys button{min-width:2.8rem;min-height:2.6rem;border-radius:10px;border:2px solid var(--line);background:var(--panel2);font:600 1.05rem var(--mono);cursor:pointer}
+.fb{margin-top:.8rem;min-height:3rem;display:block;padding:.6rem 1rem;border-radius:12px;background:var(--panel2);border-left:6px solid var(--k,var(--mute));font-size:1.1rem}
+.fb:empty{display:none}
+.fb.good{--k:var(--green)} .fb.bad{--k:var(--red)} .fb.info{--k:var(--violet)}
+.hints{margin-top:.8rem}
+.hint{border-left:5px solid var(--violet);background:rgba(185,160,255,.08);padding:.6rem .9rem;border-radius:0 12px 12px 0;margin-bottom:.5rem}
+.hint b{color:var(--violet);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;display:block}
+.helpbar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:.8rem}
+
+.yay{text-align:center;padding:2rem 1rem}
+.yay .hd{font:800 clamp(2.4rem,1.6rem + 3vw,4.4rem)/1 var(--disp);color:var(--green);margin:0 0 .6rem}
+.yay .go{font:800 clamp(1.6rem,1rem + 2vw,2.8rem)/1.1 var(--disp);margin:1rem 0}
+.yay .go b{display:inline-grid;place-items:center;min-width:4.5rem;height:4.5rem;border-radius:18px;background:var(--yellow);color:#000;vertical-align:middle;margin-left:.3rem}
+.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.toast{position:fixed;left:50%;top:1rem;transform:translateX(-50%);z-index:20;background:var(--green);color:#000;font:800 1.6rem var(--disp);padding:.6rem 1.6rem;border-radius:999px;box-shadow:0 8px 30px rgba(53,240,154,.35)}
+.foot{margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.8rem;justify-content:flex-end;color:var(--mute);font-size:.9rem}
+.foot a{color:var(--mute)}
+</style>
+</head>
+<body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+<div class="app">
+  <header class="top">
+    <div><h1>Unit 5 Review #2 <span class="c">Stations</span></h1><p>Functions and sequences &middot; packet pages 102 to 107</p></div>
+    <div class="meta" id="meta"></div>
+  </header>
+  <main id="view"></main>
+  <div class="foot"><a href="unit-5-review-2-teacher.html">Teacher board</a></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script src="unit-5-review-2-data.js"></script>
+<script>
+'use strict';
+const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const KEY = 'u5r2-state';
+let S = load(), session = null, online = null, newSession = false;
+
+function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', sid: '', screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return s; } catch (e) {} return blank(); }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const qs = n => (S.q['q' + n] = S.q['q' + n] || { w: [], sk: [], h: 0, secs: 0, done: false, wa: [] });
+const doneList = () => U.READY.filter(q => S.q['q' + q.n] && S.q['q' + q.n].done).map(q => q.n);
+const label = () => 'Group ' + S.num + (S.name ? ' · ' + S.name : '');
+
+/* ---------- live board sync ---------- */
+let pushT = 0;
+function payload() {
+  return { gid: S.gid, num: S.num, name: S.name, label: label(), cur: S.screen === 'station' ? S.cur : 0, part: S.part,
+    at: S.at, partAt: S.partAt, wrongNow: S.wrongNow, next: S.screen === 'between' ? S.next : 0, done: doneList(),
+    q: S.q, start: S.start, finished: S.finished, updated: Date.now() };
+}
+function sync(now) {
+  if (!U.dbBase() || !S.num || !S.sid) return;
+  clearTimeout(pushT);
+  pushT = setTimeout(async () => {
+    const ok = await U.dbWrite('sessions/' + S.sid + '/groups/' + S.gid, payload());
+    online = ok; meta();
+  }, now ? 0 : 400);
+}
+setInterval(() => { if (!document.hidden) sync(true); }, 20000);
+
+function meta() {
+  const live = U.dbBase() ? '<span class="pill"><span class="dot ' + (online === false ? 'off' : online ? 'on' : '') + '"></span>' + (online === false ? 'Board offline' : 'Board') + '</span>' : '';
+  $('#meta').innerHTML = (S.num ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' : '') + live;
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1600); }
+
+/* ---------- screens ---------- */
+function render() {
+  meta(); save();
+  if (newSession) return renderResume();
+  ({ setup: renderSetup, pick: renderPick, station: renderStation, between: renderBetween, finished: renderFinished }[S.screen] || renderSetup)();
+}
+
+function renderResume() {
+  view.innerHTML = '<section class="card"><p class="lab">New class period</p><h2>Is this a new group?</h2>' +
+    '<p>This computer was last used by <b>' + esc(label()) + '</b> (' + doneList().length + ' stations done).</p>' +
+    '<div class="row"><button class="btn fill cyan big" id="fresh">We are a new group</button><button class="btn line violet" id="keep">Keep going as ' + esc(label()) + '</button></div></section>';
+  $('#fresh').onclick = () => { S = blank(); S.sid = session.id; newSession = false; render(); };
+  $('#keep').onclick = () => { S.sid = session.id; newSession = false; render(); sync(true); };
+}
+
+function renderSetup() {
+  let nums = ''; for (let i = 1; i <= 12; i++) nums += '<button class="num' + (S.num === i ? ' on' : '') + '" data-g="' + i + '">' + i + '</button>';
+  view.innerHTML = '<section class="card"><p class="lab">Step 1</p><h2>What group number are you?</h2><div class="nums" id="gnums">' + nums + '</div>' +
+    '<div class="row" style="margin-top:1rem"><label class="field"><span class="lab" style="margin:0">Team name (optional, no last names)</span><input id="tname" maxlength="24" value="' + esc(S.name) + '" autocomplete="off"></label></div></section>' +
+    '<section class="card"><p class="lab">Your jobs</p><div class="roles">' +
+    '<div class="role r1"><b>Writer</b><span>Writes down all the work on paper.</span></div>' +
+    '<div class="role r2"><b>Explainer</b><span>Talks the group through each step.</span></div>' +
+    '<div class="role r3"><b>Typer</b><span>Types the answer or picks the choice.</span></div></div></section>' +
+    '<div class="row"><button class="btn fill cyan big" id="go"' + (S.num ? '' : ' disabled') + '>Next: pick your first station &rarr;</button></div>';
+  $('#gnums').onclick = e => { const b = e.target.closest('[data-g]'); if (!b) return; S.num = +b.dataset.g; S.name = $('#tname').value.trim(); render(); };
+  $('#tname').oninput = e => { S.name = e.target.value.trim(); save(); };
+  $('#go').onclick = () => { S.name = $('#tname').value.trim(); S.start = S.start || Date.now(); S.screen = 'pick'; render(); sync(); };
+}
+
+function stationGrid(cls) {
+  return U.Q.map(q => {
+    const d = S.q['q' + q.n] && S.q['q' + q.n].done;
+    return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
+  }).join('');
+}
+function renderPick() {
+  const first = !doneList().length;
+  view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 2' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
+    '<p style="color:var(--mute);margin-top:-.4rem">Find the number on the sheet in front of you.</p><div class="nums" id="qnums">' + stationGrid() + '</div></section>' +
+    '<button class="link" id="back">Change group number</button>';
+  $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
+  $('#back').onclick = () => { S.screen = 'setup'; render(); };
+}
+function goStation(n) {
+  const st = qs(n);
+  S.screen = 'station'; S.cur = n; S.at = Date.now(); S.partAt = Date.now(); S.wrongNow = 0; S.hintNow = 0;
+  S.part = st.passed || 0;            // resume a half-done station at the first part not yet passed
+  render(); sync(true); scrollTo(0, 0);
+}
+
+function renderStation() {
+  const q = U.byN(S.cur), st = qs(S.cur), P = q.parts;
+  const steps = P.map((p, k) => '<span class="' + (k < S.part ? 'ok' : k === S.part ? 'now' : '') + '"></span>').join('');
+  let parts = '';
+  for (let k = 0; k < S.part; k++) {
+    const sk = st.sk[k];
+    parts += '<div class="part ' + (sk ? 'sk' : 'ok') + '"><p class="pq">' + (P.length > 1 ? 'Part ' + (k + 1) + ': ' : '') + P[k].q + '</p><div class="got">' + (sk ? 'Skipped. Ask your teacher about this one.' : '✓ ' + esc(st.got && st.got[k] || U.keyOf(P[k]))) + '</div></div>';
+  }
+  const p = P[S.part];
+  let inp = '';
+  if (p.t === 'mc') {
+    const tried = (st.wa[S.part] || []).map(Number);
+    inp = '<div class="chs" id="chs">' + p.choices.map((c, i) => {
+      const L = p.letters ? String.fromCharCode(97 + i) : String.fromCharCode(65 + i), bad = tried.includes(i);
+      return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + '><span class="k">' + L + '</span><span>' + c + '</span></button>';
+    }).join('') + '</div>';
+  } else {
+    inp = '<form class="ans" id="ansf" autocomplete="off">' + (p.prefix ? '<span class="pre">' + p.prefix + '</span>' : '') +
+      '<input id="ans" inputmode="' + (p.t === 'num' ? 'decimal' : 'text') + '" placeholder="' + esc(p.placeholder || 'Type your answer') + '" spellcheck="false" autocapitalize="off">' +
+      '<button class="btn fill cyan" type="submit">Check</button></form>' +
+      (p.keypad || p.t === 'expr' ? '<div class="keys" id="keys">' + [p.vr || 'n', '^', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '">' + esc(k) + '</button>').join('') + '</div>' : '');
+  }
+  const hints = p.hints || [];
+  const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
+  const help = '<div class="helpbar">' + (S.hintNow < hints.length ? '<button class="btn line violet" id="hintb">Need a hint?' + (S.hintNow ? ' (' + (hints.length - S.hintNow) + ' more)' : '') + '</button>' : '') +
+    (S.wrongNow >= 3 ? '<button class="link" id="skip">Skip this part for now (your teacher will see it)</button>' : '') + '</div>';
+  parts += '<div class="part now pop"><p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
+    '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
+
+  view.innerHTML = '<div class="stn"><section class="card"><div class="qhead"><span class="qnum">' + q.n + '</span><div><p class="lab" style="margin:0">Station ' + q.n + '</p><b>' + q.title + '</b></div></div>' +
+    '<div class="qtext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</section>' +
+    '<section><div class="steps">' + steps + '</div>' + parts + '<button class="link" id="leave">Wrong station? Pick a different one</button></section></div>';
+
+  if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
+  else {
+    const a = $('#ans');
+    $('#ansf').onsubmit = e => { e.preventDefault(); submit(a.value, a); };
+    const keys = $('#keys');
+    if (keys) keys.onclick = e => {
+      const b = e.target.closest('[data-k]'); if (!b) return;
+      const k = b.dataset.k === '−' ? '-' : b.dataset.k, s0 = a.selectionStart ?? a.value.length, s1 = a.selectionEnd ?? s0;
+      a.value = a.value.slice(0, s0) + k + a.value.slice(s1); a.focus(); a.setSelectionRange(s0 + k.length, s0 + k.length);
+    };
+    if (matchMedia('(pointer:fine)').matches) a.focus();
+  }
+  const hb = $('#hintb'); if (hb) hb.onclick = () => { S.hintNow++; st.h++; render(); sync(); };
+  const sb = $('#skip'); if (sb) sb.onclick = () => { st.sk[S.part] = 1; advance(); };
+  $('#leave').onclick = () => { S.screen = 'pick'; render(); sync(true); };
+}
+
+const PRAISE = ['Good job!', 'Good job!', 'Nice work!', 'You got it!'];
+function submit(val, el) {
+  const q = U.byN(S.cur), st = qs(S.cur), p = q.parts[S.part], r = U.check(p, val), fb = $('#fb');
+  if (r.empty) { fb.className = 'fb info'; fb.textContent = r.msg; return; }
+  if (r.ok) {
+    st.got = st.got || []; st.got[S.part] = p.t === 'mc' ? U.keyOf(p) : String(val).trim();
+    toast(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+    advance();
+    return;
+  }
+  st.w[S.part] = (st.w[S.part] || 0) + 1; S.wrongNow++;
+  st.wa[S.part] = st.wa[S.part] || [];
+  const v = p.t === 'mc' ? val : String(val).trim().slice(0, 40);
+  if (st.wa[S.part].length < 12 && !st.wa[S.part].includes(v)) st.wa[S.part].push(v);
+  sync();
+  if (p.t === 'mc') { render(); }
+  else if (S.wrongNow === 3) { render(); }
+  const f = $('#fb');
+  f.className = 'fb bad';
+  f.innerHTML = (r.msg ? esc(r.msg) : 'Not quite. Explainer, talk it through again and check the Writer’s work.') +
+    (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Scan the <b>Need a hint?</b> QR code on your station sheet.</span>' : '');
+  if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
+}
+function advance() {
+  const q = U.byN(S.cur), st = qs(S.cur);
+  S.part++; st.passed = S.part; S.wrongNow = 0; S.hintNow = 0; S.partAt = Date.now();
+  if (S.part >= q.parts.length) {
+    st.done = true; st.secs = (st.secs || 0) + Math.round((Date.now() - S.at) / 1000);
+    const left = U.READY.filter(x => !(S.q['q' + x.n] && S.q['q' + x.n].done));
+    if (!left.length) { S.finished = true; S.screen = 'finished'; render(); sync(true); return; }
+    S.screen = 'between'; S.next = left[Math.floor(Math.random() * left.length)].n;
+    render(); sync(true); pickQuiet(left);
+    return;
+  }
+  render(); sync();
+}
+// prefer a station nobody else is standing at right now (when the board is connected)
+async function pickQuiet(left) {
+  if (!U.dbBase() || !S.sid) return;
+  const g = await U.dbRead('sessions/' + S.sid + '/groups');
+  if (!g || S.screen !== 'between') return;
+  const busy = {}, now = Date.now();
+  Object.values(g).forEach(x => { if (x && x.gid !== S.gid && now - (x.updated || 0) < 120000) { const n = x.cur || x.next; if (n) busy[n] = (busy[n] || 0) + 1; } });
+  const min = Math.min(...left.map(x => busy[x.n] || 0)), best = left.filter(x => (busy[x.n] || 0) === min);
+  if ((busy[S.next] || 0) > min) { S.next = best[Math.floor(Math.random() * best.length)].n; render(); sync(true); }
+}
+
+function renderBetween() {
+  const prev = U.byN(S.cur), st = qs(S.cur), d = doneList().length;
+  view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p>Station ' + prev.n + ' complete' + (st.sk.some(Boolean) ? ' (you skipped a part, so your teacher may check in)' : '') + '. That’s ' + d + ' of ' + U.READY.length + '.</p>' +
+    '<p class="go">Now move to Station <b>' + S.next + '</b></p><p style="color:var(--mute)">Bring your paper. Switch jobs if your teacher says so.</p>' +
+    '<div class="row" style="justify-content:center"><button class="btn fill green big" id="there">We’re at Station ' + S.next + ' &rarr;</button></div>' +
+    '<p style="margin-top:1rem"><button class="link" id="other">That station is crowded. Pick a different one.</button></p></section>';
+  $('#there').onclick = () => goStation(S.next);
+  $('#other').onclick = () => { S.screen = 'pick'; render(); sync(true); };
+}
+function renderFinished() {
+  const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
+  view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Go back to any station your group found tricky and check your written work.</p>' +
+    '<div class="nums" style="max-width:640px;margin:1rem auto 0">' + stationGrid() + '</div></section>';
+}
+
+/* ---------- start ---------- */
+(async function init() {
+  render();
+  if (!U.dbBase()) { S.sid = S.sid || 'local'; save(); return; }
+  session = await U.currentSession();
+  if (S.num && S.sid && S.sid !== session.id) { newSession = true; render(); return; }
+  S.sid = session.id; save(); sync(true);
+})();
+</script>
+</body>
+</html>
