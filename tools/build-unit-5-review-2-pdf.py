@@ -11,7 +11,7 @@ OUT = os.path.join(ROOT, 'resources', 'algebra', 'unit-5-review-2-stations.pdf')
 dump = r"""
 global.window = {}; global.location = { search: '' }; global.localStorage = { getItem: () => null };
 require(process.argv[1]); const U = window.U5R2;
-console.log(JSON.stringify(U.READY.map(q => ({ n: q.n, title: q.title, text: q.text, graph: q.graph ? U.graph(q.graph) : '',
+console.log(JSON.stringify(U.Q.map(q => ({ n: q.n, ready: q.ready, title: q.title, text: q.text, graph: q.graph ? U.graph(q.graph) : '',
   hint: U.hintURL(q.n), parts: q.parts.map(p => ({ q: p.pq !== undefined ? p.pq : p.q, t: p.t, letters: !!p.letters, choices: p.choices || null })) }))));
 """
 qs = json.loads(subprocess.check_output(['node', '-e', dump, os.path.join(ROOT, 'games', 'unit-5-review-2-data.js')]))
@@ -38,6 +38,7 @@ for q in qs:
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>
   <div class="q">{q['text']}</div>
   {('<div class="g">' + q['graph'] + '</div>') if q['graph'] else ''}
+  {'' if q['ready'] else '<div class="todo">DRAFT: this station still needs its graph, table or answer choices from the original packet. It is not in the game yet.</div>'}
   <div class="parts">{''.join(parts)}</div>
   <footer>
     <div class="jobs"><b>Writer</b> shows all work on paper &nbsp;&middot;&nbsp; <b>Explainer</b> talks it through &nbsp;&middot;&nbsp; <b>Typer</b> enters the answer on your group's computer</div>
@@ -76,6 +77,7 @@ footer{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-b
 .qr{display:flex;align-items:center;gap:.15in;border:3px dashed #111;border-radius:.15in;padding:.1in .16in}
 .qr svg{width:1.45in;height:1.45in}
 .qr b{display:block;font:800 19pt 'Bricolage Grotesque',Arial,sans-serif}
+.todo{margin-top:.4in;border:4px dashed #111;border-radius:.2in;padding:.4in;font:700 20pt/1.35 'IBM Plex Sans',Arial;text-align:center}
 .qr span{font-size:12pt;color:#333}
 """
 html = ('<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800'
@@ -92,5 +94,5 @@ const { chromium } = require('playwright');
   await p.pdf({ path: process.argv[2], format: 'Letter', printBackground: true, preferCSSPageSize: true }); await b.close(); })();
 """
 subprocess.check_call(['node', '-e', render, src, OUT])
-print('wrote', OUT, len(qs), 'stations')
+print('wrote', OUT, len(qs), 'stations,', sum(1 for q in qs if not q['ready']), 'still drafts')
 if '--html' in sys.argv: print(src)
