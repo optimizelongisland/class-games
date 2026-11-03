@@ -51,12 +51,20 @@ h1 .pt{color:var(--gold)}
 .tab[aria-selected=true] span{color:#3a2f00}
 
 /* unit bands */
-.units{display:flex;flex-direction:column;gap:40px}
-.unit{display:flex;flex-direction:column;gap:16px}
-.uhead{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;border-bottom:2px solid var(--line);padding-bottom:10px}
+.units{display:flex;flex-direction:column;gap:14px}
+.unit{background:var(--panel);border:2px solid var(--line);border-radius:18px;transition:border-color .14s}
+.unit[open]{border-color:var(--uc)}
+.uhead{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:16px 56px 16px 18px;cursor:pointer;list-style:none;position:relative;min-height:44px}
+.uhead::-webkit-details-marker{display:none}
+.uhead::after{content:"";position:absolute;right:22px;top:50%;width:12px;height:12px;border-right:3px solid var(--dim);border-bottom:3px solid var(--dim);transform:translateY(-70%) rotate(45deg);transition:transform .18s}
+.unit[open] .uhead::after{transform:translateY(-30%) rotate(-135deg)}
+.uhead:hover h2{color:var(--uc)}
+.ucount{font:600 .8rem var(--mono);color:var(--dim);margin-left:auto}
+@media (max-width:560px){.ucount{flex-basis:100%;margin-left:0}}
+.ubody{padding:0 18px 18px;display:flex;flex-direction:column;gap:14px}
 .unum{font:600 .85rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#000;background:var(--uc);border-radius:6px;padding:3px 9px;align-self:center}
 .uhead h2{font:800 clamp(1.4rem,3.2vw,2rem)/1.1 var(--display);margin:0;text-wrap:balance}
-.uhead p{margin:0;color:var(--dim);flex-basis:100%}
+.blurb{margin:0;color:var(--dim)}
 .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:14px}
 
 /* game cards */
@@ -146,8 +154,8 @@ function render(){
     '<button class="tab" role="tab" id="tab-' + i + '" aria-selected="' + (i === cur) + '" data-i="' + i + '"><b>' + esc(s.name) + '</b><span>' + esc(s.note || '') + '</span></button>').join('');
   const units = SUBJECTS[cur].units;
   document.getElementById('units').innerHTML = units.length ? units.map(u =>
-    '<section class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
-      '<div class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2>' + (u.blurb ? '<p>' + esc(u.blurb) + '</p>' : '') + '</div>' +
+    '<details class="unit" style="--uc:var(--c-' + (u.color || 'cyan') + ')">' +
+      '<summary class="uhead"><span class="unum">' + esc(u.num) + '</span><h2>' + esc(u.name) + '</h2><span class="ucount">' + (u.games.length ? u.games.length + (u.games.length === 1 ? ' game' : ' games') : 'No games yet') + '</span></summary><div class="ubody">' + (u.blurb ? '<p class="blurb">' + esc(u.blurb) + '</p>' : '') +
       (u.games.length ? '<div class="games">' + u.games.map(g => {
         const inner = '<div class="top"><span class="kind">' + esc(g.kind) + '</span><span class="mode">' + esc(g.mode) + '</span></div>' +
           '<h3>' + esc(g.title) + '</h3>' + (g.lesson ? '<span class="lesson">' + esc(g.lesson) + '</span>' : '') + '<p>' + esc(g.about) + '</p>' +
@@ -156,7 +164,7 @@ function render(){
         return g.soon || !g.file ? '<div class="card soon"' + st + '>' + inner + '</div>'
                                  : '<a class="card" href="games/' + esc(g.file) + '"' + st + '>' + inner + '</a>';
       }).join('') + '</div>' : '<p class="empty">No games for this unit yet.</p>') +
-    '</section>').join('') : '<p class="empty">No games here yet. Check back soon.</p>';
+    '</div></details>').join('') : '<p class="empty">No games here yet. Check back soon.</p>';
 }
 document.getElementById('tabs').addEventListener('click', e => {
   const b = e.target.closest('.tab'); if (!b) return;
