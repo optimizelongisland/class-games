@@ -14,7 +14,7 @@
    Single dark look by choice, so the hub feels like the games it opens. */
 :root{
   --bg:#050507; --grid:#14141c; --panel:#0e0e14; --panel2:#16161f; --line:#2a2a36;
-  --fg:#f5f5f8; --dim:#a3a3b5; --gold:#ffd23f;
+  --fg:#f5f5f8; --dim:#a3a3b5; --gold:#ffd23f; --gold2:#ff9f1c; --glow:#ffd23f55;
   --c-red:#ff5a4d; --c-orange:#ff9f1c; --c-green:#3ddc97; --c-cyan:#33d6ff; --c-blue:#3d8bff; --c-violet:#b388ff; --c-pink:#ff4fa8;
   --display:'Bricolage Grotesque','Arial Rounded MT Bold',system-ui,sans-serif;
   --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
@@ -24,8 +24,8 @@
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;min-height:100vh;background-color:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:32px 32px;background-position:-1px -1px;
+  background-image:radial-gradient(ellipse 90% 55% at 50% -8%,var(--glow),transparent 70%),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:100% 100%,32px 32px,32px 32px;background-position:0 0,-1px -1px,-1px -1px;background-repeat:no-repeat,repeat,repeat;background-attachment:fixed,scroll,scroll;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
 .wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
 a{color:inherit}
@@ -86,13 +86,22 @@ a.card:hover{transform:translateY(-3px);border-color:var(--c);background:var(--p
 footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding-top:16px}
 
 /* seasonal theme (set by script from today's date) */
-.greet{display:inline-flex;align-items:center;gap:8px;margin:14px 0 0;font:700 1rem var(--body);color:#000;background:var(--gold);border-radius:999px;padding:6px 14px}
+.greet{display:inline-flex;align-items:center;gap:12px;margin:18px 0 0;font:800 clamp(1.25rem,3.4vw,1.7rem)/1.1 var(--display);color:#000;
+  background:linear-gradient(100deg,var(--gold),var(--gold2));border-radius:16px;padding:10px 22px 10px 14px;box-shadow:0 0 0 3px rgba(0,0,0,.4),0 8px 30px var(--glow);
+  animation:wiggle 4s ease-in-out infinite}
 .greet:empty{display:none}
+.greet .gi{font-size:1.6em;line-height:1;display:inline-block;animation:hop 1.6s ease-in-out infinite}
+@keyframes hop{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-6px) rotate(8deg)}}
+@keyframes wiggle{0%,92%,100%{transform:rotate(0)}94%{transform:rotate(-2deg)}96%{transform:rotate(2deg)}98%{transform:rotate(-1deg)}}
+h1 .pt{text-shadow:0 0 28px var(--glow)}
+.tab[aria-selected=true]{background:linear-gradient(110deg,var(--gold),var(--gold2));box-shadow:0 6px 26px var(--glow)}
 .deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.deco span{position:absolute;font-size:clamp(2.2rem,5vw,4rem);opacity:.16;transform:rotate(var(--r,0deg));animation:bob 7s ease-in-out infinite alternate}
-@keyframes bob{to{translate:0 -14px}}
+.deco .big{position:absolute;font-size:clamp(3rem,7vw,5.5rem);opacity:.38;transform:rotate(var(--r,0deg));animation:bob 6s ease-in-out infinite alternate}
+.deco .drop{position:absolute;top:-10vh;font-size:var(--s,1.6rem);opacity:.75;animation:fall var(--t,12s) linear infinite;animation-delay:var(--dl,0s)}
+@keyframes bob{to{translate:0 -18px}}
+@keyframes fall{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(28px,30vh) rotate(90deg)}50%{transform:translate(-22px,60vh) rotate(180deg)}75%{transform:translate(24px,90vh) rotate(270deg)}100%{transform:translate(0,120vh) rotate(360deg)}}
 .wrap{position:relative;z-index:1}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}.deco span{animation:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.deco .big,.greet,.greet .gi{animation:none}.deco .drop{display:none}}
 </style>
 </head>
 <body>
@@ -124,17 +133,17 @@ footer{color:var(--dim);font-size:.9rem;border-top:1px solid var(--line);padding
    ===================================================================== */
 /* ---------- Seasonal theme: changes the hub's colors and decorations by date. Add ?season=halloween (etc.) to preview one. ---------- */
 const SEASONS = {
-  halloween:   {accent:'#ff8c1a', bg:'#07040a', grid:'#1d1226', icons:['🎃','👻','🦇','🕸️'], greet:'🎃 Happy Halloween!'},
-  fall:        {accent:'#f4a259', bg:'#080503', grid:'#21170e', icons:['🍂','🍁','🌰','🥧'], greet:'🍂 Happy fall!'},
-  thanksgiving:{accent:'#f4a259', bg:'#080503', grid:'#21170e', icons:['🦃','🍂','🥧','🌽'], greet:'🦃 Happy Thanksgiving!'},
-  winterholiday:{accent:'#ff5a5f', bg:'#030806', grid:'#0f2219', icons:['❄️','🎄','⛄','🎁'], greet:'❄️ Happy holidays!'},
-  newyear:     {accent:'#ffd23f', bg:'#04040a', grid:'#16162a', icons:['🎉','✨','🥳','🎊'], greet:'🎉 Happy New Year!'},
-  winter:      {accent:'#8fd3ff', bg:'#03060b', grid:'#101c2a', icons:['❄️','⛄','🧣','🧤'], greet:'❄️ Stay warm!'},
-  valentine:   {accent:'#ff6fae', bg:'#0a0407', grid:'#26101b', icons:['❤️','💌','💕','💘'], greet:'❤️ Happy Valentine\'s Day!'},
-  stpatrick:   {accent:'#4fdc7a', bg:'#030805', grid:'#0f2216', icons:['☘️','🍀','🌈','🪙'], greet:'☘️ Happy St. Patrick\'s Day!'},
-  spring:      {accent:'#b6f26b', bg:'#050805', grid:'#152216', icons:['🌷','🌸','🐣','🦋'], greet:'🌷 Happy spring!'},
-  summer:      {accent:'#ffd23f', bg:'#03070a', grid:'#0f1f26', icons:['☀️','🌊','😎','🏖️'], greet:'☀️ Happy summer!'},
-  backtoschool:{accent:'#ff5a4d', bg:'#060505', grid:'#1d1515', icons:['🍎','✏️','📚','📐'], greet:'🍎 Welcome back!'}
+  halloween:   {accent:'#ff8c1a', accent2:'#c77dff', bg:'#07040a', grid:'#1d1226', icons:['🎃','👻','🦇','🕸️'], fall:['🦇','🍬','👻','🍂'], greet:['🎃','Happy Halloween!']},
+  fall:        {accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🍂','🍁','🌰','🥧'], fall:['🍂','🍁','🍁','🍂'], greet:['🍁','Happy fall!']},
+  thanksgiving:{accent:'#ffa94d', accent2:'#ff6b4a', bg:'#080503', grid:'#24180e', icons:['🦃','🍂','🥧','🌽'], fall:['🍂','🍁','🍁','🍂'], greet:['🦃','Happy Thanksgiving!']},
+  winterholiday:{accent:'#ff5a5f', accent2:'#3ddc97', bg:'#030806', grid:'#0f2219', icons:['🎄','⛄','🎁','🦌'], fall:['❄️','❄️','✨','❄️'], greet:['🎄','Happy holidays!']},
+  newyear:     {accent:'#ffd23f', accent2:'#c77dff', bg:'#04040a', grid:'#16162a', icons:['🎉','🥳','🎊','✨'], fall:['🎊','✨','🎉','⭐'], greet:['🎉','Happy New Year!']},
+  winter:      {accent:'#8fd3ff', accent2:'#e0f4ff', bg:'#03060b', grid:'#101c2a', icons:['⛄','🧣','🧤','☃️'], fall:['❄️','❄️','❄️','✨'], greet:['⛄','Stay warm!']},
+  valentine:   {accent:'#ff6fae', accent2:'#ff3b5c', bg:'#0a0407', grid:'#26101b', icons:['💌','💘','🌹','🧸'], fall:['❤️','💕','💖','❤️'], greet:['💘','Happy Valentine\'s Day!']},
+  stpatrick:   {accent:'#4fdc7a', accent2:'#ffd23f', bg:'#030805', grid:'#0f2216', icons:['🌈','🪙','🎩','🍀'], fall:['☘️','🍀','☘️','🪙'], greet:['🍀','Happy St. Patrick\'s Day!']},
+  spring:      {accent:'#b6f26b', accent2:'#ff8fc7', bg:'#050805', grid:'#152216', icons:['🌷','🐣','🦋','🌼'], fall:['🌸','🌸','🦋','🌼'], greet:['🌷','Happy spring!']},
+  summer:      {accent:'#ffd23f', accent2:'#33d6ff', bg:'#03070a', grid:'#0f1f26', icons:['☀️','🏖️','😎','🍉'], fall:['🫧','🫧','🌊','⭐'], greet:['😎','Happy summer!']},
+  backtoschool:{accent:'#ff5a4d', accent2:'#ffd23f', bg:'#060505', grid:'#1d1515', icons:['🍎','📚','📐','🎒'], fall:['✏️','📏','🍎','➕'], greet:['🍎','Welcome back!']}
 };
 function seasonFor(t){
   const m = t.getMonth() + 1, d = t.getDate();
@@ -156,12 +165,18 @@ function seasonFor(t){
   let key = seasonFor(new Date());
   try { const q = new URLSearchParams(location.search).get('season'); if (q && SEASONS[q]) key = q; } catch (err) {}
   const t = SEASONS[key], r = document.documentElement.style;
-  r.setProperty('--gold', t.accent); r.setProperty('--bg', t.bg); r.setProperty('--grid', t.grid);
+  r.setProperty('--gold', t.accent); r.setProperty('--gold2', t.accent2); r.setProperty('--glow', t.accent + '55');
+  r.setProperty('--bg', t.bg); r.setProperty('--grid', t.grid);
   document.documentElement.dataset.season = key;
-  document.getElementById('greet').textContent = t.greet;
-  const spots = [[4,10,-12],[88,6,10],[10,52,8],[92,40,-8],[6,86,14],[84,80,-14],[48,94,6],[70,24,12]];
-  document.getElementById('deco').innerHTML = spots.map((p, i) =>
-    '<span style="left:' + p[0] + '%;top:' + p[1] + '%;--r:' + p[2] + 'deg;animation-delay:' + (-i * 0.9) + 's">' + t.icons[i % t.icons.length] + '</span>').join('');
+  document.getElementById('greet').innerHTML = '<span class="gi">' + t.greet[0] + '</span>' + t.greet[1];
+  const spots = [[3,8,-12],[89,4,10],[2,48,8],[93,38,-8],[4,84,14],[88,78,-14],[50,92,6],[72,20,12]];
+  let h = spots.map((p, i) =>
+    '<span class="big" style="left:' + p[0] + '%;top:' + p[1] + '%;--r:' + p[2] + 'deg;animation-delay:' + (-i * 0.9) + 's">' + t.icons[i % t.icons.length] + '</span>').join('');
+  for (let i = 0; i < 22; i++) {
+    const x = (i * 47 + 13) % 100, dur = 10 + (i * 7) % 9, sz = 1.1 + ((i * 5) % 7) / 5;
+    h += '<span class="drop" style="left:' + x + '%;--t:' + dur + 's;--dl:' + (-(i * 1.7) % dur).toFixed(1) + 's;--s:' + sz.toFixed(2) + 'rem">' + t.fall[i % t.fall.length] + '</span>';
+  }
+  document.getElementById('deco').innerHTML = h;
 })();
 
 const SUBJECTS = [
