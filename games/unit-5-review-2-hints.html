@@ -34,6 +34,8 @@ button:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
 .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(3.6rem,1fr));gap:.5rem}
 .list a{display:grid;place-items:center;min-height:3.6rem;border-radius:12px;border:2px solid var(--line);color:var(--fg);text-decoration:none;font:800 1.3rem var(--disp)}
 .note{color:var(--mute);font-size:.9rem}
+.alt{font:600 1.5rem/1.5 var(--body);margin:0 0 .6rem;color:var(--yellow)}
+.back{color:var(--violet)}
 </style>
 </head>
 <body>
@@ -43,7 +45,13 @@ button:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
 'use strict';
 const U = window.U5R2, app = document.getElementById('app');
 const n = +new URLSearchParams(location.search).get('q'), q = U.byN(n);
-if (!q || !q.ready) {
+if (q && q.alt && new URLSearchParams(location.search).get('alt')) {
+  document.title = q.alt.title + ': Station ' + n;
+  app.innerHTML = '<p class="lab">Unit 5 Review #2</p><h1>' + q.alt.title + '</h1><p class="sub">Station ' + n + '</p>' +
+    '<section class="card"><p class="lab"><span class="qn">' + n + '</span>Station ' + n + '</p><div>' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</section>' +
+    '<section class="card"><p class="alt">' + q.alt.html + '</p><p class="note">' + q.alt.note + '</p></section>' +
+    '<p><a class="back" href="?q=' + n + '">Need a hint instead?</a></p>';
+} else if (!q || !q.ready) {
   app.innerHTML = '<h1>Need a hint?</h1><p class="sub">Unit 5 Review #2. Pick your station.</p><div class="list">' +
     U.READY.map(x => '<a href="?q=' + x.n + '">' + x.n + '</a>').join('') + '</div>';
 } else {

@@ -133,11 +133,11 @@ const Q = [
       dots: [[-5, -3], [8, -1]] },
     parts: [
       { t: 'mc', q: 'State the domain and range of this function.',
-        choices: ['Domain: ' + M + '5 ≤ ' + v('x') + ' ≤ 8<br>Range: ' + M + '3 ≤ ' + v('y') + ' ≤ 2',
+        choices: ['Domain: ' + M + '5 ≤ ' + v('x') + ' ≤ 8<br>Range: ' + M + '3 ≤ ' + v('y') + ' ≤ ' + M + '1',
+                  'Domain: ' + M + '5 ≤ ' + v('x') + ' ≤ 8<br>Range: ' + M + '3 ≤ ' + v('y') + ' ≤ 2',
                   'Domain: ' + M + '3 ≤ ' + v('x') + ' ≤ 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 8',
-                  'Domain: ' + M + '5 ≤ ' + v('x') + ' ≤ 8<br>Range: ' + M + '3 ≤ ' + v('y') + ' ≤ ' + M + '1',
                   'Domain: ' + M + '10 ≤ ' + v('x') + ' ≤ 10<br>Range: ' + M + '10 ≤ ' + v('y') + ' ≤ 10'],
-        answer: 0, key: 'Domain ' + M + '5 ≤ x ≤ 8, Range ' + M + '3 ≤ y ≤ 2',
+        answer: 1, key: 'Domain ' + M + '5 ≤ x ≤ 8, Range ' + M + '3 ≤ y ≤ 2',
         hints: ['Domain = every x-value the graph covers, from left to right. Find the x-value of the leftmost dot and the rightmost dot.',
                 'Range = every y-value the graph covers, from bottom to top. Look for the lowest point and the highest point on the whole graph. They are not always the endpoints!',
                 'The highest point is the top of the hill. The lowest point is the left endpoint.'] },
@@ -255,25 +255,28 @@ const Q = [
       dots: [[-3, -5], [2, 0, 1]] },
     parts: [
       { t: 'mc', q: 'Choose the domain and range.', pq: '',
-        choices: ['Domain: ' + M + '3 ≤ ' + v('x') + ' &lt; 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 4',
-                  'Domain: ' + M + '3 ≤ ' + v('x') + ' ≤ 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 4',
+        choices: ['Domain: ' + M + '3 ≤ ' + v('x') + ' ≤ 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 4',
                   'Domain: ' + M + '5 ≤ ' + v('x') + ' ≤ 4<br>Range: ' + M + '3 ≤ ' + v('y') + ' &lt; 2',
-                  'Domain: ' + M + '3 ≤ ' + v('x') + ' &lt; 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 0'], answer: 0,
+                  'Domain: ' + M + '3 ≤ ' + v('x') + ' &lt; 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 4',
+                  'Domain: ' + M + '3 ≤ ' + v('x') + ' &lt; 2<br>Range: ' + M + '5 ≤ ' + v('y') + ' ≤ 0'], answer: 2,
         hints: ['Domain: read the x-values from the left end to the right end. Range: read the y-values from the lowest point to the highest point.',
                 'An OPEN circle means that point is NOT included, so use &lt; instead of ≤ on that side.',
                 'The highest point is the top of the curve, not an endpoint.'] }
     ] },
   { n: 16, ready: true, title: 'Domain and range',
     text: 'State the domain and range of the function.',
+    alt: { title: 'Another way to write it',
+      html: 'Domain: ' + M + '3 \u2264 ' + v('x') + ' &lt; \u221e<br>Range: 0 \u2264 ' + v('y') + ' &lt; \u221e',
+      note: 'The \u221e (infinity) symbol means the graph keeps going forever, which is what the arrow shows. Use &lt; next to \u221e, never \u2264, because you can never actually reach infinity.' },
     graph: { x: [-5, 5], y: [-5, 5],
       label: 'A square-root shaped curve starting at a closed point at (-3, 0) and rising slowly to the right, with an arrow showing it keeps going.',
       curves: [{ p: [[-3, 0], [-2.85, 0.39], [-2.5, 0.71], [-2, 1], [-1, 1.41], [0, 1.73], [1, 2], [2.5, 2.35], [4, 2.65], [5.3, 2.88]], arrow: true }] },
     parts: [
       { t: 'mc', q: 'Choose the domain and range.', pq: '',
-        choices: ['Domain: ' + v('x') + ' ≥ ' + M + '3<br>Range: ' + v('y') + ' ≥ 0',
-                  'Domain: ' + v('x') + ' ≥ 0<br>Range: ' + v('y') + ' ≥ ' + M + '3',
+        choices: ['Domain: ' + v('x') + ' ≥ 0<br>Range: ' + v('y') + ' ≥ ' + M + '3',
                   'Domain: ' + M + '3 ≤ ' + v('x') + ' ≤ 5<br>Range: 0 ≤ ' + v('y') + ' ≤ 3',
-                  'Domain: all real numbers<br>Range: ' + v('y') + ' ≥ 0'], answer: 0,
+                  'Domain: all real numbers<br>Range: ' + v('y') + ' ≥ 0',
+                  'Domain: ' + v('x') + ' ≥ ' + M + '3<br>Range: ' + v('y') + ' ≥ 0'], answer: 3,
         hints: ['Where does the graph start? Find its x-value and y-value.',
                 'The arrow means the graph keeps going forever to the right AND keeps going up (slowly).',
                 'So x starts at the starting point and never stops, and y starts at the starting point and never stops.'] }
@@ -439,5 +442,5 @@ async function currentSession() {
 
 window.U5R2 = { Q, READY: Q.filter(q => q.ready), byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean,
   SITE, dbBase, dbWrite, dbPush, dbRead, currentSession, today,
-  hintURL: n => SITE + 'games/unit-5-review-2-hints.html?q=' + n };
+  hintURL: (n, alt) => SITE + 'games/unit-5-review-2-hints.html?q=' + n + (alt ? '&alt=1' : '') };
 })();

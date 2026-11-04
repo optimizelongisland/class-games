@@ -12,7 +12,7 @@ dump = r"""
 global.window = {}; global.location = { search: '' }; global.localStorage = { getItem: () => null };
 require(process.argv[1]); const U = window.U5R2;
 console.log(JSON.stringify(U.Q.map(q => ({ n: q.n, ready: q.ready, title: q.title, text: q.text, graph: q.graph ? U.graph(q.graph) : '',
-  hint: U.hintURL(q.n), parts: q.parts.filter(p => !p.noprint).map(p => ({ q: p.pq !== undefined ? p.pq : p.q, t: p.t, labels: p.labels || 'ABCDEF', choices: p.pc === false ? null : p.choices || null })) }))));
+  hint: U.hintURL(q.n), alt: q.alt ? { title: q.alt.title, url: U.hintURL(q.n, true) } : null, parts: q.parts.filter(p => !p.noprint).map(p => ({ q: p.pq !== undefined ? p.pq : p.q, t: p.t, labels: p.labels || 'ABCDEF', choices: p.pc === false ? null : p.choices || null })) }))));
 """
 qs = json.loads(subprocess.check_output(['node', '-e', dump, os.path.join(ROOT, 'games', 'unit-5-review-2-data.js')]))
 
@@ -42,7 +42,8 @@ for q in qs:
   <div class="parts">{''.join(parts)}</div>
   <footer>
     <div class="jobs"><b>Writer</b> shows all work on paper &nbsp;&middot;&nbsp; <b>Explainer</b> talks it through &nbsp;&middot;&nbsp; <b>Typer</b> enters the answer on your group's computer</div>
-    <div class="qr">{qr(q['hint'])}<div><b>Need a hint?</b><span>Scan me</span></div></div>
+    <div class="qrs">{('<div class="qr alt">' + qr(q['alt']['url']) + '<div><b>' + q['alt']['title'] + '</b><span>Scan me</span></div></div>') if q['alt'] else ''}
+    <div class="qr">{qr(q['hint'])}<div><b>Need a hint?</b><span>Scan me</span></div></div></div>
   </footer>
 </section>''')
 
@@ -79,6 +80,8 @@ footer{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-b
 .qr svg{width:1.45in;height:1.45in}
 .qr b{display:block;font:800 19pt 'Bricolage Grotesque',Arial,sans-serif}
 .todo{margin-top:.4in;border:4px dashed #111;border-radius:.2in;padding:.4in;font:700 20pt/1.35 'IBM Plex Sans',Arial;text-align:center}
+.qrs{display:flex;gap:.15in;align-items:flex-end}
+.qr.alt b{font-size:15pt;max-width:1.5in}
 .qr span{font-size:12pt;color:#333}
 """
 html = ('<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800'
