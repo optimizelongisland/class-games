@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stations Teacher Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#000; --panel:#0d0d12; --panel2:#15151c; --line:#2a2a35; --fg:#f5f5f8; --mute:#a2a2b6;
+  --pink:#ff4fa8; --green:#35f09a; --cyan:#33d6ff; --yellow:#ffd23d; --orange:#ff8a3a; --violet:#b9a0ff; --red:#ff5a5a;
+  --disp:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace; --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(15px,.55vw + 11px,20px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.4;padding:.8rem clamp(16px,2vw,36px) 3rem}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+i{font-style:italic} sup{font-size:.7em}
+.app{max-width:1600px;margin:0 auto}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.2rem;margin-bottom:1rem}
+.top h1{font:800 clamp(1.6rem,1rem + 1.6vw,2.6rem)/1 var(--disp);margin:0}
+.top h1 span{color:var(--yellow)}
+.top .sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:.45rem;border:2px solid var(--line);border-radius:999px;padding:.25rem .8rem;font-weight:600;font-size:.9rem}
+.dot{width:.6rem;height:.6rem;border-radius:50%;background:var(--mute)} .dot.on{background:var(--green)} .dot.off{background:var(--red)}
+.btn{font-weight:600;min-height:2.6rem;padding:.35rem 1rem;border-radius:12px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn:focus-visible,.tile:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+.btn.y{background:var(--yellow);border-color:var(--yellow);color:#000}
+.btn.on{background:var(--fg);color:#000;border-color:var(--fg)}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:1rem;margin-bottom:1rem}
+.lab{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:600;margin:0 0 .6rem}
+h2{font:800 1.3rem var(--disp);margin:0 0 .6rem}
+.setup ol{margin:.2rem 0 .8rem;padding-left:1.3rem} .setup li{margin-bottom:.3rem}
+.setup code{font-family:var(--mono);background:var(--panel2);padding:.05rem .35rem;border-radius:6px;font-size:.9em}
+.setup input{min-height:2.6rem;border-radius:10px;border:2px solid var(--line);background:#000;padding:0 .7rem;flex:1 1 22rem}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.legend{display:flex;flex-wrap:wrap;gap:1rem;color:var(--mute);font-size:.85rem;margin-bottom:.6rem}
+.legend span::before{content:"";display:inline-block;width:.8rem;height:.8rem;border-radius:4px;margin-right:.35rem;vertical-align:-1px;background:var(--c)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:.7rem}
+.tile{--c:var(--line);text-align:left;border:2px solid var(--c);background:var(--panel);border-radius:14px;padding:.6rem .7rem;cursor:pointer;min-height:8.2rem;display:flex;flex-direction:column;gap:.25rem;position:relative}
+.tile.ok{--c:rgba(53,240,154,.65)} .tile.mid{--c:var(--yellow)} .tile.bad{--c:var(--red);background:rgba(255,90,90,.08)}
+.tile.off{opacity:.35;cursor:default}
+.tile.sel{box-shadow:0 0 0 3px var(--fg)}
+.tile .n{font:800 1.8rem/1 var(--disp)}
+.tile .t{font-size:.8rem;color:var(--mute);min-height:2.1em}
+.tile .st{font:600 .78rem var(--mono);color:var(--mute)}
+.tile .st b{color:var(--fg)}
+.tile .here{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:auto}
+.chip{font:600 .75rem var(--mono);padding:.1rem .45rem;border-radius:999px;background:var(--cyan);color:#000}
+.chip.stuck{background:var(--red)}
+.flag{position:absolute;top:.5rem;right:.6rem;font:700 .7rem var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+
+.cols{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:1rem;align-items:start}
+@media (max-width:1000px){.cols{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{text-align:left;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);padding:.4rem .5rem;border-bottom:2px solid var(--line)}
+td{padding:.5rem;border-bottom:1px solid var(--line);vertical-align:middle}
+td.m{font-family:var(--mono)}
+.badge{display:inline-block;white-space:nowrap;font:700 .75rem var(--body);padding:.15rem .55rem;border-radius:999px;background:var(--line)}
+.badge.stuck{background:var(--red);color:#000} .badge.ok{background:var(--green);color:#000} .badge.done{background:var(--violet);color:#000} .badge.move{background:var(--cyan);color:#000}
+.bar{height:.5rem;border-radius:9px;background:var(--line);overflow:hidden;min-width:5rem}
+.bar span{display:block;height:100%;background:var(--green)}
+.empty{color:var(--mute);padding:1rem 0}
+.detail .pq{font-weight:600;margin:.8rem 0 .3rem}
+.detail .key{color:var(--green);font-family:var(--mono);font-size:.9rem}
+.wa{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.35rem}
+.wa span{font:500 .85rem var(--mono);background:rgba(255,90,90,.14);border:1px solid rgba(255,90,90,.5);border-radius:8px;padding:.1rem .45rem}
+.wa span b{color:var(--red)}
+.small{color:var(--mute);font-size:.85rem}
+.rt{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:bottom}.rt svg{width:.55em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}.rt>span{border-top:2px solid currentColor;padding:.08em .12em 0 .08em;margin-top:1px}.rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);border:0;padding:0}
+.nw{white-space:nowrap!important}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
+</style>
+</head>
+<body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+<div class="app">
+  <header class="top">
+    <h1>Teacher Board <span>&middot; Unit 5 Review #2</span></h1>
+    <div class="sp"></div>
+    <span class="pill" id="conn"><span class="dot"></span>Not connected</span>
+    <span class="pill" id="sess">Session: ...</span>
+    <button class="btn" id="newp">Start new class period</button>
+    <button class="btn" id="keyb">Answer key</button>
+    <a class="btn" href="../resources/algebra/unit-5-review-2-stations.pdf" target="_blank" rel="noopener">Print stations</a>
+    <a class="btn" href="unit-5-review-2-stations.html" target="_blank" rel="noopener">Student game</a>
+  </header>
+
+  <section class="card setup" id="setup" hidden>
+    <p class="lab">One-time setup</p>
+    <h2>Connect the live board</h2>
+    <p>The student game works without this, but the board can't show anything until it is connected to a free Firebase database.</p>
+    <ol>
+      <li>Go to <b>console.firebase.google.com</b>, sign in with a Google account, and click <b>Create a project</b> (any name, Google Analytics off).</li>
+      <li>In the left menu choose <b>Build &rarr; Realtime Database &rarr; Create database</b>, pick the United States location, and choose <b>Start in test mode</b>.</li>
+      <li>Open the <b>Rules</b> tab, replace everything with <code>{"rules":{"u5r2":{".read":true,".write":true}}}</code>, and click <b>Publish</b>. (Test mode turns itself off after 30 days; this rule doesn't.)</li>
+      <li>Copy the database URL at the top of the <b>Data</b> tab (it ends in <code>firebaseio.com</code> or <code>firebasedatabase.app</code>), paste it below and click Connect. Then send it to Claude so it gets built into the student game and the hint pages.</li>
+    </ol>
+    <div class="row"><input id="dburl" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off"><button class="btn y" id="dbgo">Connect</button></div>
+    <p class="small">Only group numbers, team names and answers are stored. Ask groups not to type full names.</p>
+  </section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between"><p class="lab" style="margin:0">Stations</p>
+      <div class="legend"><span style="--c:var(--green)">On track</span><span style="--c:var(--yellow)">Some trouble</span><span style="--c:var(--red)">Struggling</span><span style="--c:var(--line)">Nobody yet</span></div></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="cols">
+    <section class="card"><p class="lab">Groups</p><div id="groups"></div></section>
+    <section class="card detail" id="detail"><p class="lab">Station details</p><p class="empty">Click a station to see the wrong answers groups typed and how many hints they used.</p></section>
+  </div>
+</div>
+<script src="unit-5-review-2-data.js"></script>
+<script>
+'use strict';
+const U = window.U5R2, $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const strip = s => String(s).replace(/<br>/g, ', ').replace(/<sub>(.*?)<\/sub>/g, '$1').replace(/<[^>]+>/g, '');
+let session = null, groups = {}, hints = {}, sel = 0, showKey = false, ok = null;
+const STUCK_MIN = 7, OFFLINE_S = 90;
+// Firebase can hand arrays back as objects ({"2": 1}) when they have gaps, so normalize them
+const A = x => Array.isArray(x) ? x : x && typeof x === 'object' ? Object.assign([], x) : [];
+
+function minutes(ms) { const m = Math.floor(ms / 60000); return m < 1 ? '<1 min' : m + ' min'; }
+function groupStatus(g, now) {
+  if (g.finished) return ['done', 'Finished'];
+  if (now - (g.updated || 0) > OFFLINE_S * 1000) return ['', 'Offline'];
+  if (g.next && !g.cur) return ['move', 'Moving to ' + g.next];
+  if (!g.cur) return ['', 'Picking'];
+  if ((g.wrongNow || 0) >= 3 || now - (g.at || now) > STUCK_MIN * 60000) return ['stuck', 'Stuck'];
+  return ['ok', 'Working'];
+}
+function stationStats(n) {
+  const k = 'q' + n, now = Date.now();
+  let wrong = 0, skips = 0, devHints = 0, tried = 0, done = 0, secs = 0;
+  const here = [];
+  Object.values(groups).forEach(g => {
+    const s = g.q && g.q[k];
+    if (s) {
+      const w = A(s.w).reduce((a, b) => a + (b || 0), 0), sk = A(s.sk).filter(Boolean).length;
+      if (w || sk || s.done || g.cur === n) tried++;
+      wrong += w; skips += sk; devHints += s.h || 0;
+      if (s.done) { done++; secs += s.secs || 0; }
+    }
+    if (g.cur === n && now - (g.updated || 0) < OFFLINE_S * 1000) here.push(g);
+  });
+  const qr = Object.keys(hints[k] || {}).length;
+  const score = tried ? (wrong + 2 * skips + 0.5 * (devHints + qr)) / (tried * U.byN(n).parts.length) : 0;   // trouble per group, per part
+  const stuckHere = here.some(g => groupStatus(g, now)[0] === 'stuck');
+  const level = !tried ? '' : score >= 1.5 || stuckHere ? 'bad' : score >= 0.75 ? 'mid' : 'ok';
+  return { wrong, skips, devHints, qr, tried, done, avg: done ? secs / done : 0, here, level };
+}
+
+function render() {
+  const now = Date.now();
+  $('#conn').innerHTML = '<span class="dot ' + (ok ? 'on' : ok === false ? 'off' : '') + '"></span>' + (!U.dbBase() ? 'Not connected' : ok ? 'Live' : ok === false ? 'Can’t reach database' : 'Connecting...');
+  $('#sess').textContent = 'Session: ' + (session ? session.label || session.id : '...');
+  $('#setup').hidden = !!U.dbBase();
+  $('#keyb').classList.toggle('on', showKey);
+
+  $('#grid').innerHTML = U.Q.map(q => {
+    if (!q.ready) return '<div class="tile off"><span class="n">' + q.n + '</span><span class="t">Coming soon</span></div>';
+    const s = stationStats(q.n);
+    const flag = s.level === 'bad' ? 'Struggling' : s.level === 'mid' ? 'Some trouble' : '';
+    return '<button class="tile ' + s.level + (sel === q.n ? ' sel' : '') + '" data-q="' + q.n + '">' + (flag ? '<span class="flag">' + flag + '</span>' : '') +
+      '<span class="n">' + q.n + '</span><span class="t">' + q.title + '</span>' +
+      '<span class="st"><b>' + s.done + '</b> done &middot; <b>' + s.wrong + '</b> wrong &middot; <b>' + (s.devHints + s.qr) + '</b> hints' + (s.skips ? ' &middot; <b>' + s.skips + '</b> skipped' : '') + '</span>' +
+      '<span class="here">' + s.here.map(g => '<span class="chip' + (groupStatus(g, now)[0] === 'stuck' ? ' stuck' : '') + '">G' + g.num + '</span>').join('') + '</span></button>';
+  }).join('');
+
+  const list = Object.values(groups).filter(g => g && g.num).sort((a, b) => a.num - b.num || (b.updated || 0) - (a.updated || 0));
+  $('#groups').innerHTML = !list.length ? '<p class="empty">' + (U.dbBase() ? 'No groups yet. They show up here as soon as they pick a group number.' : 'Connect the database to see groups.') + '</p>' :
+    '<table><thead><tr><th>Group</th><th>Status</th><th>Station</th><th>Time here</th><th>Wrong (this part)</th><th>Done</th></tr></thead><tbody>' +
+    list.map(g => {
+      const [cls, txt] = groupStatus(g, now), q = g.cur && U.byN(g.cur), d = A(g.done).length;
+      return '<tr><td><b>' + esc(g.label || 'Group ' + g.num) + '</b></td><td><span class="badge ' + cls + '">' + txt + '</span></td>' +
+        '<td class="m">' + (q ? q.n + (q.parts.length > 1 ? ' · part ' + (Math.min(g.part, q.parts.length - 1) + 1) + '/' + q.parts.length : '') : '–') + '</td>' +
+        '<td class="m">' + (q && g.at ? minutes(now - g.at) : '–') + '</td><td class="m">' + (q ? g.wrongNow || 0 : '–') + '</td>' +
+        '<td><div class="row" style="gap:.4rem;flex-wrap:nowrap"><div class="bar"><span style="width:' + Math.round(100 * d / U.READY.length) + '%"></span></div><span class="m">' + d + '/' + U.READY.length + '</span></div></td></tr>';
+    }).join('') + '</tbody></table><p class="small">"Stuck" = 3 or more wrong tries on the same part, or more than ' + STUCK_MIN + ' minutes at one station.</p>';
+  renderDetail();
+}
+
+function renderDetail() {
+  if (!sel) return;
+  const q = U.byN(sel), s = stationStats(sel), k = 'q' + sel;
+  const qrBy = {}; Object.values(hints[k] || {}).forEach(h => { qrBy[h.part] = (qrBy[h.part] || 0) + 1; });
+  const parts = q.parts.map((p, i) => {
+    const counts = {}; let w = 0, sk = 0;
+    Object.values(groups).forEach(g => {
+      const st = g.q && g.q[k]; if (!st) return;
+      w += A(st.w)[i] || 0; sk += A(st.sk)[i] ? 1 : 0;
+      A(A(st.wa)[i]).forEach(a => {
+        const lbl = p.t === 'mc' ? (p.labels || 'ABCDEF')[+a] + ') ' + strip(p.choices[+a]) : a;
+        counts[lbl] = (counts[lbl] || 0) + 1;
+      });
+    });
+    const wa = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return '<p class="pq">' + (q.parts.length > 1 ? 'Part ' + (i + 1) + ': ' : '') + p.q + '</p>' +
+      (showKey ? '<div class="key">Answer: ' + esc(U.keyOf(p)) + '</div>' : '') +
+      '<div class="small">' + w + ' wrong tries &middot; ' + (qrBy[i] || 0) + ' QR hints opened' + (sk ? ' &middot; ' + sk + ' skipped' : '') + '</div>' +
+      (wa.length ? '<div class="wa">' + wa.map(([a, c]) => '<span>' + esc(a) + (c > 1 ? ' <b>×' + c + '</b>' : '') + '</span>').join('') + '</div>' : '');
+  }).join('');
+  $('#detail').innerHTML = '<p class="lab">Station ' + q.n + ' details</p><h2>' + q.title + '</h2><div>' + q.text + '</div>' +
+    '<p class="small" style="margin-top:.6rem">' + s.tried + (s.tried === 1 ? ' group' : ' groups') + ' tried &middot; ' + s.done + ' finished' + (s.avg ? ' &middot; about ' + Math.max(1, Math.round(s.avg / 60)) + ' min on average' : '') + ' &middot; ' + s.devHints + ' on-screen hints &middot; ' + s.qr + ' QR hints</p>' + parts;
+}
+
+$('#grid').onclick = e => { const t = e.target.closest('[data-q]'); if (!t) return; sel = +t.dataset.q; render(); };
+$('#keyb').onclick = () => { showKey = !showKey; if (!sel) sel = U.READY[0].n; render(); };
+$('#dbgo').onclick = () => {
+  const v = $('#dburl').value.trim().replace(/\/+$/, '');
+  try { localStorage.setItem('u5r2-db', v); } catch (e) {}
+  if (!U.dbBase()) { alert('That doesn’t look like a Firebase database URL. It should start with https:// and end in firebaseio.com or firebasedatabase.app.'); return; }
+  start();
+};
+$('#newp').onclick = async () => {
+  if (!U.dbBase()) { alert('Connect the database first.'); return; }
+  const lbl = prompt('Name this class period (for example "Period 3"). Groups will start fresh when they reload the game.', 'Period ');
+  if (lbl === null) return;
+  const s = { id: U.today() + '-' + Date.now().toString(36), label: lbl.trim() || 'Class', started: Date.now() };
+  if (await U.dbWrite('current', s)) { session = s; groups = {}; hints = {}; render(); poll(); }
+  else alert('Could not reach the database. Check the connection and try again.');
+};
+
+let timer = 0;
+async function poll() {
+  clearTimeout(timer);
+  if (!U.dbBase()) { render(); return; }
+  if (!session) session = await U.currentSession();
+  const [g, h, cur] = await Promise.all([U.dbRead('sessions/' + session.id + '/groups'), U.dbRead('sessions/' + session.id + '/hints'), U.dbRead('current')]);
+  ok = g !== undefined;
+  if (ok) {
+    groups = g || {}; hints = h || {};
+    if (cur && cur.id && cur.id !== session.id) { session = cur; groups = {}; hints = {}; }   // a new period was started elsewhere
+  }
+  render();
+  timer = setTimeout(poll, 3000);
+}
+function start() { session = null; poll(); }
+setInterval(() => { if (Object.keys(groups).length) render(); }, 15000);   // keep "time here" fresh
+start();
+</script>
+</body>
+</html>
