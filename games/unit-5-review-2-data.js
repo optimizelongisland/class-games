@@ -228,10 +228,10 @@ const Q = [
   { n: 13, ready: true, title: 'Build an arithmetic sequence',
     text: 'Write an arithmetic sequence in which ' + nw(v('a') + '<sub>1</sub> = 3') + ' and ' + nw(v('a') + '<sub>4</sub> = 15') + '. Find the 13th term.',
     parts: [
-      { t: 'aseq', q: 'Write the sequence. Type at least the first 4 terms, separated by commas.', pq: 'Write the sequence.', first: 3, d: 4, min: 4, key: '3, 7, 11, 15, …', placeholder: 'e.g. 1, 2, 3, 4',
+      { t: 'expr', vr: 'n', q: 'Write a rule for the ' + v('n') + 'th term of the sequence.', pq: 'Write a rule for the ' + v('n') + 'th term.', answer: '3+4(n-1)', key: 'aₙ = 3 + 4(n − 1)  or  aₙ = 4n − 1', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['You know the 1st term (3) and the 4th term (15). Draw 4 blanks: 3, __, __, 15.',
-                'To get from the 1st term to the 4th term you add the common difference 3 times. So 3 + 3' + v('d') + ' = 15.',
-                'Solve for ' + v('d') + ', then keep adding ' + v('d') + ' to fill in the blanks.'] },
+                'To get from the 1st term to the 4th term you add the common difference 3 times. So 3 + 3' + v('d') + ' = 15. Solve for ' + v('d') + '.',
+                'Put ' + v('a') + '<sub>1</sub> and ' + v('d') + ' into ' + nw(v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> + ' + v('d') + '(' + v('n') + ' ' + M + ' 1)') + '.'] },
       { t: 'num', q: 'Find the 13th term.', answer: 51, prefix: v('a') + '<sub>13</sub> =',
         hints: ['Use ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> + (' + v('n') + ' ' + M + ' 1)' + v('d') + ' with ' + v('n') + ' = 13.',
                 'From the 1st term to the 13th term you add ' + v('d') + ' twelve times.'] }

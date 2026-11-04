@@ -157,15 +157,16 @@ U.PRACTICE = {
       { q: 'For 2, 8, 14, 20, … : write a rule and find the 15th term.', ans: nw(an('n') + ' = 2 + 6(' + n + ' ' + M + ' 1)') + ', ' + nw(an('15') + ' = 86') },
       { q: 'For 20, 17, 14, 11, … : write a rule and find the 10th term.', ans: nw(an('n') + ' = 20 ' + M + ' 3(' + n + ' ' + M + ' 1)') + ', ' + nw(an('10') + ' = ' + M + '7') }] },
 
-  13: { topic: 'Arithmetic sequence from two terms',
-    ex: { q: 'Write an arithmetic sequence with ' + nw(an('1') + ' = 5') + ' and ' + nw(an('5') + ' = 25') + '. Find the 10th term.',
+  13: { topic: 'Arithmetic rule from two terms',
+    ex: { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 5') + ' and ' + nw(an('5') + ' = 25') + '. Find the 10th term.',
       steps: ['From ' + an('1') + ' to ' + an('5') + ' is 4 jumps. The total change is ' + nw('25 ' + M + ' 5 = 20') + '.',
-        'Each jump: ' + nw('20 ÷ 4 = 5') + ', so ' + nw(v('d') + ' = 5') + '. The sequence is 5, 10, 15, 20, 25, …',
+        'Each jump: ' + nw('20 ÷ 4 = 5') + ', so ' + nw(v('d') + ' = 5') + ' (the sequence is 5, 10, 15, 20, 25, …).',
+        'Rule: ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + ', so ' + nw(an('n') + ' = 5 + 5(' + n + ' ' + M + ' 1)') + '.',
         nw(an('10') + ' = 5 + 5(9) = 50') + '.'],
-      ans: '5, 10, 15, 20, 25, … and ' + nw(an('10') + ' = 50') },
+      ans: nw(an('n') + ' = 5 + 5(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('10') + ' = 50') },
     tries: [
-      { q: 'Write an arithmetic sequence with ' + nw(an('1') + ' = 2') + ' and ' + nw(an('4') + ' = 20') + '. Find the 11th term.', ans: '2, 8, 14, 20, … and ' + nw(an('11') + ' = 62') },
-      { q: 'Write an arithmetic sequence with ' + nw(an('1') + ' = 10') + ' and ' + nw(an('3') + ' = 4') + '. Find the 12th term.', ans: '10, 7, 4, 1, … and ' + nw(an('12') + ' = ' + M + '23') }] },
+      { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 2') + ' and ' + nw(an('4') + ' = 20') + '. Find the 11th term.', ans: nw(an('n') + ' = 2 + 6(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('11') + ' = 62') },
+      { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 10') + ' and ' + nw(an('3') + ' = 4') + '. Find the 12th term.', ans: nw(an('n') + ' = 10 ' + M + ' 3(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('12') + ' = ' + M + '23') }] },
 
   14: { topic: 'Geometric sequence with a fraction ratio',
     ex: { q: 'For 1, ' + fr('1', '2') + ', ' + fr('1', '4') + ', ' + fr('1', '8') + ', … : write a rule and find the 6th term.',
