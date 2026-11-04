@@ -1,5 +1,5 @@
 """Builds resources/algebra/unit-5-review-2-stations.pdf: one station per page, each with a
-"Need a hint?" QR code. Questions come from games/unit-5-review-2-data.js, so edit them there.
+"Another way to write it" QR on Station 16 (hints live in the game). Questions come from games/unit-5-review-2-data.js, so edit them there.
 Needs: python3 with `pip install qrcode`, node, and Playwright (Chromium).
 Run from the repo root:  python3 tools/build-unit-5-review-2-pdf.py"""
 import json, os, re, subprocess, sys, tempfile, io
@@ -43,7 +43,7 @@ for q in qs:
   <footer>
     <div class="jobs"><div class="job"><span class="em">✏️</span><div><b>Recorder</b><span>writes the work &amp; types the answer</span></div></div><div class="job"><span class="em">🗣️</span><div><b>Explainer</b><span>talks it through out loud</span></div></div><div class="swap">🔄 Switch jobs at every station!</div></div>
     <div class="qrs">{('<div class="qr alt">' + qr(q['alt']['url']) + '<div><b>' + q['alt']['title'] + '</b><span>Scan me</span></div></div>') if q['alt'] else ''}
-    <div class="qr">{qr(q['hint'])}<div><b>Need a hint?</b><span>Scan me</span></div></div></div>
+    </div>
   </footer>
 </section>''')
 
@@ -93,10 +93,6 @@ footer{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-b
 .qr b{display:block;font:800 19pt 'Bricolage Grotesque',Arial,sans-serif}
 .todo{margin-top:.4in;border:4px dashed #111;border-radius:.2in;padding:.4in;font:700 20pt/1.35 'IBM Plex Sans',Arial;text-align:center}
 .qrs{display:flex;gap:.12in;align-items:flex-end;flex:none}
-.qrs:has(.alt) .qr svg{width:1.05in;height:1.05in}
-.qrs:has(.alt) .qr{padding:.08in .1in;gap:.1in}
-.qrs:has(.alt) .qr b{font-size:13pt;max-width:1.05in}
-.qrs:has(.alt) .qr.alt b{font-size:12pt}
 .qr.alt b{font-size:15pt;max-width:1.5in}
 .qr span{font-size:12pt;color:#333}
 """
