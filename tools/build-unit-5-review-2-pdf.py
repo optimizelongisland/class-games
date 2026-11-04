@@ -41,7 +41,7 @@ for q in qs:
   {'' if q['ready'] else '<div class="todo">DRAFT: this station still needs its graph, table or answer choices from the original packet. It is not in the game yet.</div>'}
   <div class="parts">{''.join(parts)}</div>
   <footer>
-    <div class="jobs"><b>Writer</b> shows all work on paper &nbsp;&middot;&nbsp; <b>Explainer</b> talks it through &nbsp;&middot;&nbsp; <b>Typer</b> enters the answer on your group's computer</div>
+    <div class="jobs"><b>Writer</b> shows all work on paper<br><b>Explainer &amp; Typer</b> talks it through and enters the answer<br>Switch jobs at every station</div>
     <div class="qrs">{('<div class="qr alt">' + qr(q['alt']['url']) + '<div><b>' + q['alt']['title'] + '</b><span>Scan me</span></div></div>') if q['alt'] else ''}
     <div class="qr">{qr(q['hint'])}<div><b>Need a hint?</b><span>Scan me</span></div></div></div>
   </footer>
