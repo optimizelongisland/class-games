@@ -15,6 +15,8 @@ const ROOT = 'u5r2';                       // top-level key in the database
 const v = s => '<i>' + s + '</i>';                          // italic variable
 const fr = (a, b) => '<span class="fr"><span>' + a + '</span><span>' + b + '</span></span>';
 const sup = s => '<sup>' + s + '</sup>';
+// square root: the check mark and the bar are one drawn shape, so they always meet
+const rt = s => '<span class="rt"><svg viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0.5 12.5 L2.8 11 L5.6 19.2 L9.6 1"/></svg><span>' + s + '</span><span class="sr">square root of ' + s.replace(/<[^>]+>/g, '') + '</span></span>';
 const M = '−';                                          // real minus sign
 
 /* ---------- graph drawing (SVG, styled by the page) ---------- */
@@ -106,10 +108,10 @@ const Q = [
                 'Repeating y-values is OK! Only repeating x-values with different y-values breaks a function.'] }
     ] },
   { n: 3, ready: true, title: 'Evaluate a function',
-    text: 'If ' + v('f') + '(' + v('x') + ') = ' + fr('<span class="rt">√<span>2' + v('x') + ' + 3</span></span>', '6' + v('x') + ' ' + M + ' 5') + ', then ' + v('f') + '(' + fr('1', '2') + ') =',
+    text: 'If ' + v('f') + '(' + v('x') + ') = ' + fr(rt('2' + v('x') + ' + 3'), '6' + v('x') + ' ' + M + ' 5') + ', then ' + v('f') + '(' + fr('1', '2') + ') =',
     parts: [
       { t: 'mc', q: 'Choose the value.', pq: '', labels: 'abcd',
-        choices: ['1', M + '2', M + '1', M + fr('13', '3')], answer: 2,
+        choices: ['1', M + '2', M + '1', M + '\u2009' + fr('13', '3')], answer: 2,
         hints: ['Replace EVERY ' + v('x') + ' with ' + fr('1', '2') + '.',
                 'Top: 2(' + fr('1', '2') + ') + 3 = 1 + 3. Bottom: 6(' + fr('1', '2') + ') ' + M + ' 5 = 3 ' + M + ' 5.',
                 'Take the square root of the top, then divide by the bottom.'] }
