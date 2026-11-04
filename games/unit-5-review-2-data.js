@@ -443,7 +443,12 @@ async function currentSession() {
   return { id: 'day-' + today(), label: 'Today' };
 }
 
-window.U5R2 = { Q, READY: Q.filter(q => q.ready), byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean,
+// students pick their class period; each period gets its own session for the day
+const PERIODS = [1, 3];
+const periodSession = p => ({ id: 'day-' + today() + '-p' + p, label: 'Period ' + p, period: +p });
+
+window.U5R2 = { Q, PERIODS, periodSession, H: { v, fr, sup, nw, rt, M }, READY: Q.filter(q => q.ready), byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean,
   SITE, dbBase, dbWrite, dbPush, dbRead, currentSession, today,
+  practiceURL: (name, list, period) => 'unit-5-review-2-practice.html?name=' + encodeURIComponent(name) + '&q=' + list.join(',') + (period ? '&p=' + period : ''),
   hintURL: (n, alt) => SITE + 'games/unit-5-review-2-hints.html?q=' + n + (alt ? '&alt=1' : '') };
 })();

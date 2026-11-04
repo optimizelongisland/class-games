@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Practice Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
+<style>
+/* a worksheet: paper colors on screen and in print */
+:root{--bg:#eef0f5;--paper:#fff;--ink:#16161d;--mute:#5d5d72;--line:#d9dbe4;--accent:#6b46e5;--accent2:#0b8fb3;--soft:#f3efff;--grid:#e3e5ec;
+  --disp:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html{font-size:clamp(15px,.4vw + 13px,18px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;padding:1rem 16px 4rem}
+.paper{max-width:820px;margin:0 auto;background:var(--paper);border-radius:14px;padding:clamp(1rem,3vw,2.4rem);box-shadow:0 2px 14px rgba(0,0,0,.08)}
+i{font-style:italic} sup{font-size:.7em} sub{font-size:.7em}
+.nw{white-space:nowrap!important}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.rt{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:bottom}.rt svg{width:.55em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}.rt>span{border-top:1.5px solid currentColor;padding:.08em .12em 0 .08em;margin-top:1px}.rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);border:0;padding:0}
+.graph{display:block;width:100%;max-width:300px;margin:.6rem 0}
+.g-grid{stroke:var(--grid);stroke-width:1}.g-axis{stroke:var(--ink);stroke-width:2;fill:none}.g-arrow{fill:var(--ink)}
+.g-lab{fill:var(--ink);font:italic 600 17px var(--body)}.g-curve{stroke:var(--accent2);stroke-width:3.5;fill:none;stroke-linecap:round}
+.g-dot{fill:var(--accent2)}.g-dot.open{fill:#fff;stroke:var(--accent2);stroke-width:3}.g-num{fill:var(--mute);font:500 14px var(--body)}.g-title{fill:var(--mute);font:600 14px var(--body)}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;max-width:820px;margin:0 auto 1rem}
+.btn{font:600 1rem var(--body);border-radius:12px;min-height:3rem;padding:.4rem 1.2rem;cursor:pointer;border:2px solid var(--accent);background:var(--accent);color:#fff;text-decoration:none;display:inline-flex;align-items:center}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
+.sub{color:var(--mute);margin:.3rem 0 0}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:flex-end;border-bottom:3px solid var(--ink);padding-bottom:.8rem;margin-bottom:1.2rem}
+.head .who{font:600 1rem var(--body);color:var(--mute)}
+.stn{break-inside:avoid-page;margin-bottom:1.6rem;padding-bottom:1.2rem;border-bottom:1px dashed var(--line)}
+.stn h2{font:800 1.35rem/1.2 var(--disp);margin:0 0 .7rem;display:flex;gap:.6rem;align-items:center}
+.stn h2 .n{display:inline-grid;place-items:center;min-width:2.3rem;height:2.3rem;border-radius:10px;background:var(--ink);color:#fff;font-size:1.1rem}
+.ex{background:var(--soft);border-left:5px solid var(--accent);border-radius:0 12px 12px 0;padding:.8rem 1rem;margin-bottom:1rem;break-inside:avoid}
+.tag{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent);margin:0 0 .3rem}
+.ex ol{margin:.4rem 0 .4rem 1.2rem;padding:0}.ex li{margin:.25rem 0}
+.ex .a{font-weight:600}
+.try{break-inside:avoid;margin:0 0 1rem}
+.try .q{margin:0 0 .3rem}
+.try ol.ch{list-style:none;padding:0;margin:.3rem 0 0;display:grid;grid-template-columns:1fr 1fr;gap:.3rem 1.5rem}
+.work{height:7.5rem;border:1.5px solid var(--line);border-radius:10px;background:repeating-linear-gradient(transparent 0 1.85rem,var(--grid) 1.85rem calc(1.85rem + 1px))}
+.key{break-before:page;margin-top:1rem}
+.key h2{font:800 1.4rem var(--disp);margin:0 0 .6rem}
+.key li{margin:.3rem 0}
+.empty{color:var(--mute)}
+
+/* build-your-own form */
+.form label{display:block;font-weight:600;margin:.6rem 0 .3rem}
+.form input[type=text]{font:500 1.15rem var(--body);min-height:3rem;border:2px solid var(--line);border-radius:12px;padding:0 .8rem;width:min(100%,22rem)}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:.5rem;margin:.6rem 0 1rem}
+.picks label{display:flex;gap:.6rem;align-items:center;font-weight:500;margin:0;padding:.55rem .7rem;border:2px solid var(--line);border-radius:12px;cursor:pointer}
+.picks input{width:1.2rem;height:1.2rem;accent-color:var(--accent)}
+.picks label:has(input:checked){border-color:var(--accent);background:var(--soft)}
+
+@media print{
+  body{background:#fff;padding:0}
+  .paper{box-shadow:none;border-radius:0;padding:0;max-width:none}
+  .bar,.cg-back{display:none!important}
+  @page{margin:.6in}
+}
+</style>
+</head>
+<body>
+<a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
+<div id="app"></div>
+<script src="unit-5-review-2-data.js"></script>
+<script src="unit-5-review-2-practice-data.js"></script>
+<script>
+'use strict';
+const U = window.U5R2, P = U.PRACTICE, app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const prm = new URLSearchParams(location.search);
+const name = (prm.get('name') || '').replace(/[^\p{L}\p{M}' .&-]/gu, '').trim().slice(0, 40);
+const list = (prm.get('q') || '').split(',').map(Number).filter(n => P[n]).filter((n, i, a) => a.indexOf(n) === i).sort((a, b) => a - b);
+
+function sheet() {
+  document.title = (name ? name + '’s ' : '') + 'Practice Sheet: Unit 5 Review #2';
+  let k = 0;
+  const key = [];
+  const body = list.map(n => {
+    const p = P[n], e = p.ex;
+    const tries = p.tries.map(t => {
+      k++; key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + t.ans + '</li>');
+      return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+        (t.choices ? '<ol class="ch">' + t.choices.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>' : '') + '<div class="work" aria-label="space for your work"></div></div>';
+    }).join('');
+    return '<section class="stn"><h2><span class="n">' + n + '</span>' + p.topic + '</h2>' +
+      '<div class="ex"><p class="tag">Worked example</p><p style="margin:0">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+      '<ol>' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="a" style="margin:0">Answer: ' + e.ans + '</p></div>' +
+      '<p class="tag" style="color:var(--accent2)">Your turn</p>' + tries + '</section>';
+  }).join('');
+  app.innerHTML = '<div class="bar"><button class="btn" id="pdf">⬇️ Save as PDF</button><a class="btn ghost" href="?' + (name ? 'name=' + encodeURIComponent(name) + '&' : '') + 'edit=1&q=' + list.join(',') + '">Add or remove stations</a></div>' +
+    '<main class="paper"><div class="head"><div><h1>' + (name ? esc(name) + '’s ' : 'My ') + 'Practice Sheet</h1><p class="sub">Unit 5 Review #2 · Functions and sequences</p></div>' +
+    '<div class="who">' + (prm.get('p') ? 'Period ' + esc(prm.get('p')) + ' · ' : '') + new Date().toLocaleDateString() + '</div></div>' +
+    '<p>Read each worked example first, then try the problems below it on your own. Answers are on the last page. No peeking until you finish!</p>' +
+    body + '<section class="key"><h2>Answer key</h2><ol style="list-style:none;padding:0">' + key.join('') + '</ol></section></main>';
+  document.getElementById('pdf').onclick = () => window.print();
+}
+
+function form() {
+  document.title = 'Make a Practice Sheet: Unit 5 Review #2';
+  const on = new Set(list);
+  app.innerHTML = '<main class="paper form"><h1>Make a practice sheet</h1><p class="sub">Unit 5 Review #2. Pick the stations you want more practice on.</p>' +
+    '<form id="f"><label for="nm">First name</label><input type="text" id="nm" maxlength="16" value="' + esc(name) + '" autocomplete="off">' +
+    '<div class="picks">' + Object.keys(P).map(Number).map(n => '<label><input type="checkbox" value="' + n + '"' + (on.has(n) ? ' checked' : '') + '><span><b>' + n + '.</b> ' + P[n].topic + '</span></label>').join('') + '</div>' +
+    '<button class="btn" type="submit">Make my sheet</button> <span id="msg" class="empty"></span></form></main>';
+  document.getElementById('f').onsubmit = e => {
+    e.preventDefault();
+    const q = [...document.querySelectorAll('.picks input:checked')].map(i => i.value);
+    if (!q.length) { document.getElementById('msg').textContent = 'Pick at least one station.'; return; }
+    const nm = document.getElementById('nm').value.trim();
+    location.search = '?' + (nm ? 'name=' + encodeURIComponent(nm) + '&' : '') + 'q=' + q.join(',') + (prm.get('p') ? '&p=' + encodeURIComponent(prm.get('p')) : '');
+  };
+}
+
+if (list.length && !prm.get('edit')) sheet(); else form();
+</script>
+</body>
+</html>
