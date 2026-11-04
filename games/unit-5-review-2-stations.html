@@ -105,6 +105,11 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .stn{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:clamp(14px,2vw,32px);align-items:start}
 @media (max-width:900px){.stn{grid-template-columns:1fr}}
 .qhead{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem}
+.jobbar{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0 0}
+.jb{flex:1 1 12rem;border:2px solid var(--c);border-radius:14px;padding:.45rem .8rem;font-size:.92rem;color:var(--mute)}
+.jb b{display:block;color:var(--c);font:800 1.15rem var(--disp)}
+.jb.r1{--c:var(--pink)} .jb.r2{--c:var(--cyan)}
+.yay .jobbar{margin:.4rem auto 1.4rem;max-width:760px}
 .qnum{display:grid;place-items:center;min-width:3.6rem;height:3.6rem;border-radius:14px;background:var(--cyan);color:#000;font:800 1.9rem var(--disp)}
 .qtext{font-size:1.2rem}
 .graph{display:block;width:100%;max-width:460px;margin:.8rem auto 0}
@@ -187,6 +192,13 @@ function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), n
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
 function save() { S.last = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const people = () => (S.names || []).map(x => x.trim()).filter(Boolean);
+// who does which job: the Recorder rotates through the partners, one station at a time
+function jobs(k) {
+  const P = people(); if (P.length < 2) return null;
+  const r = P[k % P.length];
+  return { rec: r, exp: P.filter(x => x !== r).join(' & ') };
+}
+const jobBar = j => j ? '<div class="jobbar"><span class="jb r1"><b>✏️ ' + esc(j.rec) + '</b> Recorder: writes the work &amp; types</span><span class="jb r2"><b>🗣️ ' + esc(j.exp) + '</b> Explainer: talks it through</span></div>' : '';
 const hue = i => Math.round((i - 1) * 360 / 16 + 190) % 360;
 // stations each student asked for extra practice on (plus any part the pair skipped)
 function practiceFor(k) {
@@ -247,7 +259,7 @@ function renderSetup() {
     '<section class="card"><p class="lab">Your jobs</p><div class="roles">' +
     '<div class="role r1"><b>✏️ Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div>' +
     '<div class="role r2"><b>🗣️ Explainer</b><span>Talks through each step out loud.</span></div></div>' +
-    '<p style="color:var(--mute);margin:.8rem 0 0">🔄 Switch jobs at every station.</p></section>' +
+    '<p style="color:var(--mute);margin:.8rem 0 0">🔄 The game tells you who does which job at each station, and you switch every time.</p></section>' +
     '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button><span id="need" style="color:var(--yellow)"></span></div>';
   const check = () => {
     const miss = [!S.period && 'your period', !people().length && 'at least one first name'].filter(Boolean);
@@ -322,7 +334,7 @@ function renderStation() {
   parts += '<div class="part now pop"><p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
-  view.innerHTML = '<div class="stn"><section class="card"><div class="qhead"><span class="qnum">' + q.n + '</span><div><p class="lab" style="margin:0">Station ' + q.n + '</p><b>' + q.title + '</b></div></div>' +
+  view.innerHTML = '<div class="stn"><section class="card"><div class="qhead"><span class="qnum">' + q.n + '</span><div><p class="lab" style="margin:0">Station ' + q.n + '</p><b>' + q.title + '</b></div></div>' + jobBar(jobs(doneList().length)) +
     '<div class="look"><span class="ic">📄</span><div><b>The problem is on the sheet at Station ' + q.n + '.</b><br>Read it there' + (q.graph ? ' and use the graph on the sheet' : '') + '. Answer it here.</div></div></section>' +
     '<section><div class="steps">' + steps + '</div>' + parts + '<button class="link" id="leave">Wrong station? Pick a different one</button></section></div>';
 
@@ -383,7 +395,8 @@ function submit(val, el) {
   else if (S.wrongNow === 3) { render(); }
   const f = $('#fb');
   f.className = 'fb bad';
-  f.innerHTML = (r.msg ? esc(r.msg) : 'Not quite. Explainer, talk it through again and check the Recorder’s work.') +
+  const jj = jobs(doneList().length);
+  f.innerHTML = (r.msg ? esc(r.msg) : jj ? 'Not quite. ' + esc(jj.exp) + ', talk it through again and check ' + esc(jj.rec) + '’s work.' : 'Not quite. Talk it through again and check your work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
   if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
   else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
@@ -528,7 +541,7 @@ function renderBetween() {
   if (picking) { view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p class="go">Finding your next station\u2026</p></section>'; return; }
   const prev = U.byN(S.cur), st = qs(S.cur), d = doneList().length;
   view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p>Station ' + prev.n + ' complete' + (st.sk.some(Boolean) ? ' (you skipped a part, so your teacher may check in)' : '') + '. That’s ' + d + ' of ' + U.READY.length + '.</p>' +
-    '<p class="go">Now move to Station <b>' + S.next + '</b></p><p style="color:var(--mute)">Bring your paper and switch jobs: the Recorder is now the Explainer.</p>' +
+    '<p class="go">Now move to Station <b>' + S.next + '</b></p>' + (jobs(d) ? '<p style="font-size:1.15rem">🔄 Switch jobs! At Station ' + S.next + ':</p>' + jobBar(jobs(d)) : '<p style="color:var(--mute)">Bring your paper.</p>') + '' +
     '<div class="row" style="justify-content:center"><button class="btn fill green big" id="there">We’re at Station ' + S.next + ' &rarr;</button></div>' +
     '<p style="margin-top:1rem"><button class="link" id="other">That station is crowded. Pick a different one.</button></p></section>' +
     '<details class="card"><summary style="cursor:pointer;color:var(--mute)">Class is ending? Open your practice sheets now</summary>' + sheetLinks() + '</details>';
