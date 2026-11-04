@@ -92,8 +92,8 @@ const Q = [
     parts: [
       { t: 'mc', q: 'State whether Marcel is correct. Justify your answer.', labels: '1234',
         choices: ['Yes, Marcel is correct. The graph passes the vertical line test.',
-                  'Yes, Marcel is correct. Every ' + v('x') + '-value on the graph has a ' + v('y') + '-value.',
-                  'No, Marcel is not correct. ' + v('x') + ' = 2 is paired with two ' + v('y') + '-values, 3 and ' + M + '1, so the graph fails the vertical line test.',
+                  'Yes, Marcel is correct. Every ' + nw(v('x') + '-value') + ' on the graph has a ' + nw(v('y') + '-value') + '.',
+                  'No, Marcel is not correct. ' + nw(v('x') + ' = 2') + ' is paired with two ' + nw(v('y') + '-values') + ', 3 and ' + M + '1, so the graph fails the vertical line test.',
                   'No, Marcel is not correct. The graph has a V shape, so it cannot be a function.'], answer: 2,
         hints: ['A graph is a function if every x-value has only ONE y-value.',
                 'Use the vertical line test: slide a pencil held straight up and down across the graph. Does it ever touch the graph in two places at once?',

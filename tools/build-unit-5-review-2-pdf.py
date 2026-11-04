@@ -41,7 +41,7 @@ for q in qs:
   {'' if q['ready'] else '<div class="todo">DRAFT: this station still needs its graph, table or answer choices from the original packet. It is not in the game yet.</div>'}
   <div class="parts">{''.join(parts)}</div>
   <footer>
-    <div class="jobs"><b>Recorder</b> writes the work and types the answer<br><b>Explainer</b> talks it through<br>Switch jobs at every station</div>
+    <div class="jobs"><div class="job"><span class="em">✏️</span><div><b>Recorder</b><span>writes the work &amp; types the answer</span></div></div><div class="job"><span class="em">🗣️</span><div><b>Explainer</b><span>talks it through out loud</span></div></div><div class="swap">🔄 Switch jobs at every station!</div></div>
     <div class="qrs">{('<div class="qr alt">' + qr(q['alt']['url']) + '<div><b>' + q['alt']['title'] + '</b><span>Scan me</span></div></div>') if q['alt'] else ''}
     <div class="qr">{qr(q['hint'])}<div><b>Need a hint?</b><span>Scan me</span></div></div></div>
   </footer>
@@ -65,7 +65,7 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .g-grid{stroke:#9a9a9a;stroke-width:1}.g-axis{stroke:#111;stroke-width:2.6;fill:none}.g-arrow{fill:#111}
 .g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.g-curve{stroke:#111;stroke-width:3.6;fill:none}.g-dot{fill:#111}
 .g-num{fill:#222;font:500 15px 'IBM Plex Sans',Arial}.g-title{fill:#222;font:600 15px 'IBM Plex Sans',Arial}.g-dot.open{fill:#fff;stroke:#111;stroke-width:3}.rt{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:bottom}.rt svg{width:.55em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}.rt>span{border-top:2px solid currentColor;padding:.08em .12em 0 .08em;margin-top:1px}.rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);border:0;padding:0}
-.nw{white-space:nowrap}
+.nw{white-space:nowrap!important}
 .terms{display:block;text-align:center;margin-top:.25in;font-size:1.15em;word-spacing:.15em}
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
@@ -79,14 +79,24 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .page.dense .chs{gap:.34in .4in;margin-top:.22in}
 .chs.wide{grid-template-columns:1fr 1fr;font-size:15pt;line-height:1.25}
 .chs li{display:flex;gap:.08in}
-.chs.wide li span{white-space:normal}
+.chs.wide li>span{white-space:normal}
 footer{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:.3in;border-top:2px solid #111;padding-top:.15in}
-.jobs{font-size:11.5pt;color:#333;max-width:4.6in}
+.jobs{display:flex;flex-direction:column;gap:.07in;font-size:11pt;color:#222;flex:1 1 auto;min-width:0}
+.job{display:flex;align-items:center;gap:.1in;border:2px solid #111;border-radius:.12in;padding:.05in .12in}
+.job .em{font-family:'Noto Color Emoji';font-size:20pt;line-height:1}
+.job b{display:block;font:800 13pt 'Bricolage Grotesque',Arial,sans-serif}
+.job span{font-size:10.5pt}
+.swap{font-weight:700;font-size:11pt}
+.swap,.em{font-family:'IBM Plex Sans','Noto Color Emoji',Arial,sans-serif}
 .qr{display:flex;align-items:center;gap:.15in;border:3px dashed #111;border-radius:.15in;padding:.1in .16in}
 .qr svg{width:1.45in;height:1.45in}
 .qr b{display:block;font:800 19pt 'Bricolage Grotesque',Arial,sans-serif}
 .todo{margin-top:.4in;border:4px dashed #111;border-radius:.2in;padding:.4in;font:700 20pt/1.35 'IBM Plex Sans',Arial;text-align:center}
-.qrs{display:flex;gap:.15in;align-items:flex-end}
+.qrs{display:flex;gap:.12in;align-items:flex-end;flex:none}
+.qrs:has(.alt) .qr svg{width:1.05in;height:1.05in}
+.qrs:has(.alt) .qr{padding:.08in .1in;gap:.1in}
+.qrs:has(.alt) .qr b{font-size:13pt;max-width:1.05in}
+.qrs:has(.alt) .qr.alt b{font-size:12pt}
 .qr.alt b{font-size:15pt;max-width:1.5in}
 .qr span{font-size:12pt;color:#333}
 """
