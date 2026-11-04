@@ -31,7 +31,7 @@ for q in qs:
         if not p['q'] and not p['choices']: continue
         h = '<div class="part">' + ('<p>' + lead + p['q'] + '</p>' if p['q'] else '')
         if p['choices']:
-            h += '<ol class="chs' + (' wide' if any(len(re.sub(r'<[^>]+>', '', c)) > 30 for c in p['choices']) else '') + '" style="grid-template-rows:repeat(' + str((len(p['choices']) + 1) // 2) + ',auto)">' + ''.join(
+            h += '<ol class="chs' + (' wide' if any(len(re.sub(r'<[^>]+>', '', c)) > 30 for c in p['choices']) else '') + '" style="' + ('grid-template-columns:repeat(3,1fr);grid-template-rows:auto' if len(p['choices']) == 3 else 'grid-template-rows:repeat(' + str((len(p['choices']) + 1) // 2) + ',auto)') + '">' + ''.join(
                 '<li><b>' + p['labels'][k] + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
         parts.append(h + '</div>')
     pages.append(f'''<section class="page{' dense' if q['graph'] and (len(q['parts']) > 1 or any(p['choices'] for p in q['parts'])) else ''}">
@@ -70,7 +70,7 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
 .parts{font-size:19pt;line-height:1.35}
-.part{margin-top:.6in}
+.part{margin-top:.85in}
 .part p{margin:0}
 .pl{font-weight:700}
 .chs{list-style:none;margin:.3in 0 0;padding:0 0 0 .3in;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;gap:.5in .4in}
