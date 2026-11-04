@@ -292,7 +292,7 @@ const Q = [
   { n: 18, ready: true, title: 'Solve for x',
     text: 'If ' + nw(v('f') + '(' + v('x') + ') =') + ' ' + fr('5' + v('x') + ' ' + M + ' 9', '2') + ', algebraically determine the value of ' + v('x') + ' when ' + nw(v('f') + '(' + v('x') + ') = 8') + '.',
     parts: [
-      { t: 'num', q: 'What is ' + v('x') + '? (Writer: show every step on paper!)', pq: 'Show every step.', answer: 5, prefix: v('x') + ' =',
+      { t: 'num', q: 'What is ' + v('x') + '? (Recorder: show every step on paper!)', pq: 'Show every step.', answer: 5, prefix: v('x') + ' =',
         hints: [v('f') + '(' + v('x') + ') = 8 means the whole fraction equals 8. Write ' + fr('5' + v('x') + ' ' + M + ' 9', '2') + ' = 8.',
                 'Undo the division first: multiply both sides by 2.',
                 'Then add 9 to both sides and divide by 5. Check by plugging your answer back in.'] }
