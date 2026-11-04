@@ -29,7 +29,9 @@
     display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.2rem;line-height:1.45;touch-action:none}
   .card .tag{position:absolute;left:6px;top:2px;font-weight:800;font-size:.95rem}
   .sys{height:110px;cursor:default}
-  .sys .eq{font-size:1.25rem}
+  .sys .eq{font-size:1.25rem;line-height:1.9}
+  .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.9em;line-height:1.15;margin:0 3px}
+  .fr span:first-child{border-bottom:2px solid currentColor;padding:0 2px}
   .sol,.gr{cursor:grab}
   .sol{height:110px;font-size:1.3rem}
   .gr{height:150px;width:150px;padding:18px 4px 4px}
@@ -109,8 +111,8 @@ const GRAPH_IMG = {
 /* Cards from the paper card sort. Answer key: 1-b-F, 2-d-C, 3-c-B, 4-a-D, 5-e-A, 6-f-E */
 const SYSTEMS = [
   {n:'1', eq:['2y − x = 10','y = 3x'], sol:'b', gr:'F'},
-  {n:'2', eq:['½x + 2y = 4','4y = −x + 8'], sol:'d', gr:'C'},
-  {n:'3', eq:['2y − 3 = y + 2','−⅕y = x'], sol:'c', gr:'B'},
+  {n:'2', eq:['<span class="fr"><span>1</span><span>2</span></span>x + 2y = 4','4y = −x + 8'], sol:'d', gr:'C'},
+  {n:'3', eq:['2y − 3 = y + 2','−<span class="fr"><span>1</span><span>5</span></span>y = x'], sol:'c', gr:'B'},
   {n:'4', eq:['3x + 4 = −y','4y = −12x + 8'], sol:'a', gr:'D'},
   {n:'5', eq:['y = 2x − 6','3x + y = 4'], sol:'e', gr:'A'},
   {n:'6', eq:['x + y = −1','2y = −x'], sol:'f', gr:'E'}
