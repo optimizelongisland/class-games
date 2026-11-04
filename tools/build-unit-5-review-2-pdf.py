@@ -40,11 +40,7 @@ for q in qs:
   {('<div class="g">' + q['graph'] + '</div>') if q['graph'] else ''}
   {'' if q['ready'] else '<div class="todo">DRAFT: this station still needs its graph, table or answer choices from the original packet. It is not in the game yet.</div>'}
   <div class="parts">{''.join(parts)}</div>
-  <footer>
-    <div class="jobs"><div class="job"><span class="em">✏️</span><div><b>Recorder</b><span>writes the work &amp; types the answer</span></div></div><div class="job"><span class="em">🗣️</span><div><b>Explainer</b><span>talks it through out loud</span></div></div><div class="swap">🔄 Switch jobs at every station!</div></div>
-    <div class="qrs">{('<div class="qr alt">' + qr(q['alt']['url']) + '<div><b>' + q['alt']['title'] + '</b><span>Scan me</span></div></div>') if q['alt'] else ''}
-    </div>
-  </footer>
+  {('<footer><div class="qrs"><div class="qr alt">' + qr(q['alt']['url']) + '<div><b>' + q['alt']['title'] + '</b><span>Scan me</span></div></div></div></footer>') if q['alt'] else ''}
 </section>''')
 
 css = """
