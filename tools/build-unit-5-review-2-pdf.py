@@ -34,7 +34,7 @@ for q in qs:
             h += '<ol class="chs' + (' wide' if any(len(c) > 30 for c in p['choices']) else '') + '">' + ''.join(
                 '<li><b>' + p['labels'][k] + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
         parts.append(h + '</div>')
-    pages.append(f'''<section class="page{' dense' if q['graph'] and len(q['parts']) > 1 else ''}">
+    pages.append(f'''<section class="page{' dense' if q['graph'] and (len(q['parts']) > 1 or any(len(c) > 60 for p in q['parts'] for c in (p['choices'] or []))) else ''}">
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>
   <div class="q">{q['text']}</div>
   {('<div class="g">' + q['graph'] + '</div>') if q['graph'] else ''}
