@@ -85,8 +85,7 @@ td.m{font-family:var(--mono)}
     <h1>Teacher Board <span>&middot; Unit 5 Review #2</span></h1>
     <div class="sp"></div>
     <span class="pill" id="conn"><span class="dot"></span>Not connected</span>
-    <span class="pill" id="sess">Session: ...</span>
-    <button class="btn" id="newp">Start new class period</button>
+    <span id="pers"></span>
     <button class="btn" id="keyb">Answer key</button>
     <a class="btn" href="../resources/algebra/unit-5-review-2-stations.pdf" target="_blank" rel="noopener">Print stations</a>
     <a class="btn" href="unit-5-review-2-stations.html" target="_blank" rel="noopener">Student game</a>
@@ -103,7 +102,7 @@ td.m{font-family:var(--mono)}
       <li>Copy the database URL at the top of the <b>Data</b> tab (it ends in <code>firebaseio.com</code> or <code>firebasedatabase.app</code>), paste it below and click Connect. Then send it to Claude so it gets built into the student game and the hint pages.</li>
     </ol>
     <div class="row"><input id="dburl" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off"><button class="btn y" id="dbgo">Connect</button></div>
-    <p class="small">Only group numbers, team names and answers are stored. Ask groups not to type full names.</p>
+    <p class="small">Only group numbers, first names, answers and "extra practice" picks are stored. Students type first names only.</p>
   </section>
 
   <section class="card">
@@ -116,6 +115,9 @@ td.m{font-family:var(--mono)}
     <section class="card"><p class="lab">Groups</p><div id="groups"></div></section>
     <section class="card detail" id="detail"><p class="lab">Station details</p><p class="empty">Click a station to see the wrong answers groups typed and how many hints they used.</p></section>
   </div>
+  <section class="card"><p class="lab">Practice sheets</p>
+    <p class="small" style="margin-top:0">Each student's sheet has the stations they asked for extra practice on, plus any part their group skipped. Open one and use Save as PDF to post it in your class LMS.</p>
+    <div id="sheets"></div></section>
 </div>
 <script src="unit-5-review-2-data.js"></script>
 <script>
@@ -123,6 +125,7 @@ td.m{font-family:var(--mono)}
 const U = window.U5R2, $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const strip = s => String(s).replace(/<br>/g, ', ').replace(/<sub>(.*?)<\/sub>/g, '$1').replace(/<[^>]+>/g, '');
+let period = (() => { try { return +localStorage.getItem('u5r2-period') || U.PERIODS[0]; } catch (e) { return U.PERIODS[0]; } })();
 let session = null, groups = {}, hints = {}, sel = 0, showKey = false, ok = null;
 const STUCK_MIN = 7, OFFLINE_S = 90;
 // Firebase can hand arrays back as objects ({"2": 1}) when they have gaps, so normalize them
@@ -161,7 +164,7 @@ function stationStats(n) {
 function render() {
   const now = Date.now();
   $('#conn').innerHTML = '<span class="dot ' + (ok ? 'on' : ok === false ? 'off' : '') + '"></span>' + (!U.dbBase() ? 'Not connected' : ok ? 'Live' : ok === false ? 'Can’t reach database' : 'Connecting...');
-  $('#sess').textContent = 'Session: ' + (session ? session.label || session.id : '...');
+  $('#pers').innerHTML = U.PERIODS.map(p => '<button class="btn' + (p === period ? ' on' : '') + '" data-per="' + p + '">Period ' + p + '</button>').join(' ');
   $('#setup').hidden = !!U.dbBase();
   $('#keyb').classList.toggle('on', showKey);
 
@@ -186,6 +189,24 @@ function render() {
         '<td><div class="row" style="gap:.4rem;flex-wrap:nowrap"><div class="bar"><span style="width:' + Math.round(100 * d / U.READY.length) + '%"></span></div><span class="m">' + d + '/' + U.READY.length + '</span></div></td></tr>';
     }).join('') + '</tbody></table><p class="small">"Stuck" = 3 or more wrong tries on the same part, or more than ' + STUCK_MIN + ' minutes at one station.</p>';
   renderDetail();
+  renderSheets(list);
+}
+function renderSheets(list) {
+  const rows = [];
+  list.forEach(g => {
+    const names = A(g.names).length ? A(g.names) : [];
+    names.forEach((nm, k) => {
+      const L = U.READY.map(q => q.n).filter(n => {
+        const f = g.feel && g.feel['q' + n] || {}, st = g.q && g.q['q' + n];
+        return f[k] === 'more' || (st && A(st.sk).some(Boolean) && f[k] !== 'good');
+      });
+      rows.push({ nm, num: g.num, L });
+    });
+  });
+  $('#sheets').innerHTML = !rows.length ? '<p class="empty">Students show up here after they type their names.</p>' :
+    '<table><thead><tr><th>Student</th><th>Group</th><th>Extra practice on</th><th></th></tr></thead><tbody>' +
+    rows.sort((a, b) => a.nm.localeCompare(b.nm)).map(r => '<tr><td><b>' + esc(r.nm) + '</b></td><td class="m">' + r.num + '</td><td class="m">' + (r.L.length ? r.L.join(', ') : '–') + '</td>' +
+      '<td>' + (r.L.length ? '<a class="btn" target="_blank" rel="noopener" href="' + U.practiceURL(r.nm, r.L, period) + '">Open sheet</a>' : '') + '</td></tr>').join('') + '</tbody></table>';
 }
 
 function renderDetail() {
@@ -220,25 +241,29 @@ $('#dbgo').onclick = () => {
   if (!U.dbBase()) { alert('That doesn’t look like a Firebase database URL. It should start with https:// and end in firebaseio.com or firebasedatabase.app.'); return; }
   start();
 };
-$('#newp').onclick = async () => {
-  if (!U.dbBase()) { alert('Connect the database first.'); return; }
-  const lbl = prompt('Name this class period (for example "Period 3"). Groups will start fresh when they reload the game.', 'Period ');
-  if (lbl === null) return;
-  const s = { id: U.today() + '-' + Date.now().toString(36), label: lbl.trim() || 'Class', started: Date.now() };
-  if (await U.dbWrite('current', s)) { session = s; groups = {}; hints = {}; render(); poll(); }
-  else alert('Could not reach the database. Check the connection and try again.');
+$('#pers').onclick = e => {
+  const b = e.target.closest('[data-per]'); if (!b) return;
+  period = +b.dataset.per; try { localStorage.setItem('u5r2-period', period); } catch (e) {}
+  groups = {}; hints = {}; start();
 };
 
 let timer = 0;
 async function poll() {
   clearTimeout(timer);
   if (!U.dbBase()) { render(); return; }
-  if (!session) session = await U.currentSession();
-  const [g, h, cur] = await Promise.all([U.dbRead('sessions/' + session.id + '/groups'), U.dbRead('sessions/' + session.id + '/hints'), U.dbRead('current')]);
+  const want = U.periodSession(period);
+  if (!session || session.id !== want.id) { session = want; groups = {}; hints = {}; }   // also rolls over at midnight
+  const [g, h] = await Promise.all([U.dbRead('sessions/' + session.id + '/groups'), U.dbRead('sessions/day-' + U.today() + '/hints')]);
   ok = g !== undefined;
   if (ok) {
-    groups = g || {}; hints = h || {};
-    if (cur && cur.id && cur.id !== session.id) { session = cur; groups = {}; hints = {}; }   // a new period was started elsewhere
+    groups = g || {};
+    // keep only the QR hints opened while this period's groups were working
+    const G = Object.values(groups).filter(x => x && x.start);
+    const t0 = G.length ? Math.min(...G.map(x => x.start)) - 120000 : Infinity, t1 = G.length ? Math.max(...G.map(x => x.updated || 0)) + 300000 : 0;
+    hints = {};
+    Object.entries(h || {}).forEach(([k, list]) => Object.entries(list || {}).forEach(([id, x]) => {
+      if (x && x.t >= t0 && x.t <= t1) (hints[k] = hints[k] || {})[id] = x;
+    }));
   }
   render();
   timer = setTimeout(poll, 3000);

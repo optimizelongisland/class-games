@@ -71,11 +71,11 @@ if (q && q.alt && new URLSearchParams(location.search).get('alt')) {
     const k = +b.dataset.k; shown[k]++; draw(); log(k, shown[k]);
   });
   draw();
-  let sid = null;
   const log = async (part, level) => {
     if (!U.dbBase()) return;
-    sid = sid || (await U.currentSession()).id;
-    U.dbPush('sessions/' + sid + '/hints/q' + n, { t: Date.now(), part, level });
+    // hint phones don't know the class period, so hints go in one list for the day;
+    // the teacher board matches them to a period by time
+    U.dbPush('sessions/day-' + U.today() + '/hints/q' + n, { t: Date.now(), part, level });
   };
 }
 </script>

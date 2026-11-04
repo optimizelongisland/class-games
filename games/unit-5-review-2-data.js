@@ -208,7 +208,7 @@ const Q = [
       { t: 'expr', vr: 'n', q: 'Write a rule that represents the ' + v('n') + 'th term of the sequence.', answer: '2^(n-1)', key: 'aₙ = 1(2)ⁿ⁻¹', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['Geometric rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '.',
                 v('a') + '<sub>1</sub> is the first term. ' + v('r') + ' is what you multiply by each time.',
-                'Type exponents with ^ and put the exponent in parentheses, like 3(4)^(n-1).'] },
+                'Tap ^ to go up into the exponent, type ' + v('n') + ' ' + M + ' 1 there, then tap ↓ to come back down.'] },
       { t: 'num', q: 'Find the 10th term of the sequence.', answer: 512, prefix: v('a') + '<sub>10</sub> =',
         hints: ['Use your rule and replace ' + v('n') + ' with 10.', 'Do the exponent first: 2' + sup('9') + ' means 2 multiplied by itself 9 times.'] }
     ] },
@@ -228,10 +228,10 @@ const Q = [
   { n: 13, ready: true, title: 'Build an arithmetic sequence',
     text: 'Write an arithmetic sequence in which ' + nw(v('a') + '<sub>1</sub> = 3') + ' and ' + nw(v('a') + '<sub>4</sub> = 15') + '. Find the 13th term.',
     parts: [
-      { t: 'aseq', q: 'Write the sequence. Type at least the first 4 terms, separated by commas.', pq: 'Write the sequence.', first: 3, d: 4, min: 4, key: '3, 7, 11, 15, …', placeholder: 'e.g. 1, 2, 3, 4',
+      { t: 'expr', vr: 'n', q: 'Write a rule for the ' + v('n') + 'th term of the sequence.', pq: 'Write a rule for the ' + v('n') + 'th term.', answer: '3+4(n-1)', key: 'aₙ = 3 + 4(n − 1)  or  aₙ = 4n − 1', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['You know the 1st term (3) and the 4th term (15). Draw 4 blanks: 3, __, __, 15.',
-                'To get from the 1st term to the 4th term you add the common difference 3 times. So 3 + 3' + v('d') + ' = 15.',
-                'Solve for ' + v('d') + ', then keep adding ' + v('d') + ' to fill in the blanks.'] },
+                'To get from the 1st term to the 4th term you add the common difference 3 times. So 3 + 3' + v('d') + ' = 15. Solve for ' + v('d') + '.',
+                'Put ' + v('a') + '<sub>1</sub> and ' + v('d') + ' into ' + nw(v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> + ' + v('d') + '(' + v('n') + ' ' + M + ' 1)') + '.'] },
       { t: 'num', q: 'Find the 13th term.', answer: 51, prefix: v('a') + '<sub>13</sub> =',
         hints: ['Use ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> + (' + v('n') + ' ' + M + ' 1)' + v('d') + ' with ' + v('n') + ' = 13.',
                 'From the 1st term to the 13th term you add ' + v('d') + ' twelve times.'] }
@@ -242,7 +242,7 @@ const Q = [
       { t: 'expr', vr: 'n', q: 'Write a rule for the ' + v('n') + 'th term of this geometric sequence.', answer: '(1/3)^(n-1)', key: 'aₙ = 1(1/3)ⁿ⁻¹', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['Geometric rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '.',
                 'To find ' + v('r') + ', divide any term by the term before it: ' + fr('1', '3') + ' ÷ 1 = ?',
-                'Type fractions with / and put them in parentheses, like (2/5)^(n-1).'] },
+                'Type the fraction with / inside parentheses, like (2/5). Then tap ^ and type ' + v('n') + ' ' + M + ' 1 up in the exponent.'] },
       { t: 'num', q: 'Determine the 7th term.', answer: 1 / 729, key: '1/729', prefix: v('a') + '<sub>7</sub> =',
         hints: ['Replace ' + v('n') + ' with 7 in your rule.', '(' + fr('1', '3') + ')' + sup('6') + ' = ' + fr('1' + sup('6'), '3' + sup('6')) + '. Type it as a fraction like 1/100.'] }
     ] },
@@ -397,7 +397,7 @@ function check(part, input) {
     if (same(f)) return { ok: true };
     // common slip: 2^n-1 instead of 2^(n-1)
     const fixed = body.replace(/\^([a-z0-9]+)([-+][0-9]+)/, '^($1$2)');
-    if (fixed !== body && same(tryParse(fixed, vr))) return { ok: false, msg: 'So close! Put the exponent in parentheses: ^(n−1).' };
+    if (fixed !== body && same(tryParse(fixed, vr))) return { ok: false, msg: 'So close! The whole n − 1 has to be up in the exponent.' };
     return { ok: false };
   }
   return { ok: false };
@@ -443,7 +443,12 @@ async function currentSession() {
   return { id: 'day-' + today(), label: 'Today' };
 }
 
-window.U5R2 = { Q, READY: Q.filter(q => q.ready), byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean,
+// students pick their class period; each period gets its own session for the day
+const PERIODS = [1, 3];
+const periodSession = p => ({ id: 'day-' + today() + '-p' + p, label: 'Period ' + p, period: +p });
+
+window.U5R2 = { Q, PERIODS, periodSession, H: { v, fr, sup, nw, rt, M }, READY: Q.filter(q => q.ready), byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean,
   SITE, dbBase, dbWrite, dbPush, dbRead, currentSession, today,
+  practiceURL: (name, list, period) => 'unit-5-review-2-practice.html?name=' + encodeURIComponent(name) + '&q=' + list.join(',') + (period ? '&p=' + period : ''),
   hintURL: (n, alt) => SITE + 'games/unit-5-review-2-hints.html?q=' + n + (alt ? '&alt=1' : '') };
 })();
