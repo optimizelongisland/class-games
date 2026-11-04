@@ -15,6 +15,7 @@ const ROOT = 'u5r2';                       // top-level key in the database
 const v = s => '<i>' + s + '</i>';                          // italic variable
 const fr = (a, b) => '<span class="fr"><span>' + a + '</span><span>' + b + '</span></span>';
 const sup = s => '<sup>' + s + '</sup>';
+const nw = s => '<span class="nw">' + s + '</span>';            // keep a formula on one line
 // square root: the check mark and the bar are one drawn shape, so they always meet
 const rt = s => '<span class="rt"><svg viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0.5 12.5 L2.8 11 L5.6 19.2 L9.6 1"/></svg><span>' + s + '</span><span class="sr">square root of ' + s.replace(/<[^>]+>/g, '') + '</span></span>';
 const M = '−';                                          // real minus sign
@@ -117,7 +118,7 @@ const Q = [
                 'Take the square root of the top, then divide by the bottom.'] }
     ] },
   { n: 4, ready: true, title: 'Evaluate a function',
-    text: 'A function is defined as ' + v('K') + '(' + v('x') + ') = 2' + v('x') + sup(2) + ' ' + M + ' 5' + v('x') + ' + 3. The value of ' + v('K') + '(' + M + '3) is',
+    text: 'A function is defined as ' + nw(v('K') + '(' + v('x') + ') = 2' + v('x') + sup(2) + ' ' + M + ' 5' + v('x') + ' + 3') + '. The value of ' + nw(v('K') + '(' + M + '3)') + ' is',
     parts: [
       { t: 'mc', q: 'Choose the value.', pq: '', labels: 'abcd', choices: ['54', '36', '0', M + '18'], answer: 1,
         hints: ['Replace every ' + v('x') + ' with (' + M + '3). Keep the parentheses!',
@@ -149,7 +150,7 @@ const Q = [
                 'What is the y-value of the graph at that spot?'] }
     ] },
   { n: 6, ready: true, title: 'Subtracting polynomials',
-    text: 'What is (' + v('x') + ' ' + M + ' 4)' + sup(2) + ' subtracted from (' + v('x') + sup(2) + ' + 3' + v('x') + ' ' + M + ' 4)?',
+    text: 'What is ' + nw('(' + v('x') + ' ' + M + ' 4)' + sup(2)) + ' subtracted from ' + nw('(' + v('x') + sup(2) + ' + 3' + v('x') + ' ' + M + ' 4)') + '?',
     parts: [
       { t: 'expr', vr: 'x', q: 'Type your simplified answer.', pq: '', answer: '11x-20', key: '11x ' + M + ' 20', prefix: '',
         hints: ['"A subtracted from B" means B ' + M + ' A. So start with (' + v('x') + sup(2) + ' + 3' + v('x') + ' ' + M + ' 4) ' + M + ' (' + v('x') + ' ' + M + ' 4)' + sup(2) + '.',
@@ -183,7 +184,7 @@ const Q = [
                 'Read the y-axis numbers: the y-axis shows Percent Maximum Activity, not pH.'] }
     ] },
   { n: 9, ready: true, title: 'Terms from a formula',
-    text: 'Find the first 5 terms given the formula ' + v('f') + '(' + v('n') + ') = 3(' + v('n') + ' ' + M + ' 1) + 4',
+    text: 'Find the first 5 terms given the formula ' + nw(v('f') + '(' + v('n') + ') = 3(' + v('n') + ' ' + M + ' 1) + 4'),
     parts: [
       { t: 'seq', q: 'Type the first 5 terms, separated by commas.', pq: '', answer: [4, 7, 10, 13, 16], placeholder: 'e.g. 1, 2, 3, 4, 5',
         hints: ['The first term is ' + v('f') + '(1). Replace ' + v('n') + ' with 1.',
@@ -191,7 +192,7 @@ const Q = [
                 'Check: do the terms go up by the same amount each time? They should!'] }
     ] },
   { n: 10, ready: true, title: 'Terms from a formula',
-    text: 'Find the first 5 terms given the formula ' + v('f') + '(' + v('n') + ') = 2(5)' + sup(v('n') + ' ' + M + ' 1'),
+    text: 'Find the first 5 terms given the formula ' + nw(v('f') + '(' + v('n') + ') = 2(5)' + sup(v('n') + ' ' + M + ' 1')),
     parts: [
       { t: 'seq', q: 'Type the first 5 terms, separated by commas.', pq: '', answer: [2, 10, 50, 250, 1250], placeholder: 'e.g. 1, 2, 3, 4, 5',
         hints: ['The first term is ' + v('f') + '(1). Replace ' + v('n') + ' with 1: 2(5)' + sup('1 ' + M + ' 1') + ' = 2(5)' + sup('0') + '.',
@@ -225,7 +226,7 @@ const Q = [
         hints: ['Use your rule and replace ' + v('n') + ' with 12.', 'Remember order of operations: parentheses, then multiply, then add.'] }
     ] },
   { n: 13, ready: true, title: 'Build an arithmetic sequence',
-    text: 'Write an arithmetic sequence in which ' + v('a') + '<sub>1</sub> = 3 and ' + v('a') + '<sub>4</sub> = 15. Find the 13th term.',
+    text: 'Write an arithmetic sequence in which ' + nw(v('a') + '<sub>1</sub> = 3') + ' and ' + nw(v('a') + '<sub>4</sub> = 15') + '. Find the 13th term.',
     parts: [
       { t: 'aseq', q: 'Write the sequence. Type at least the first 4 terms, separated by commas.', pq: 'Write the sequence.', first: 3, d: 4, min: 4, key: '3, 7, 11, 15, …', placeholder: 'e.g. 1, 2, 3, 4',
         hints: ['You know the 1st term (3) and the 4th term (15). Draw 4 blanks: 3, __, __, 15.',
@@ -236,7 +237,7 @@ const Q = [
                 'From the 1st term to the 13th term you add ' + v('d') + ' twelve times.'] }
     ] },
   { n: 14, ready: true, title: 'Geometric sequence with fractions',
-    text: 'The terms of a geometric sequence are given below.<br>1, &nbsp;' + fr('1', '3') + ', &nbsp;' + fr('1', '9') + ', &nbsp;' + fr('1', '27') + ', …',
+    text: 'The terms of a geometric sequence are given below.<br><span class="terms">1, &nbsp;&nbsp;' + fr('1', '3') + ', &nbsp;&nbsp;' + fr('1', '9') + ', &nbsp;&nbsp;' + fr('1', '27') + ', &nbsp;…</span>',
     parts: [
       { t: 'expr', vr: 'n', q: 'Write a rule for the ' + v('n') + 'th term of this geometric sequence.', answer: '(1/3)^(n-1)', key: 'aₙ = 1(1/3)ⁿ⁻¹', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['Geometric rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '.',
@@ -289,7 +290,7 @@ const Q = [
                 'Test each choice: divide the 2nd term by the 1st term. Which one gives ' + M + '2?'] }
     ] },
   { n: 18, ready: true, title: 'Solve for x',
-    text: 'If ' + v('f') + '(' + v('x') + ') = ' + fr('5' + v('x') + ' ' + M + ' 9', '2') + ', algebraically determine the value of ' + v('x') + ' when ' + v('f') + '(' + v('x') + ') = 8.',
+    text: 'If ' + nw(v('f') + '(' + v('x') + ') =') + ' ' + fr('5' + v('x') + ' ' + M + ' 9', '2') + ', algebraically determine the value of ' + v('x') + ' when ' + nw(v('f') + '(' + v('x') + ') = 8') + '.',
     parts: [
       { t: 'num', q: 'What is ' + v('x') + '? (Writer: show every step on paper!)', pq: 'Show every step.', answer: 5, prefix: v('x') + ' =',
         hints: [v('f') + '(' + v('x') + ') = 8 means the whole fraction equals 8. Write ' + fr('5' + v('x') + ' ' + M + ' 9', '2') + ' = 8.',

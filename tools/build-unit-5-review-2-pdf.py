@@ -31,10 +31,10 @@ for q in qs:
         if not p['q'] and not p['choices']: continue
         h = '<div class="part">' + ('<p>' + lead + p['q'] + '</p>' if p['q'] else '')
         if p['choices']:
-            h += '<ol class="chs' + (' wide' if any(len(re.sub(r'<[^>]+>', '', c)) > 40 for c in p['choices']) else '') + '" style="grid-template-rows:repeat(' + str((len(p['choices']) + 1) // 2) + ',auto)">' + ''.join(
+            h += '<ol class="chs' + (' wide' if any(len(re.sub(r'<[^>]+>', '', c)) > 30 for c in p['choices']) else '') + '" style="grid-template-rows:repeat(' + str((len(p['choices']) + 1) // 2) + ',auto)">' + ''.join(
                 '<li><b>' + p['labels'][k] + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
         parts.append(h + '</div>')
-    pages.append(f'''<section class="page{' dense' if q['graph'] and (len(q['parts']) > 1 or any(len(re.sub(r'<[^>]+>', '', c)) > 50 for p in q['parts'] for c in (p['choices'] or []))) else ''}">
+    pages.append(f'''<section class="page{' dense' if q['graph'] and (len(q['parts']) > 1 or any(p['choices'] for p in q['parts'])) else ''}">
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>
   <div class="q">{q['text']}</div>
   {('<div class="g">' + q['graph'] + '</div>') if q['graph'] else ''}
@@ -58,23 +58,26 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .num small{font:700 12pt 'IBM Plex Sans',Arial;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.04in}
 .ttl small{display:block;font-size:12pt;letter-spacing:.16em;text-transform:uppercase;color:#555;font-weight:600}
 .ttl b{font:800 28pt/1.1 'Bricolage Grotesque',Arial,sans-serif}
-.q{font-size:22pt;line-height:1.4;margin:.3in 0 .1in}
-.page.dense .q{margin-top:.18in}.page.dense .graph{width:3.1in;height:3.1in}.page.dense .parts{font-size:17pt}.page.dense .part{margin-top:.12in}
+.q{font-size:22pt;line-height:1.5;margin:.35in 0 .2in}
+.page.dense .q{margin-top:.14in;margin-bottom:0}.page.dense .graph{width:3.1in;height:3.1in}.page.dense .parts{font-size:17pt}.page.dense .part{margin-top:.2in}
 .g{display:flex;justify-content:center;margin:.05in 0}
 .graph{width:3.9in;height:3.9in}
 .g-grid{stroke:#9a9a9a;stroke-width:1}.g-axis{stroke:#111;stroke-width:2.6;fill:none}.g-arrow{fill:#111}
 .g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.g-curve{stroke:#111;stroke-width:3.6;fill:none}.g-dot{fill:#111}
 .g-num{fill:#222;font:500 15px 'IBM Plex Sans',Arial}.g-title{fill:#222;font:600 15px 'IBM Plex Sans',Arial}.g-dot.open{fill:#fff;stroke:#111;stroke-width:3}.rt{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:bottom}.rt svg{width:.55em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}.rt>span{border-top:2px solid currentColor;padding:.08em .12em 0 .08em;margin-top:1px}.rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);border:0;padding:0}
+.nw{white-space:nowrap}
+.terms{display:inline-block;margin-top:.2in;font-size:1.1em}
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
 .parts{font-size:19pt;line-height:1.35}
-.part{margin-top:.2in}
+.part{margin-top:.6in}
 .part p{margin:0}
 .pl{font-weight:700}
-.chs{list-style:none;margin:.2in 0 0;padding:0 0 0 .3in;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;gap:.34in .4in}
-.page.dense .chs{gap:.2in .4in;margin-top:.14in}
+.chs{list-style:none;margin:.3in 0 0;padding:0 0 0 .3in;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;gap:.5in .4in}
+.page.dense .chs{gap:.24in .4in;margin-top:.16in}
 .chs.wide{grid-template-columns:1fr 1fr;font-size:15pt;line-height:1.25}
 .chs li{display:flex;gap:.08in}
+.chs.wide li span{white-space:normal}
 footer{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:.3in;border-top:2px solid #111;padding-top:.15in}
 .jobs{font-size:11.5pt;color:#333;max-width:4.6in}
 .qr{display:flex;align-items:center;gap:.15in;border:3px dashed #111;border-radius:.15in;padding:.1in .16in}
