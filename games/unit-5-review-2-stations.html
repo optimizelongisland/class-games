@@ -197,7 +197,7 @@ function practiceFor(k) {
 }
 const qs = n => (S.q['q' + n] = S.q['q' + n] || { w: [], sk: [], h: 0, secs: 0, done: false, wa: [] });
 const doneList = () => U.READY.filter(q => S.q['q' + q.n] && S.q['q' + q.n].done).map(q => q.n);
-const label = () => 'Team ' + S.num + (people().length ? ' · ' + people().join(' & ') : '');
+const label = () => people().join(' & ') || 'Your team';
 
 /* ---------- live board sync ---------- */
 let pushT = 0;
@@ -207,7 +207,7 @@ function payload() {
     q: S.q, start: S.start, finished: S.finished, updated: Date.now() };
 }
 function sync(now) {
-  if (!U.dbBase() || !S.num || !S.sid) return;
+  if (!U.dbBase() || !S.started || !S.sid) return;
   clearTimeout(pushT);
   pushT = setTimeout(async () => {
     const ok = await U.dbWrite('sessions/' + S.sid + '/groups/' + S.gid, payload());
@@ -218,7 +218,7 @@ setInterval(() => { if (!document.hidden) sync(true); }, 20000);
 
 function meta() {
   const live = U.dbBase() ? '<span class="pill"><span class="dot ' + (online === false ? 'off' : online ? 'on' : '') + '"></span>' + (online === false ? 'Board offline' : 'Board') + '</span>' : '';
-  $('#meta').innerHTML = (S.num ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' : '') + live;
+  $('#meta').innerHTML = (S.started ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' : '') + live;
 }
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1600); }
 
@@ -240,29 +240,26 @@ function renderResume() {
 function renderSetup() {
   const pc = ['var(--pink)', 'var(--cyan)', 'var(--green)', 'var(--yellow)'];
   const pers = U.PERIODS.map((p, i) => '<button class="per' + (S.period === p ? ' on' : '') + '" style="--c:' + pc[i % 4] + '" data-p="' + p + '">Period ' + p + '</button>').join('');
-  let nums = ''; for (let i = 1; i <= 16; i++) nums += '<button class="num' + (S.num === i ? ' on' : '') + '" style="--h:' + hue(i) + '" data-g="' + i + '"><small>Team</small>' + i + '</button>';
   const nm = [0, 1, 2].map(k => '<label class="field"><span class="lab" style="margin:0">' + (k === 0 ? 'Partner 1 first name' : k === 1 ? 'Partner 2 first name' : 'Partner 3 (only if you are a team of 3)') + '</span>' +
     '<input data-n="' + k + '" maxlength="16" value="' + esc(S.names[k] || '') + '" autocomplete="off" autocapitalize="words" spellcheck="false"' + (k === 0 && !S.names[0] ? ' class="need"' : '') + '></label>').join('');
   view.innerHTML = '<section class="card"><p class="lab">Step 1</p><h2>What period are you in?</h2><div class="pers" id="pers">' + pers + '</div></section>' +
-    '<section class="card"><p class="lab">Step 2</p><h2>What is your team number?</h2><p style="color:var(--mute);margin-top:-.4rem">Use the team number your teacher gave you and your partner. <b style="color:var(--fg)">This is not a station.</b> You pick your station on the next screen.</p><div class="nums g4" id="gnums">' + nums + '</div></section>' +
-    '<section class="card"><p class="lab">Step 3</p><h2>Type your first names</h2><p style="color:var(--mute);margin-top:-.4rem">First names only. Each of you gets your own practice sheet at the end.</p><div class="names" id="names">' + nm + '</div></section>' +
+    '<section class="card"><p class="lab">Step 2</p><h2>Type your first names</h2><p style="color:var(--mute);margin-top:-.4rem">First names only. Each of you gets your own practice sheet at the end.</p><div class="names" id="names">' + nm + '</div></section>' +
     '<section class="card"><p class="lab">Your jobs</p><div class="roles">' +
     '<div class="role r1"><b>✏️ Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div>' +
     '<div class="role r2"><b>🗣️ Explainer</b><span>Talks through each step out loud.</span></div></div>' +
     '<p style="color:var(--mute);margin:.8rem 0 0">🔄 Switch jobs at every station.</p></section>' +
     '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button><span id="need" style="color:var(--yellow)"></span></div>';
   const check = () => {
-    const miss = [!S.period && 'your period', !S.num && 'your team number', !people().length && 'at least one first name'].filter(Boolean);
+    const miss = [!S.period && 'your period', !people().length && 'at least one first name'].filter(Boolean);
     $('#go').disabled = !!miss.length;
     $('#need').textContent = miss.length ? 'Still need ' + miss.join(', ') + '.' : '';
   };
   $('#pers').onclick = e => { const b = e.target.closest('[data-p]'); if (!b) return; S.period = +b.dataset.p; render(); };
-  $('#gnums').onclick = e => { const b = e.target.closest('[data-g]'); if (!b) return; S.num = +b.dataset.g; render(); };
   $('#names').oninput = e => { const k = e.target.dataset.n; if (k === undefined) return; S.names[+k] = e.target.value.replace(/[^\p{L}\p{M}' .-]/gu, ''); if (k === '0') e.target.classList.toggle('need', !S.names[0].trim()); save(); check(); };
   $('#go').onclick = () => {
     S.names = S.names.map(x => x.trim());
     S.sid = U.dbBase() ? U.periodSession(S.period).id : 'local';
-    S.start = S.start || Date.now(); S.screen = 'pick'; render(); sync(true);
+    S.start = S.start || Date.now(); S.started = true; S.screen = 'pick'; render(); sync(true);
   };
   check();
 }
@@ -275,9 +272,9 @@ function stationGrid(cls) {
 }
 function renderPick() {
   const first = !doneList().length;
-  view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 4' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
+  view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 3' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
     '<p style="color:var(--mute);margin-top:-.4rem">Tap the big station number printed at the top of the paper in front of you.' + (first && U.dbBase() ? ' Orange stations already have a team, so pick a different one if you can.' : '') + '</p><div class="nums g6" id="qnums">' + stationGrid() + '</div></section>' +
-    '<button class="link" id="back">Change period, team or names</button>';
+    '<button class="link" id="back">Change period or names</button>';
   markBusy();
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
   $('#back').onclick = () => { S.screen = 'setup'; render(); };
@@ -549,14 +546,15 @@ function renderFinished() {
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
 function startOver() { S = blank(); newSession = false; try { localStorage.removeItem(KEY); } catch (e) {} render(); scrollTo(0, 0); }
-$('#restart').onclick = () => { if (confirm('Start over as a new team? This clears ' + (S.num ? label() : 'this device') + '’s progress on this device.')) startOver(); };
+$('#restart').onclick = () => { if (confirm('Start over as a new team? This clears ' + (S.started ? label() : 'this device') + '’s progress on this device.')) startOver(); };
 if (new URLSearchParams(location.search).has('new')) { S = blank(); try { localStorage.removeItem(KEY); history.replaceState(null, '', location.pathname + location.search.replace(/[?&]new(=[^&]*)?/, '').replace(/^&/, '?')); } catch (e) {} }
 
 /* ---------- start ---------- */
 (function init() {
-  if (S.num && !S.period) { S = blank(); try { localStorage.removeItem(KEY); } catch (e) {} }   // saved by the older version without periods
+  if (S.num && S.period && !S.started) S.started = true;   // saved by the version with team numbers
+  if ((S.num || S.started) && !S.period) { S = blank(); try { localStorage.removeItem(KEY); } catch (e) {} }   // saved by the older version without periods
   // a different class (another period or another day) picking up this device: ask before reusing it
-  const stale = S.num && S.last && (Date.now() - S.last > 30 * 60000 || (U.dbBase() && S.period && S.sid !== U.periodSession(S.period).id));
+  const stale = S.started && S.last && (Date.now() - S.last > 30 * 60000 || (U.dbBase() && S.period && S.sid !== U.periodSession(S.period).id));
   if (stale && S.screen !== 'setup') newSession = true;
   if (S.period && S.screen !== 'setup' && !newSession) S.sid = U.dbBase() ? U.periodSession(S.period).id : 'local';
   render();
