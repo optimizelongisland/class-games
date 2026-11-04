@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Linear Fleet: Linear Functions</title>
+<title>Battle My Math Ship: Slope</title>
 <style>
   :root{
     --navy:#0b2545; --navy2:#13315c; --gold:#f4a261; --ink:#10223a; --card:#fff; --line:#c5d1de;
-    --hit:#d62828; --miss:#6c7a89; --good:#14532d; --goodbg:#d8f3dc;
+    --hit:#d62828; --miss:#6c7a89; --ship:#13315c;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(#0b2545,#134074 60%,#1d5a96);color:var(--ink);min-height:100vh}
   header{color:#fff;text-align:center;padding:14px 12px 4px}
   header h1{margin:0;font-size:clamp(1.4rem,4vw,2.2rem);letter-spacing:.04em}
   header h1 small{font-size:.45em;display:block;letter-spacing:.3em;color:var(--gold)}
-  main{max-width:1200px;margin:0 auto;padding:10px 16px 60px}
+  main{max-width:1000px;margin:0 auto;padding:10px 16px 40px}
   .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.25);margin-bottom:14px}
-  .center{max-width:520px;margin:20px auto}
+  .center{max-width:480px;margin:20px auto}
   label{font-weight:600;display:block;margin:10px 0 4px}
   input[type=text]{width:100%;padding:12px;font-size:1.1rem;border:2px solid var(--line);border-radius:10px}
   input[type=text]:focus{outline:none;border-color:var(--navy2)}
@@ -24,255 +24,244 @@
   button:hover:not(:disabled){background:var(--navy)}
   button:disabled{opacity:.45;cursor:not-allowed}
   button.alt{background:var(--gold);color:#3b1f00}
-  button.alt:hover:not(:disabled){background:#e98d43}
   button.ghost{background:#e7edf3;color:var(--ink)}
-  button.ghost:hover:not(:disabled){background:#d5dee8}
   .row{display:flex;gap:10px;flex-wrap:wrap}
   .row>*{flex:1}
-  .or{text-align:center;color:#667;margin:16px 0 4px;font-weight:600}
-  .msg{margin-top:8px;font-weight:700}
-  .msg.bad{color:var(--hit)} .msg.good{color:var(--good)}
-  .hint{font-size:.88rem;color:#52627a;margin-top:6px}
-  .hidden{display:none !important}
-  h2{margin:0 0 4px;font-size:1.3rem}
+  .or{text-align:center;color:#667;margin:14px 0 4px;font-weight:600}
+  .code{font-size:3rem;letter-spacing:.3em;font-weight:800;text-align:center;color:var(--navy2);background:#eef2f7;border-radius:12px;padding:10px 0 10px .3em;margin:10px 0}
+  .banner{border-radius:12px;padding:12px 16px;font-weight:700;text-align:center;font-size:1.15rem}
+  .banner.you{background:#d8f3dc;color:#14532d}
+  .banner.opp{background:#fff3cd;color:#664d03}
+  .banner.over{background:var(--navy2);color:#fff}
+  .eventline{color:#fff;text-align:center;min-height:1.4em;margin:8px 0 10px;font-size:.95rem;opacity:.95}
+  .score{display:flex;justify-content:center;gap:10px;margin-bottom:10px;color:#fff;font-weight:700}
+  .score div{background:rgba(255,255,255,.14);border-radius:10px;padding:6px 16px;text-align:center;min-width:140px}
+  .score span{font-size:1.5rem;margin-right:6px}
+  .score small{display:block;font-weight:600;opacity:.85}
+
+  .stage{display:grid;grid-template-columns:1fr 170px;gap:14px;align-items:start}
+  .side{display:flex;flex-direction:column;gap:10px;position:sticky;top:12px}
+  .side button{width:100%;padding:16px 10px;font-size:1.05rem;position:relative;line-height:1.25}
+  .side .dot{position:absolute;top:-8px;right:-8px;background:var(--hit);color:#fff;border-radius:999px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.8rem;padding:0 6px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+  @media (max-width:800px){.stage{grid-template-columns:1fr}.side{order:-1;position:static}}
+
+  h2{margin:0 0 2px;font-size:1.3rem}
   .sub{margin:0 0 10px;font-size:.92rem;color:#52627a}
-  .members{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .members input{font-size:1rem !important;padding:10px !important}
-  .code{font-size:clamp(3rem,10vw,6rem);letter-spacing:.25em;font-weight:900;text-align:center;color:var(--navy2);background:#eef2f7;border-radius:12px;padding:6px 0 6px .25em;margin:8px 0}
-  .pill{display:inline-block;border-radius:999px;padding:4px 12px;font-weight:700;font-size:.9rem;margin:3px;color:#fff}
+  .boardwrap{overflow-x:auto;container-type:inline-size}
+  table.grid{width:100%;min-width:700px;border-collapse:collapse;table-layout:fixed}
+  .grid th{background:#dfe5ec;font-weight:700;padding:6px 2px;border:1px solid #9aa8b8;font-size:.95rem}
+  .grid th:first-child{width:38px}
+  .grid td{border:1px solid #9aa8b8;text-align:center;padding:2px;height:76px;position:relative;background:#fff}
+  .cin{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:2px}
+  .t{white-space:nowrap;font-size:clamp(11px,1.8cqw,17px);line-height:1.2}
+  .slot svg{display:block;width:52px;height:29px;color:var(--ship)}
+  .slot:empty{display:none}
+  .grid td.hit{background:#fde0e0}
+  .grid td.hit .slot svg{color:var(--hit)}
+  .grid td.miss{background:#e4e8ec;color:#8a96a3}
+  .grid td.pending{background:#e3f0ff}
+  .grid td.pending .mark{color:#2b6cb0}
+  .mark{position:absolute;top:2px;left:5px;font-size:.78rem;font-weight:800;pointer-events:none}
+  .grid td.hit .mark{color:var(--hit)}
+  .grid td.miss .mark{color:var(--miss)}
+  .grid.pickable td{cursor:pointer}
+  .grid.atk td.pick{cursor:pointer}
+  .grid.atk td.pick:hover{background:#fff3cd}
+  .grid td.sel{outline:3px solid var(--gold);outline-offset:-3px;background:#fff3cd}
+  .grid.setup td:hover{background:#eef4fb}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;margin-top:8px;color:#52627a;align-items:center}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+  .legend svg{width:26px;height:14px;vertical-align:-3px;margin-right:4px}
 
-  /* ===== Ocean ===== */
-  .ocean{display:grid;gap:3px;background:#0a3d62;padding:6px;border-radius:12px;user-select:none}
-  .ocean .lab{color:#cfe0f3;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,1.3vw,15px)}
-  .ocean .c{aspect-ratio:1;background:#1f6fb2;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;transition:background .2s}
-  .ocean.firing .c.u{cursor:crosshair}
-  .ocean.firing .c.u:hover{background:#ffd166;box-shadow:0 0 0 2px #fff inset}
-  .ocean .c.m{background:#4f6d8a}
-  .ocean .c.m::after{content:"";width:28%;height:28%;border-radius:50%;background:#c9d6e3;opacity:.8}
-  .ocean .c.h{background:var(--tc,#d62828)}
-  .ocean .c.h::after{content:"✸";color:#fff;font-weight:900;font-size:clamp(9px,1.6vw,22px);text-shadow:0 1px 2px rgba(0,0,0,.6)}
-  .ocean .c.s{background:#2b2d42;box-shadow:inset 0 0 0 3px var(--tc,#d62828)}
-  .ocean .c.s::after{content:"";width:70%;height:40%;background:var(--tc,#d62828);border-radius:40% 40% 10% 10%}
-  .ocean .c.r{background:#7a8ca0;box-shadow:inset 0 0 0 2px #ffd166}
-  .ocean .c.pend{background:#ffd166;animation:blink .5s infinite alternate}
-  .ocean .c.flash{animation:flash 1.2s ease-out}
-  @keyframes blink{to{opacity:.5}}
-  @keyframes flash{0%{transform:scale(1.5);z-index:2;box-shadow:0 0 0 4px #fff}100%{transform:scale(1)}}
+  .ask{background:#fffaf0;border:2px solid var(--gold);border-radius:12px;padding:14px;margin-top:12px}
+  .ask .q{font-size:1.25rem;font-weight:700;margin:4px 0 8px}
+  .msg{margin-top:8px;font-weight:700}
+  .msg.bad{color:var(--hit)} .msg.good{color:#14532d}
+  .hint{font-size:.85rem;color:#52627a;margin-top:6px}
+  .hidden{display:none !important}
+  .big{font-size:2.2rem;font-weight:800;text-align:center;margin:6px 0}
+  .endrow{text-align:center;margin-top:6px}
+  .endrow button{background:transparent;color:#cfe0f3;text-decoration:underline;font-weight:600;padding:8px}
+  .endrow button:hover:not(:disabled){background:transparent;color:#fff}
 
-  /* ===== Team screen ===== */
-  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-  .stat{flex:1;min-width:120px;background:rgba(255,255,255,.14);color:#fff;border-radius:12px;padding:8px 12px;text-align:center}
-  .stat b{display:block;font-size:1.7rem;line-height:1.1}
-  .stat small{font-weight:600;opacity:.85}
-  .stat.ammo b{color:#ffd166}
-  .play{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:start}
-  @media (max-width:860px){.play{grid-template-columns:1fr}}
-  .tiers{display:grid;gap:10px}
-  .tier{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px;background:#eef2f7;color:var(--ink);border:2px solid transparent}
-  .tier:hover:not(:disabled){background:#fff3cd;border-color:var(--gold)}
-  .tier .ic{font-size:2rem}
-  .tier b{display:block;font-size:1.1rem}
-  .tier span{font-weight:500;font-size:.9rem;color:#52627a}
-  .tier .tq{margin-left:auto;background:var(--navy2);color:#fff;border-radius:999px;padding:4px 10px;font-size:.85rem;white-space:nowrap}
-  .typist{background:#e3f0ff;color:#123;border-radius:10px;padding:8px 12px;font-weight:600;margin-bottom:10px;font-size:.95rem}
-  .typist b{color:#0b4ea2}
-  .qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
-  .qtag{font-weight:800;color:var(--navy2);letter-spacing:.05em;font-size:.85rem;text-transform:uppercase}
-  .prompt{font-size:1.15rem;font-weight:600;margin:4px 0 10px;line-height:1.4}
-  table.ft{border-collapse:collapse;margin:6px auto 12px;font-size:1.15rem;min-width:200px}
-  .ft th,.ft td{border:2px solid #9aa8b8;padding:6px 18px;text-align:center}
-  .ft th{background:#dfe5ec}
-  .choices{display:grid;gap:8px}
-  .choices button{text-align:left;background:#eef2f7;color:var(--ink);font-weight:600;border:2px solid transparent}
-  .choices button:hover:not(:disabled){border-color:var(--gold);background:#fff3cd}
-  .yn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .yn button{font-size:1.2rem;padding:16px}
-  .ansrow{display:flex;gap:8px;align-items:center}
-  .ansrow .fx0{font-weight:800;font-size:1.2rem;white-space:nowrap}
-  .fb{border-radius:12px;padding:12px 14px;margin-top:10px}
-  .fb.good{background:var(--goodbg);color:var(--good)}
-  .fb.bad{background:#fde0e0;color:#7a1010}
-  .fb h3{margin:0 0 6px}
-  .work{background:#fff;color:var(--ink);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:.95rem;line-height:1.5}
-  .work .ok{color:var(--good);font-weight:700} .work .no{color:var(--hit);font-weight:700}
-  .firehint{background:#fff3cd;border:2px solid var(--gold);border-radius:10px;padding:8px 12px;font-weight:700;margin-bottom:8px;text-align:center}
-  .board-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem;color:#52627a;margin-top:8px}
-  .board-legend i{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:4px}
-
-  /* ===== Host (projector) ===== */
-  .hostbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:#fff;margin-bottom:12px}
-  .hostbar .jc{font-size:1.1rem;font-weight:700}
-  .hostbar .jc b{font-size:2.2rem;letter-spacing:.2em;color:#ffd166;margin-left:6px;vertical-align:-4px}
-  .clock{font-size:2.4rem;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
-  .clock.low{color:#ff8a8a}
-  #hgOcean .ocean{max-width:calc((100vh - 250px) * 1.25);margin:0 auto}
-  .hostgrid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);gap:14px;align-items:start}
-  @media (max-width:900px){.hostgrid{grid-template-columns:1fr}}
-  .lb{list-style:none;margin:0;padding:0}
-  .lb li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;margin-bottom:6px;background:#f3f6fa;transition:transform .3s}
-  .lb li .sw{width:16px;height:16px;border-radius:50%;flex:0 0 auto}
-  .lb li .nm{font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .lb li .sc{font-weight:900;font-size:1.3rem;font-variant-numeric:tabular-nums}
-  .lb li .am{font-size:.8rem;color:#52627a;white-space:nowrap}
-  .lb li.off{opacity:.45}
-  .lb li .rk{font-weight:900;color:#52627a;width:1.4em}
-  .feed{list-style:none;margin:0;padding:0;font-size:.95rem}
-  .feed li{padding:5px 0;border-bottom:1px solid #e3e8ef}
-  .feed li:first-child{animation:slide .4s ease-out;font-weight:700}
-  @keyframes slide{from{opacity:0;transform:translateX(-10px)}}
-  .fleetlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .fleetlist span{background:#eef2f7;border-radius:8px;padding:3px 8px;font-size:.82rem;font-weight:700}
-  .fleetlist span.sunk{text-decoration:line-through;opacity:.5}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-  .controls button{padding:10px 14px;font-size:.95rem}
-  .seg{display:flex;gap:6px;flex-wrap:wrap}
-  .seg button{background:#eef2f7;color:var(--ink);padding:8px 14px}
-  .seg button.on{background:var(--navy2);color:#fff}
-  .joined{min-height:60px;margin:10px 0}
-
-  /* overlays */
-  .ov{position:fixed;inset:0;z-index:90;background:rgba(5,15,30,.78);display:flex;align-items:center;justify-content:center;padding:16px}
-  .ov .card{max-width:760px;width:100%;max-height:92vh;overflow:auto}
-  .pause-word{color:#fff;text-align:center}
-  .pause-word b{display:block;font-size:clamp(2.5rem,9vw,5rem)}
-  .podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;margin:16px 0}
-  .podium div{border-radius:12px 12px 0 0;color:#fff;text-align:center;padding:10px 12px;width:160px;font-weight:800}
-  .podium .p1{height:170px;background:#e9b949;color:#3b2a00}
-  .podium .p2{height:130px;background:#a8b4c2;color:#1b2533}
-  .podium .p3{height:100px;background:#c98a52;color:#2b1700}
-  .podium big{display:block;font-size:2rem}
-  table.res{width:100%;border-collapse:collapse;font-size:.95rem}
-  .res th,.res td{border-bottom:1px solid #e3e8ef;padding:6px;text-align:center}
-  .res td:first-child,.res th:first-child{text-align:left}
-
-  /* HIT / MISS pop-up */
-  .fx{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,15,30,.45);pointer-events:none;animation:fxin .2s ease-out}
+  /* HIT / MISS pop-up animation */
+  .fx{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,15,30,.55);animation:fxin .2s ease-out}
   .fx.out{opacity:0;transition:opacity .35s}
-  .fxword{font-size:clamp(3.5rem,16vw,6.5rem);font-weight:900;letter-spacing:.06em;color:#fff;text-align:center;text-shadow:0 4px 0 var(--hit),0 0 30px rgba(255,120,40,.9);animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+  .fxbox{position:relative;text-align:center;width:min(86vw,420px)}
+  .fxword{font-size:clamp(3.5rem,16vw,6.5rem);font-weight:900;letter-spacing:.06em;color:#fff;text-shadow:0 4px 0 var(--hit),0 0 30px rgba(255,120,40,.9);animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+  .fxsub{color:#fff;font-weight:700;font-size:1.2rem;margin-top:4px;animation:pop .5s .15s both}
+  .fxship{width:min(70vw,300px);height:auto;margin:0 auto;display:block;color:var(--hit);animation:sink 1.7s ease-in both;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+  .fxwave{width:min(86vw,420px);height:34px;margin-top:-26px;color:#4aa3e0;position:relative}
+  .boom{position:absolute;left:50%;top:38%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffd166 30%,#ef476f 60%,rgba(239,71,111,0) 72%);animation:boom .9s ease-out both}
   .fx.miss .fxword{text-shadow:0 4px 0 #3a6ea5,0 0 30px rgba(120,190,255,.9)}
-  .fx.sunk .fxword{text-shadow:0 4px 0 #6a040f,0 0 40px rgba(255,200,40,1)}
-  .fxsub{color:#fff;font-weight:700;font-size:1.2rem;text-align:center;animation:pop .5s .15s both}
-  @keyframes pop{from{transform:scale(.3);opacity:0}}
-  @keyframes fxin{from{opacity:0}}
-  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+  .fx.miss .fxship{display:none}
+  .drop{font-size:5rem;animation:drop .9s ease-in both}
+  @keyframes fxin{from{opacity:0}to{opacity:1}}
+  @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes boom{0%{transform:scale(.2);opacity:1}100%{transform:scale(7);opacity:0}}
+  @keyframes sink{0%{transform:translateY(0) rotate(0)}25%{transform:translateY(-6px) rotate(-3deg)}100%{transform:translateY(55px) rotate(16deg);opacity:.15}}
+  @keyframes drop{0%{transform:translateY(-70px);opacity:0}70%{transform:translateY(0);opacity:1}100%{transform:translateY(0) scale(1.1);opacity:.8}}
+
+  /* defender alert: small banner at the top, does not block the board */
+  .alert{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:90;width:min(92vw,440px);display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.4);pointer-events:none;animation:alin .3s cubic-bezier(.2,1.4,.4,1) both}
+  .alert.hit{background:var(--hit)}
+  .alert.miss{background:#2a6f97}
+  .alert .ic{font-size:1.9rem;line-height:1}
+  .alert b{display:block;font-size:1.25rem;font-weight:900;letter-spacing:.02em}
+  .alert span{font-size:.98rem;font-weight:600;opacity:.95}
+  .alert.out{opacity:0;transform:translate(-50%,-14px);transition:opacity .35s,transform .35s}
+  @keyframes alin{from{opacity:0;transform:translate(-50%,-30px)}to{opacity:1;transform:translate(-50%,0)}}
+  @media (prefers-reduced-motion:reduce){.alert{animation:none}}
+
+  /* how-to-play card */
+  #howModal{z-index:60}
+  #howModal .modal{max-width:520px}
+  .howlist{list-style:none;margin:12px 0 16px;padding:0;display:grid;gap:10px}
+  .howlist li{display:flex;gap:14px;align-items:center;font-size:1.08rem;background:#eef4fb;border-radius:12px;padding:10px 14px}
+  .howlist .n{flex:0 0 38px;height:38px;border-radius:50%;background:var(--navy2);color:#fff;font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+  #btnHow{position:fixed;top:12px;right:12px;width:42px;height:42px;border-radius:50%;padding:0;font-size:1.25rem;background:var(--gold);color:#3b1f00;z-index:20}
+  #btnGot{width:100%;padding:14px;font-size:1.15rem}
+
+  /* ship placement pop-up */
+  .backdrop{position:fixed;inset:0;background:rgba(5,15,30,.72);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
+  .modal{background:#fff;border-radius:16px;width:100%;max-width:880px;max-height:96vh;overflow:auto;padding:20px}
+  .modal h2{font-size:1.5rem}
+  .steps{margin:6px 0 12px;padding:10px 14px;background:#eef4fb;border-radius:10px;font-size:1rem}
+  .counter{font-weight:800;font-size:1.2rem}
+  .modal .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .modal .foot button{padding:14px 28px;font-size:1.1rem}
 </style>
 </head>
 <body>
 
-<header><h1><small>UNIT 6 &middot; LINEAR FUNCTIONS</small>LINEAR FLEET</h1></header>
+<!-- ship icon used everywhere -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ship" viewBox="0 0 100 56">
+    <path d="M44 3 L62 5 L63 16 L44 13 Z" fill="currentColor"/>
+    <path d="M27 12 L77 19 L79 29 L27 23 Z" fill="currentColor"/>
+    <path d="M3 22 L98 31 L98 40 L90 48 L26 48 Z" fill="currentColor"/>
+    <circle cx="35" cy="34" r="2.6" fill="#fff"/><circle cx="47" cy="35" r="2.6" fill="#fff"/>
+    <circle cx="59" cy="36" r="2.6" fill="#fff"/><circle cx="71" cy="37" r="2.6" fill="#fff"/><circle cx="83" cy="38" r="2.6" fill="#fff"/>
+    <path d="M0 52 q7 -6 14 0 t14 0 t14 0 t14 0 t14 0 t14 0 t14 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+</svg>
+
+<header><h1><small>BATTLE MY MATH SHIP</small>SLOPE</h1></header>
 <main>
 
-<!-- ===== LANDING ===== -->
-<section id="landing" class="card center">
-  <h2>Join your team's battle</h2>
-  <p class="sub">One device per team. Solve linear function missions to earn torpedoes, then fire at the hidden fleet. Every hit scores for your team.</p>
-  <div id="rejoinBox" class="hidden" style="margin-bottom:10px"><button id="btnRejoin" class="alt" style="width:100%"></button></div>
-  <label for="joinCode">Game code (on the board)</label>
-  <input id="joinCode" type="text" maxlength="4" placeholder="ABCD" style="text-transform:uppercase;letter-spacing:.3em;text-align:center;font-weight:800" autocomplete="off">
-  <label for="teamName">Team name</label>
-  <input id="teamName" type="text" maxlength="18" placeholder="e.g. The Slope Sharks" autocomplete="off">
-  <label>Crew (first names, 3 or 4)</label>
-  <div class="members">
-    <input type="text" class="mem" maxlength="14" placeholder="Crew 1" autocomplete="off">
-    <input type="text" class="mem" maxlength="14" placeholder="Crew 2" autocomplete="off">
-    <input type="text" class="mem" maxlength="14" placeholder="Crew 3" autocomplete="off">
-    <input type="text" class="mem" maxlength="14" placeholder="Crew 4 (optional)" autocomplete="off">
-  </div>
-  <button id="btnJoin" style="width:100%;margin-top:14px">Join the battle</button>
-  <p id="landMsg" class="msg bad"></p>
-  <div class="or">Teacher</div>
+<!-- LOBBY -->
+<section id="lobby" class="card center">
+  <label for="name">Your name</label>
+  <input id="name" type="text" maxlength="20" placeholder="First name" autocomplete="off">
+  <div class="or">Start a new game</div>
+  <button id="btnCreate" style="width:100%">Create game (you are Player 1)</button>
+  <div class="or">or join your partner</div>
   <div class="row">
-    <button id="btnHost" class="alt">Host on the projector</button>
-    <button id="btnPractice" class="ghost">Practice on my own</button>
+    <input id="joinCode" type="text" maxlength="4" placeholder="Game code" style="text-transform:uppercase;letter-spacing:.2em;text-align:center" autocomplete="off">
+    <button id="btnJoin" class="alt" style="flex:0 0 auto">Join (Player 2)</button>
   </div>
-  <div id="resumeBox" class="hidden" style="margin-top:10px"><button id="btnResume" class="ghost" style="width:100%"></button></div>
-  <p class="hint">The teacher hosts first and puts the 4-letter code on the board. Practice mode works offline with no code.</p>
+  <p id="lobbyMsg" class="msg bad"></p>
+  <p class="hint">One partner creates the game and tells the other the 4-letter code. Both players need internet access.</p>
 </section>
 
-<!-- ===== HOST LOBBY ===== -->
-<section id="hostLobby" class="card center hidden" style="max-width:760px">
-  <h2 style="text-align:center">Teams: join with this code</h2>
-  <div class="code" id="hlCode">----</div>
-  <p class="sub" style="text-align:center">Open this page on one device per team, type the code, team name and crew names.</p>
-  <div class="joined" id="hlTeams"><span class="sub">Waiting for teams…</span></div>
-  <label>Battle length</label>
-  <div class="seg" id="hlTime">
-    <button data-m="12">12 min</button><button data-m="15">15 min</button><button data-m="20" class="on">20 min</button><button data-m="25">25 min</button><button data-m="0">No timer</button>
-  </div>
-  <button id="btnStart" class="alt" style="width:100%;margin-top:16px;font-size:1.2rem">Start the battle</button>
-  <p id="hlMsg" class="msg bad"></p>
-  <p class="hint">Teams can still join after you start. If this tab gets closed, reopen the game and press <b>Resume</b>.</p>
+<!-- WAITING FOR PARTNER -->
+<section id="waiting" class="card center hidden">
+  <h2 style="text-align:center">Share this code with your partner</h2>
+  <div class="code" id="gameCode">----</div>
+  <p style="text-align:center">Waiting for your partner to join…</p>
 </section>
 
-<!-- ===== HOST GAME (projector) ===== -->
-<section id="hostGame" class="hidden">
-  <div class="hostbar">
-    <div class="jc">Join code <b id="hgCode">----</b></div>
-    <div class="clock" id="hgClock"></div>
+<!-- GAME -->
+<section id="game" class="hidden">
+  <div class="score">
+    <div><span id="myScore">0</span><small id="myNameLbl">You</small></div>
+    <div><span id="oppScore">0</span><small id="oppNameLbl">Partner</small></div>
   </div>
-  <div class="hostgrid">
-    <div class="card" style="padding:12px">
-      <div id="hgOcean"></div>
-      <div class="fleetlist" id="hgFleet"></div>
-    </div>
+  <div id="banner" class="banner"></div>
+  <div id="eventline" class="eventline"></div>
+
+  <div class="stage">
     <div>
-      <div class="card"><h2>Leaderboard</h2><ul class="lb" id="hgLb"></ul></div>
-      <div class="card"><h2>Battle log</h2><ul class="feed" id="hgFeed"></ul></div>
-    </div>
-  </div>
-  <div class="controls">
-    <button id="btnPause" class="alt">Pause: eyes up front</button>
-    <button id="btnMissed" class="ghost">Discuss a missed mission</button>
-    <button id="btnReveal" class="ghost">Show hidden ships</button>
-    <button id="btnEnd" class="ghost">End battle</button>
-  </div>
-</section>
-
-<!-- ===== TEAM WAITING ===== -->
-<section id="teamWait" class="card center hidden">
-  <h2 id="twTitle" style="text-align:center"></h2>
-  <p style="text-align:center" class="sub">You're in! Waiting for the teacher to start the battle.</p>
-  <div class="work" style="background:#eef2f7">
-    <b>How to play</b>
-    <ol style="margin:6px 0 0;padding-left:20px">
-      <li>Pick a mission. Harder missions earn more torpedoes.</li>
-      <li>The crew member named on screen types. Everyone else checks the work.</li>
-      <li>Correct answer: you get points and torpedoes. Fire them at the ocean.</li>
-      <li>Wrong answer: read the explanation together while you reload.</li>
-      <li>Every team fires at the same hidden fleet. Hit = +100. Final blow on a ship = +250.</li>
-    </ol>
-  </div>
-</section>
-
-<!-- ===== TEAM PLAY ===== -->
-<section id="teamPlay" class="hidden">
-  <div class="stats">
-    <div class="stat"><b id="tpScore">0</b><small id="tpName">Team</small></div>
-    <div class="stat ammo"><b id="tpAmmo">0</b><small>Torpedoes</small></div>
-    <div class="stat"><b id="tpRank">-</b><small>Place</small></div>
-    <div class="stat"><b id="tpClock">--</b><small>Time left</small></div>
-  </div>
-  <div class="play">
-    <div class="card" id="mission"></div>
-    <div class="card" style="padding:12px">
-      <div id="tpFireHint" class="firehint hidden"></div>
-      <div id="tpOcean"></div>
-      <div class="board-legend">
-        <span><i style="background:#1f6fb2"></i>Unknown</span>
-        <span><i style="background:#4f6d8a"></i>Splash (miss)</span>
-        <span><i style="background:#d62828"></i>Hit (team color)</span>
-        <span><i style="background:#2b2d42;box-shadow:inset 0 0 0 2px #d62828"></i>Sunk</span>
+      <!-- ATTACK VIEW -->
+      <div id="attackView" class="card">
+        <h2>Attack Board</h2>
+        <p class="sub">Click a square, then find the slope between the two points.</p>
+        <div class="boardwrap"><table class="grid atk" id="atkGrid"></table></div>
+        <div class="legend">
+          <span><svg style="color:var(--hit)"><use href="#ship"/></svg>Ship sunk</span>
+          <span><i style="background:#e4e8ec"></i>Missed</span>
+        </div>
+        <div id="ask" class="ask hidden">
+          <div>Attacking square <b id="askCell"></b></div>
+          <div class="q" id="askQ"></div>
+          <div class="row">
+            <input id="answer" type="text" placeholder="slope, e.g. -3/4, 2, 0 or undefined" autocomplete="off">
+            <button id="btnFire" style="flex:0 0 auto">Fire!</button>
+          </div>
+          <div class="hint">slope = (y₂ − y₁) / (x₂ − x₁). Write fractions like 3/4. Type <b>undefined</b> if there is no slope.</div>
+          <div id="askMsg" class="msg"></div>
+        </div>
+        <div id="result" class="msg"></div>
       </div>
-      <p class="sub" id="tpFeed" style="margin:8px 0 0;min-height:1.3em"></p>
+
+      <!-- FLEET VIEW -->
+      <div id="fleetView" class="card hidden">
+        <h2>My Fleet Board <span id="boardTag" style="font-weight:500;font-size:.9rem;color:#52627a"></span></h2>
+        <p class="sub">Your ships are hidden here. Your partner's shots show up on this board.</p>
+        <div class="boardwrap"><table class="grid mine" id="myGrid"></table></div>
+        <div class="legend">
+          <span><svg style="color:var(--ship)"><use href="#ship"/></svg>Your ship</span>
+          <span><svg style="color:var(--hit)"><use href="#ship"/></svg>Ship hit</span>
+          <span><i style="background:#e4e8ec"></i>Shot missed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <button id="btnSwitch" class="alt"></button>
     </div>
   </div>
+
+  <div class="endrow"><button id="btnEnd">End game now (most ships sunk wins)</button></div>
 </section>
 
-<!-- ===== OVERLAYS ===== -->
-<div id="ovPause" class="ov hidden"><div class="pause-word"><b>⚓ ALL HANDS</b>Eyes on the board. Hands off the keyboard.<div id="pauseHostHint" class="hidden" style="margin-top:14px;font-size:.9rem;opacity:.75">Teacher: click anywhere to resume.</div></div></div>
-<div id="ovConn" class="ov hidden"><div class="card center" style="text-align:center"><h2>Reconnecting…</h2><p class="sub" id="ovConnMsg">Lost the connection to the teacher's screen. Trying again.</p></div></div>
-<div id="ovMissed" class="ov hidden"><div class="card"><div id="missedBody"></div><div class="row" style="margin-top:12px"><button id="btnMissPrev" class="ghost">Previous</button><button id="btnMissShow" class="alt">Show the work</button><button id="btnMissNext" class="ghost">Next</button><button id="btnMissClose">Close</button></div></div></div>
-<div id="ovOver" class="ov hidden"><div class="card" id="overBody"></div></div>
+<!-- SHIP PLACEMENT POP-UP -->
+<div id="setupModal" class="backdrop hidden">
+  <div class="modal">
+    <h2>Place your 12 battleships</h2>
+    <div class="steps">
+      <b>1.</b> Click a square to hide a ship there. Click it again to take it off.<br>
+      <b>2.</b> When you have placed <b>12</b> ships, click <b>Done</b>.
+    </div>
+    <div class="boardwrap"><table class="grid setup" id="setupGrid"></table></div>
+    <div class="foot">
+      <div class="counter"><span id="shipCount">0</span> of 12 ships placed</div>
+      <button id="btnReady" disabled>Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO PLAY -->
+<button id="btnHow" class="hidden" title="How to play" aria-label="How to play">?</button>
+<div id="howModal" class="backdrop hidden">
+  <div class="modal">
+    <h2>How to play</h2>
+    <ol class="howlist">
+      <li><span class="n">1</span><span><b>Hide your ships.</b> Place 12 ships on your Fleet Board.</span></li>
+      <li><span class="n">2</span><span><b>Attack at the same time!</b> No waiting for turns. Click a square on the Attack Board and find the slope between the two points.</span></li>
+      <li><span class="n">3</span><span><b>Type your answer, then click Fire.</b> Correct answer = your shot is fired. Wrong answer = wait 20 seconds, then try again.</span></li>
+      <li><span class="n">4</span><span><b>Be the first to sink all 12 ships to win!</b></span></li>
+    </ol>
+    <button id="btnGot">Got it!</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<section id="over" class="card center hidden">
+  <div id="overTitle" class="big"></div>
+  <p id="overDetail" style="text-align:center;font-size:1.1rem"></p>
+  <button id="btnAgain" style="width:100%">Back to start</button>
+</section>
 
 </main>
 
@@ -288,744 +277,347 @@
 
 </script>
 <script>
-/* =====================================================================
-   LINEAR FLEET
-   Whole-class team battle for Algebra 1 Honors, Unit 6 Lesson 1
-   (linear functions: equal differences over equal intervals,
-   rate of change from a table, writing f(x) = mx + b from a table).
-
-   The teacher's projector is the host. Each team joins on one device
-   with the 4-letter code. All teams fire at ONE shared hidden fleet.
-   Teams generate and check their own missions; the host owns the
-   ocean, the torpedo counts and the scores.
-   ===================================================================== */
-
-const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
-const pick = a => a[Math.floor(Math.random() * a.length)];
-const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const r6 = v => Math.round(v * 1e6) / 1e6;
-/* Click-twice confirm (pop-up confirm boxes can be blocked inside Google Sites). */
-function sure(btn, label){
-  if (btn.dataset.armed && Date.now() - +btn.dataset.armed < 4000){ delete btn.dataset.armed; return true; }
-  btn.dataset.armed = Date.now(); btn.dataset.orig = btn.textContent; btn.textContent = label;
-  setTimeout(() => { if (btn.dataset.armed){ delete btn.dataset.armed; btn.textContent = btn.dataset.orig; } }, 4000);
-  return false;
-}
-const SCREENS = ['landing','hostLobby','hostGame','teamWait','teamPlay'];
-function show(id){ SCREENS.forEach(s => $(s).classList.toggle('hidden', s !== id)); }
-
-/* ---------- number formatting ---------- */
-function num(v){ v = r6(v); return (v < 0 ? '−' : '') + String(Math.abs(v)); }
-function money(v){ v = r6(v); return '$' + (Number.isInteger(v) ? v : v.toFixed(2)); }
-function lin(m, b){
-  m = r6(m); b = r6(b);
-  let s = m === 0 ? '' : m === 1 ? 'x' : m === -1 ? '−x' : num(m) + 'x';
-  if (b !== 0 || s === '') s += s === '' ? num(b) : (b > 0 ? ' + ' : ' − ') + String(Math.abs(b));
-  return 'f(x) = ' + s;
-}
-
-/* =====================================================================
-   MISSIONS (question generators)
-   tier 1 Recon  - Is the table linear?               1 torpedo, +50
-   tier 2 Scan   - Which statement gives the rate?    2 torpedoes, +100
-   tier 3 Command- Write the function f(x) = mx + b   3 torpedoes, +150
-   ===================================================================== */
-const TIERS = [
-  null,
-  {name:'Recon', icon:'🔭', ammo:1, pts:50, lock:12, desc:'Is the function linear? Check equal differences over equal intervals.'},
-  {name:'Rate Scan', icon:'📡', ammo:2, pts:100, lock:12, desc:'Pick the statement that describes the rate of change.'},
-  {name:'Full Command', icon:'🎯', ammo:3, pts:150, lock:10, desc:'Write the linear function from the table.'}
-];
-
-function rateRows(xs, ys){
-  const out = [];
-  for (let i = 1; i < xs.length; i++){
-    const dx = r6(xs[i] - xs[i-1]), dy = r6(ys[i] - ys[i-1]);
-    out.push({dx, dy, rate: r6(dy / dx)});
+/* ===== Question data (from the Algebra and Beyond worksheet) =====
+   board: slope values hidden under each player's ships.
+   attack: point pairs; the slope of a pair equals the OPPONENT's board value in that square. */
+const COLS = ["A","B","C","D","E"];
+const DATA = {
+  p1: {
+    board: [
+      ["-2","7/3","0","undefined","-1"],
+      ["1/7","1","-1/2","-2/3","3"],
+      ["4","2","2/3","-5","-6"],
+      ["-5/4","-3","1/4","1/2","5/7"],
+      ["4/11","-3/8","3/4","-8","3/2"]],
+    attack: [
+      [[-6,2,3,-1],[2,0,3,2],[-2,-2,3,0],[-3,-3,2,2],[1,4,9,6]],
+      [[0,0,2,7],[-5,-4,-3,10],[-1,3,3,-2],[7,-4,7,-8],[0,4,3,-2]],
+      [[2,4,7,5],[2,6,3,-4],[5,6,6,-1],[3,4,5,3],[-5,3,0,6]],
+      [[3,2,9,-4],[-3,-1,6,-4],[-3,1,3,5],[-5,1,5,-3],[-2,4,4,4]],
+      [[-1,4,1,-2],[4,3,8,4],[0,0,3,30],[-4,8,-3,-6],[-8,3,8,-3]]]
+  },
+  p2: {
+    board: [
+      ["-1/3","2","2/5","1","1/4"],
+      ["7/2","7","-5/4","undefined","-2"],
+      ["1/5","-10","-7","-1/2","3/5"],
+      ["-1","-1/3","2/3","-2/5","0"],
+      ["-3","1/4","10","-14","-3/8"]],
+    attack: [
+      [[3,-6,4,-8],[-6,-6,-3,1],[-9,1,5,1],[-5,4,-5,-7],[1,-3,3,-5]],
+      [[-10,-4,-3,-3],[2,4,3,5],[-6,4,2,0],[-3,4,3,0],[-1,-5,2,4]],
+      [[1,2,2,6],[4,-7,9,3],[-7,-1,5,7],[-4,18,3,-17],[0,13,4,-11]],
+      [[-3,7,1,2],[-10,33,-2,9],[-4,7,0,8],[2,-1,8,2],[2,2,9,7]],
+      [[-9,-8,2,-4],[-5,-4,3,-7],[0,-2,4,1],[0,12,1,4],[12,5,18,14]]]
   }
-  return out;
-}
-function isLinear(xs, ys){ const rr = rateRows(xs, ys); return rr.every(r => Math.abs(r.rate - rr[0].rate) < 1e-6); }
+};
 
-function genRecon(){
-  const kind = pick(['lin','lin','linUneven','quad','exp','off','fakeEven']);
-  let xs, ys, m, b;
-  const M = [-4,-3,-2,-1,1,2,3,4,0.5,-0.5,1.5,-2.5];
-  if (kind === 'lin' || kind === 'off'){
-    const step = pick([1,1,2,3]), start = pick([-2,-1,0,1,2]) * (step === 3 ? 1 : 1);
-    m = pick(M); b = rnd(-6, 6);
-    xs = [0,1,2,3,4].map(i => start + i * step);
-    ys = xs.map(x => r6(m * x + b));
-    if (kind === 'off'){ const i = rnd(1, 3); ys[i] = r6(ys[i] + pick([-1,1,2,-2])); }
-  } else if (kind === 'linUneven'){
-    // uneven x-intervals but still linear (the honors trap)
-    do { xs = shuffle([...Array(11)].map((_, i) => i - 2)).slice(0, 5).sort((a, b) => a - b); }
-    while (new Set(rateRows(xs, xs).map(r => r.dx)).size < 2);
-    m = pick([-3,-2,-1,1,2,3]); b = rnd(-5, 5);
-    ys = xs.map(x => m * x + b);
-  } else if (kind === 'quad'){
-    const a = pick([1,1,2,-1]), c = rnd(-4, 4), start = pick([-2,0,1]);
-    xs = [0,1,2,3,4].map(i => start + i); ys = xs.map(x => a * x * x + c);
-  } else if (kind === 'exp'){
-    const base = pick([2,2,3]), a = pick([1,2,3,5]);
-    xs = [0,1,2,3,4]; ys = xs.map(x => a * Math.pow(base, x));
-  } else { // fakeEven: equal y-steps over UNEQUAL x-steps => not linear
-    do { xs = shuffle([...Array(9)].map((_, i) => i)).slice(0, 5).sort((a, b) => a - b); }
-    while (new Set(rateRows(xs, xs).map(r => r.dx)).size < 2);
-    const d = pick([2,3,4,5,-3]), s = rnd(-4, 6);
-    ys = xs.map((_, i) => s + i * d);
-  }
-  const yl = pick(['f(x)','f(x)','y']), xl = 'x';
-  const labels = Math.random() < 0.3 ? ['Input','Output'] : [xl, yl];
-  return {tier:1, xs, ys, labels, linear: isLinear(xs, ys),
-    prompt:'Is this function linear?'};
+/* ===== Slope helpers ===== */
+const SHIPS = 12;
+function trueSlope(q){ // q = [x1,y1,x2,y2] -> {n,d} reduced, or null if undefined
+  const dx=q[2]-q[0], dy=q[3]-q[1];
+  if(dx===0) return null;
+  const g=gcd(Math.abs(dy),Math.abs(dx))||1;
+  let n=dy/g,d=dx/g; if(d<0){n=-n;d=-d;}
+  return {n,d};
 }
-
-const CONTEXTS = [
-  {x:'Number of Goldfish', y:'Cost ($)', money:true, up:'The cost increases', down:'The cost decreases', one:'goldfish', many:'goldfish', tail1:'each time 1 goldfish is added', tailN:n=>'each time '+n+' goldfish are added', rates:[0.3,0.5,0.75,1.25,1.5,2], b:[0,0,2,4]},
-  {x:'Toothbrushes Made', y:'Cost ($)', money:true, up:'The cost increases by', down:'The cost decreases by', tail1:'for each additional toothbrush made', tailN:n=>'for each additional '+n+' toothbrushes made', rates:[0.5,1.5,2.5,3,4.5], b:[0,10,25]},
-  {x:'Minutes', y:'Gallons in the Pool', money:false, unit:' gallons', up:'The water increases by', down:'The water decreases by', tail1:'each minute', tailN:n=>'every '+n+' minutes', rates:[4,6,8,12,15], b:[0,20,50,100]},
-  {x:'Hours Driven', y:'Miles Traveled', money:false, unit:' miles', up:'The distance increases by', down:'The distance decreases by', tail1:'each hour', tailN:n=>'every '+n+' hours', rates:[45,50,55,60,65], b:[0,0,30]},
-  {x:'Hours Burning', y:'Candle Height (cm)', money:false, unit:' cm', up:'The height increases by', down:'The height decreases by', tail1:'each hour', tailN:n=>'every '+n+' hours', rates:[-0.5,-1.5,-2,-2.5], b:[30,24,40], start0:true},
-  {x:'Tickets Sold', y:'Money Raised ($)', money:true, up:'The money raised increases by', down:'The money raised decreases by', tail1:'for each ticket sold', tailN:n=>'for every '+n+' tickets sold', rates:[2.5,4,6,7.5,12], b:[0,0,-50]}
-];
-function genScan(){
-  const c = pick(CONTEXTS), k = pick([2,3,4,5,10]), r = pick(c.rates), b = pick(c.b);
-  const startX = c.start0 ? 0 : k;
-  const xs = [0,1,2,3].map(i => startX + i * k), ys = xs.map(x => r6(b + r * x));
-  const fmtv = v => c.money ? money(Math.abs(v)) : String(r6(Math.abs(v))) + c.unit;
-  const say = (v, n) => (v < 0 ? c.down : c.up) + ' ' + fmtv(v) + ' ' + (n === 1 ? c.tail1 : c.tailN(n)) + '.';
-  const correct = Math.random() < 0.5 ? {v:r, n:1} : {v:r6(r * k), n:k};
-  const cands = [{v:r6(r*k), n:1}, {v:r, n:k}, {v:r6(r*k*2), n:k}, {v:r6(r/2), n:1}, {v:r6(r*k/2), n:k}, {v:r6(r+1), n:1}, {v:r6(r*2), n:1}];
-  if (b !== 0 && xs[0] !== 0) cands.unshift({v:r6(ys[0] / xs[0]), n:1});
-  const seen = new Set([say(correct.v, correct.n)]), opts = [correct];
-  for (const d of cands){
-    if (opts.length >= 4) break;
-    if (Math.abs(d.v / d.n - r) < 1e-9 || d.v === 0 || Math.abs(d.v * 100 - Math.round(d.v * 100)) > 1e-9) continue;
-    const t = say(d.v, d.n); if (seen.has(t)) continue;
-    seen.add(t); opts.push(d);
-  }
-  const choices = shuffle(opts.map(o => ({text: say(o.v, o.n), ok: o === correct})));
-  return {tier:2, xs, ys, labels:[c.x, c.y], money:c.money, choices,
-    prompt:'The table is a linear function. Which statement describes its rate of change?', r, k};
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function parseAnswer(s){ // -> 'undef' | {n,d} | {dec} | null (unparseable)
+  s=String(s).toLowerCase().replace(/[−–]/g,"-").replace(/\s+/g,"").replace(/^m=/,"");
+  if(!s) return null;
+  if(/^(undefined|undef|und|dne|nope|noslope)$/.test(s)) return "undef";
+  let m=s.match(/^(-?\d+)\/(-?\d+)$/);
+  if(m){ let n=+m[1],d=+m[2]; if(d===0) return "undef"; if(d<0){n=-n;d=-d;} return {n,d}; }
+  if(/^-?\d+(\.\d+)?$/.test(s)){ return {dec:parseFloat(s)}; }
+  return null;
 }
-
-function genCommand(){
-  const m = pick([-5,-4,-3,-2,-1,1,2,3,4,5,-3,2,0.5,-0.5,1.5,0.25,-0.75]);
-  const b = rnd(-8, 8);
-  const layout = pick(['center','center','noZero','step2','step2noZero']);
-  const xs = layout === 'center' ? [-2,-1,0,1,2]
-          : layout === 'noZero' ? [1,2,3,4,5]
-          : layout === 'step2' ? [-4,-2,0,2,4] : [2,4,6,8,10];
-  const ys = xs.map(x => r6(m * x + b));
-  return {tier:3, xs, ys, labels:['x','f(x)'], m, b,
-    prompt:'This function is linear. Write it in the form f(x) = mx + b.'};
+function isCorrect(input,q){
+  const a=parseAnswer(input), t=trueSlope(q);
+  if(a===null) return false;
+  if(t===null) return a==="undef";
+  if(a==="undef") return false;
+  if(a.dec!==undefined){ const diff=Math.abs(a.dec - t.n/t.d), places=(String(a.dec).split(".")[1]||"").length; return diff<1e-9 || (places>=2 && diff<0.005); }
+  return a.n*t.d===t.n*a.d;
 }
-const GEN = [null, genRecon, genScan, genCommand];
+function fmtPt(x,y){return "("+x+", "+y+")";}
 
-/* ---------- checking a typed function ---------- */
-function checkExpr(input, m, b){
-  let s = String(input).toLowerCase().replace(/[−–—]/g, '-').replace(/\s+/g, '');
-  s = s.replace(/^(f\(x\)|y|g\(x\)|h\(x\))=/, '');
-  if (!s) return 'empty';
-  if (!/^[0-9x+\-*/.()]+$/.test(s)) return 'invalid';
-  s = s.replace(/(\d|\)|x)(?=[x(])/g, '$1*').replace(/(x|\))(?=[\d.])/g, '$1*');
-  let f;
-  try { f = new Function('x', '"use strict";return (' + s + ');'); f(1); } catch (e) { return 'invalid'; }
-  for (const x of [-3, 0, 1, 2, 7]){
-    const v = f(x);
-    if (typeof v !== 'number' || !isFinite(v) || Math.abs(v - (m * x + b)) > 1e-6) return false;
-  }
-  return true;
-}
+/* ===== State ===== */
+const $=id=>document.getElementById(id);
+let peer=null, conn=null, isHost=false, myName="", oppName="Partner";
+let myData=null, atkData=null;
+let ships=new Set(), incoming=new Map();      // incoming: cell -> 'hit'|'miss' (partner's shots at me)
+let outgoing=new Map();                       // cell -> 'hit'|'miss' (my shots)
+let myReady=false, oppReady=false, phase="lobby", selected=null, finished=false;
+let pending=new Set();                        // shots I fired that are waiting for the result
+let view="attack", notice=0;                  // notice = news waiting on the other board
 
-/* ---------- rendering a mission ---------- */
-function tableHTML(q){
-  const fy = v => q.money ? money(v).replace('$-', '−$') : num(v);
-  return '<table class="ft"><tr><th>' + esc(q.labels[0]) + '</th><th>' + esc(q.labels[1]) + '</th></tr>' +
-    q.xs.map((x, i) => '<tr><td>' + num(x) + '</td><td>' + fy(q.ys[i]) + '</td></tr>').join('') + '</table>';
-}
-function workHTML(q){
-  const rr = rateRows(q.xs, q.ys);
-  const same = isLinear(q.xs, q.ys);
-  let h = '<b>Rate check, row by row:</b><br>' + rr.map((r, i) =>
-    'x: ' + num(q.xs[i]) + ' → ' + num(q.xs[i+1]) + ' &nbsp; (change ' + num(r.dx) + '), &nbsp;' +
-    'y change ' + num(r.dy) + ' &nbsp;⇒&nbsp; ' + num(r.dy) + ' ÷ ' + num(r.dx) + ' = <b>' + num(r.rate) + '</b>').join('<br>');
-  if (q.tier === 1){
-    h += '<br>' + (same
-      ? '<span class="ok">Every rate is ' + num(rr[0].rate) + ', so it IS linear.</span>'
-      : '<span class="no">The rates are not all equal, so it is NOT linear.</span>');
-    const dxs = new Set(rr.map(r => r.dx)), dys = new Set(rr.map(r => r.dy));
-    if (same && dxs.size > 1) h += '<br>Watch out: the x-intervals are uneven, so the y-differences look different. Divide to compare rates!';
-    if (!same && dys.size === 1) h += '<br>Watch out: the y-values go up by the same amount, but the x-intervals are NOT equal.';
-  } else if (q.tier === 2){
-    const c = q.choices.find(c => c.ok);
-    h += '<br>The rate is ' + (q.money ? money(q.r) : num(q.r)) + ' per 1 unit, which is the same as ' + (q.money ? money(q.r * q.k) : num(q.r * q.k)) + ' per ' + q.k + ' units.' +
-         '<br><span class="ok">Answer: ' + esc(c.text) + '</span>';
-  } else {
-    const has0 = q.xs.indexOf(0);
-    h += '<br>m = ' + num(q.m) + '. ';
-    h += has0 >= 0 ? 'When x = 0, f(x) = ' + num(q.b) + ', so b = ' + num(q.b) + '.'
-      : 'x = 0 is not in the table, so work backwards: ' + num(q.ys[0]) + ' − (' + num(q.m) + ')(' + num(q.xs[0]) + ') = ' + num(q.b) + ', so b = ' + num(q.b) + '.';
-    h += '<br><span class="ok">' + lin(q.m, q.b) + '</span>';
-  }
-  return h;
-}
+function show(id){ ["lobby","waiting","game","over"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); }
+function event(t){ $("eventline").textContent=t; }
+function send(o){ if(conn&&conn.open) conn.send(o); }
+const cellId=(r,c)=>COLS[c]+(r+1);
+const SHIP='<svg viewBox="0 0 100 56"><use href="#ship"/></svg>';
 
-/* =====================================================================
-   OCEAN (host owns it)
-   ===================================================================== */
-const ROWS = 10, COLS = 12, LETTERS = 'ABCDEFGHIJKL';
-const FLEET = [['Aircraft Carrier',5],['Battleship',4],['Battleship',4],['Cruiser',3],['Cruiser',3],['Cruiser',3],['Destroyer',2],['Destroyer',2],['Destroyer',2],['Submarine',2]];
-const PRACTICE_FLEET = [['Battleship',4],['Cruiser',3],['Cruiser',3],['Destroyer',2],['Destroyer',2]];
-const cellName = i => LETTERS[i % COLS] + (Math.floor(i / COLS) + 1);
-function placeFleet(fleet){
-  for (let attempt = 0; attempt < 400; attempt++){
-    const taken = new Set(), ships = [];
-    let ok = true;
-    for (const [name, size] of fleet){
-      let placed = false;
-      for (let t = 0; t < 200 && !placed; t++){
-        const hor = Math.random() < 0.5, r = rnd(0, ROWS - (hor ? 1 : size)), c = rnd(0, COLS - (hor ? size : 1));
-        const cells = [...Array(size)].map((_, i) => (r + (hor ? 0 : i)) * COLS + c + (hor ? i : 0));
-        const buffer = attempt < 300; // keep ships from touching when possible
-        const clash = cells.some(i => {
-          if (taken.has(i)) return true;
-          if (!buffer) return false;
-          const rr = Math.floor(i / COLS), cc = i % COLS;
-          for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++){
-            const R = rr + a, C = cc + b;
-            if (R >= 0 && R < ROWS && C >= 0 && C < COLS && taken.has(R * COLS + C)) return true;
-          }
-          return false;
-        });
-        if (!clash){ cells.forEach(i => taken.add(i)); ships.push({name, size, cells, sunkBy:null}); placed = true; }
-      }
-      if (!placed){ ok = false; break; }
-    }
-    if (ok) return ships;
-  }
-  return [];
-}
+/* ===== Lobby / connection ===== */
+function randCode(){ const L="ABCDEFGHJKMNPQRSTUVWXYZ"; let s=""; for(let i=0;i<4;i++) s+=L[Math.floor(Math.random()*L.length)]; return s; }
+const PREFIX="slope-bms-";
+function needName(){ myName=$("name").value.trim(); if(!myName){ $("lobbyMsg").textContent="Please type your name first."; return false;} $("lobbyMsg").textContent=""; return true; }
 
-const COLORS = ['#e63946','#f77f00','#e9c46a','#2a9d8f','#4cc9f0','#4361ee','#9b5de5','#f15bb5','#06d6a0','#a0522d','#8d99ae','#ff70a6'];
-
-/* =====================================================================
-   HOST
-   ===================================================================== */
-const PREFIX = 'linfleet-u6-';
-const HOST_KEY = 'linear-fleet-host';
-let H = null;            // host state
-let hostPeer = null, conns = new Map(); // teamId -> conn
-let practice = false;
-let revealShips = false, missedIdx = 0, missedWork = false;
-
-function newHostState(code, isPractice){
-  return {code, practice:!!isPractice, phase:'lobby', minutes:20, endAt:0, remaining:0,
-    teams:[], cells:new Array(ROWS * COLS).fill(0), by:new Array(ROWS * COLS).fill(-1),
-    ships:placeFleet(isPractice ? PRACTICE_FLEET : FLEET), feed:[], missed:[], saved:Date.now()};
-}
-function saveHost(){
-  if (!H || H.practice) return;
-  H.saved = Date.now();
-  try { localStorage.setItem(HOST_KEY, JSON.stringify(H)); } catch (e) {}
-}
-function randCode(){ const L = 'ABCDEFGHJKMNPQRSTUVWXYZ'; let s = ''; for (let i = 0; i < 4; i++) s += L[Math.floor(Math.random() * L.length)]; return s; }
-
-function startHostPeer(code, tries){
-  if (typeof Peer === 'undefined'){ $('landMsg').textContent = 'Could not load the game network. Check the internet, or use Practice mode.'; return; }
-  $('landMsg').className = 'msg'; $('landMsg').textContent = 'Starting the game…';
-  hostPeer = new Peer(PREFIX + code);
-  hostPeer.on('open', () => {
-    $('landMsg').textContent = '';
-    if (!H || H.code !== code) H = newHostState(code, false);
-    renderHost();
+$("btnCreate").onclick=()=>{
+  if(!needName()) return;
+  isHost=true; createPeer(randCode());
+};
+function createPeer(code){
+  $("lobbyMsg").textContent="Connecting…";
+  peer=new Peer(PREFIX+code);
+  peer.on("open",()=>{ $("gameCode").textContent=code; $("lobbyMsg").textContent=""; show("waiting"); });
+  peer.on("error",e=>{
+    if(e.type==="unavailable-id"){ createPeer(randCode()); return; }
+    $("lobbyMsg").textContent="Could not connect ("+e.type+"). Check your internet and try again."; show("lobby");
   });
-  hostPeer.on('error', e => {
-    if (e.type === 'unavailable-id'){
-      if (H && H.code === code && tries < 12){ // resuming: the old tab's id may take a moment to free up
-        $('landMsg').textContent = 'Reconnecting to game ' + code + '… (' + (tries + 1) + ')';
-        hostPeer.destroy(); setTimeout(() => startHostPeer(code, tries + 1), 3000); return;
-      }
-      if (!H || H.code !== code){ hostPeer.destroy(); startHostPeer(randCode(), 0); return; }
-      $('landMsg').className = 'msg bad'; $('landMsg').textContent = 'Could not reclaim code ' + code + '. Press Host on the projector to start a new game.'; return;
-    }
-    if (!H){ $('landMsg').className = 'msg bad'; $('landMsg').textContent = 'Could not start the game (' + e.type + '). Check the internet, or use Practice mode.'; return; }
-    if (e.type === 'peer-unavailable') return; // harmless
-    console.warn('peer error', e.type);
+  peer.on("connection",c=>{
+    if(conn&&conn.open){ c.close(); return; }
+    conn=c; wire();
   });
-  hostPeer.on('disconnected', () => { try { hostPeer.reconnect(); } catch (e) {} });
-  hostPeer.on('connection', c => {
-    c.on('data', d => hostRecv(c, d));
-    c.on('close', () => { if (c._tid != null && conns.get(c._tid) === c){ conns.delete(c._tid); renderHost(); } });
+}
+$("btnJoin").onclick=()=>{
+  if(!needName()) return;
+  const code=$("joinCode").value.trim().toUpperCase();
+  if(code.length!==4){ $("lobbyMsg").textContent="Enter the 4-letter code."; return; }
+  isHost=false; $("lobbyMsg").textContent="Connecting…";
+  peer=new Peer();
+  peer.on("error",e=>{
+    $("lobbyMsg").textContent = e.type==="peer-unavailable" ? "No game found with that code. Check the letters." : "Connection problem ("+e.type+").";
+  });
+  peer.on("open",()=>{
+    conn=peer.connect(PREFIX+code,{reliable:true});
+    wire();
+  });
+};
+function wire(){
+  conn.on("open",()=>{ send({t:"hello",name:myName}); });
+  conn.on("data",onMsg);
+  conn.on("close",()=>{
+    if(finished) return;
+    $("setupModal").classList.add("hidden");
+    banner("over","Your partner disconnected."); event(""); $("btnEnd").disabled=true; phase="over"; renderAll();
   });
 }
 
-function hostRecv(c, d){
-  if (!d || typeof d !== 'object') return;
-  if (d.t === 'join'){
-    const name = String(d.name || 'Team').slice(0, 18).trim() || 'Team';
-    let id = H.teams.findIndex(t => t.name.toLowerCase() === name.toLowerCase());
-    if (id < 0){
-      id = H.teams.length;
-      H.teams.push({name, color:COLORS[id % COLORS.length], members:(d.members || []).slice(0, 4).map(m => String(m).slice(0, 14)),
-        score:0, ammo:0, hits:0, sinks:0, shots:0, right:[0,0,0,0], wrong:[0,0,0,0]});
-      if (H.phase !== 'lobby') log('🚢 ' + name + ' joined the battle.');
+/* ===== Messages ===== */
+function onMsg(m){
+  switch(m.t){
+    case "hello": oppName=m.name||"Partner"; beginGame(); break;
+    case "ready": oppReady=true; maybeStart(); break;
+    case "go": startPlay(); break;
+    case "attack": handleAttack(m.cell); break;
+    case "result": handleResult(m); break;
+    case "end": finish("ended"); break;
+  }
+}
+
+/* ===== Game setup ===== */
+function beginGame(){
+  if(phase!=="lobby") return;
+  myData = isHost ? DATA.p1 : DATA.p2;
+  atkData = isHost ? DATA.p1.attack : DATA.p2.attack;
+  $("myNameLbl").textContent=myName; $("oppNameLbl").textContent=oppName;
+  $("boardTag").textContent="(Player "+(isHost?"1":"2")+")";
+  buildGrid($("setupGrid"),"s"); buildGrid($("myGrid"),"m"); buildGrid($("atkGrid"),"a");
+  phase="setup"; show("game"); setView("fleet");
+  $("setupModal").classList.remove("hidden");
+  $("howModal").classList.remove("hidden"); $("btnHow").classList.remove("hidden");
+  banner("opp","Get ready: hide your ships!");
+  renderAll();
+}
+function buildGrid(t,prefix){
+  t.innerHTML="<tr><th></th>"+COLS.map(c=>"<th>"+c+"</th>").join("")+"</tr>";
+  for(let r=0;r<5;r++){
+    const tr=document.createElement("tr"); tr.innerHTML="<th>"+(r+1)+"</th>";
+    for(let c=0;c<5;c++){
+      const id=cellId(r,c), td=document.createElement("td"); td.id=prefix+id;
+      let txt;
+      if(prefix==="a"){ const q=atkData[r][c]; txt=fmtPt(q[0],q[1])+" and "+fmtPt(q[2],q[3]); }
+      else txt="m = "+myData.board[r][c];
+      td.innerHTML='<div class="cin"><div class="slot"></div><span class="t">'+txt+'</span></div>';
+      if(prefix==="s") td.onclick=()=>toggleShip(id);
+      if(prefix==="a") td.onclick=()=>pickCell(id,r,c);
+      tr.appendChild(td);
     }
-    c._tid = id; conns.set(id, c);
-    send(c, {t:'welcome', id});
-  } else if (c._tid != null){
-    hostAction(c._tid, d);
-  }
-  saveHost(); renderHost();
-}
-
-/* All game rules live here so practice mode can call them directly. */
-function hostAction(id, d){
-  const T = H.teams[id]; if (!T) return;
-  const playing = H.phase === 'play';
-  if (d.t === 'right' && playing){
-    const tier = TIERS[d.tier]; if (!tier) return;
-    T.right[d.tier]++; T.ammo += tier.ammo; T.score += tier.pts;
-  } else if (d.t === 'wrong'){
-    if (TIERS[d.tier]) T.wrong[d.tier]++;
-    if (d.q && H.missed.length < 60) H.missed.push({team:T.name, q:d.q});
-  } else if (d.t === 'fire' && playing){
-    const i = d.cell | 0;
-    if (T.ammo < 1 || i < 0 || i >= ROWS * COLS || H.cells[i] !== 0) { pushState(id, {t:'fired', cell:i, res:'blocked'}); return; }
-    T.ammo--; T.shots++;
-    const ship = H.ships.find(s => s.cells.includes(i));
-    let res = 'miss', sunk = null;
-    if (ship){
-      H.cells[i] = 2; H.by[i] = id; T.hits++; T.score += 100; res = 'hit';
-      if (ship.cells.every(k => H.cells[k] === 2)){
-        ship.sunkBy = id; T.sinks++; T.score += 250; res = 'sunk'; sunk = ship.name;
-        log('💥 ' + T.name + ' sank the ' + ship.name + '! (+250)');
-      } else log('🎯 ' + T.name + ' hit at ' + cellName(i) + '.');
-    } else { H.cells[i] = 1; H.by[i] = id; }
-    H.lastShot = i;
-    pushState(id, {t:'fired', cell:i, res, ship:sunk});
-    if (H.ships.length && H.ships.every(s => s.sunkBy != null)){ log('🏁 The whole fleet is sunk!'); endBattle(); }
+    t.appendChild(tr);
   }
 }
-function log(t){ H.feed.unshift(t); H.feed.length = Math.min(H.feed.length, 30); }
-
-function publicState(){
-  const ranks = rankTeams();
-  return {t:'state', phase:H.phase, endAt:H.endAt, remaining:H.remaining, now:Date.now(),
-    cells:H.cells, by:H.by, sunk:H.ships.filter(s => s.sunkBy != null).map(s => ({cells:s.cells, by:s.sunkBy})),
-    teams:H.teams.map((t, i) => ({name:t.name, color:t.color, score:t.score, rank:ranks.indexOf(i) + 1})),
-    feed:H.feed.slice(0, 3), last:H.lastShot};
+function toggleShip(id){
+  if(phase!=="setup"||myReady) return;
+  if(ships.has(id)) ships.delete(id); else if(ships.size<SHIPS) ships.add(id);
+  renderAll();
 }
-function rankTeams(){ return H.teams.map((t, i) => i).sort((a, b) => H.teams[b].score - H.teams[a].score || H.teams[b].hits - H.teams[a].hits); }
-function send(c, msg){ try { if (c && c.open) c.send(msg); } catch (e) {} }
-function pushState(onlyId, extra){
-  const pub = publicState();
-  if (practice){
-    teamRecv(Object.assign({}, pub, {you:0, ammo:H.teams[0].ammo}));
-    if (extra) teamRecv(extra);
-    return;
-  }
-  conns.forEach((c, id) => {
-    send(c, Object.assign({}, pub, {you:id, ammo:H.teams[id] ? H.teams[id].ammo : 0}));
-    if (extra && id === onlyId) send(c, extra);
-  });
-}
-
-function hostTick(){
-  if (!H || H.practice) return;
-  if (H.phase === 'play' && H.endAt && Date.now() >= H.endAt){ log('⏰ Time! Torpedoes down.'); endBattle(); }
-  renderClock();
-}
-setInterval(hostTick, 500);
-
-function endBattle(){
-  if (H.phase === 'over') return;
-  if (H.phase === 'paused' && H.minutes) H.endAt = Date.now() + H.remaining;
-  H.phase = 'over'; revealShips = true; saveHost();
-  if (practice) { pushState(); return; }
-  pushState(); renderHost(); showHostOver();
-}
-
-/* ---------- host rendering ---------- */
-function oceanHTML(cells, by, sunk, teams, opts){
-  const sunkMap = new Map();
-  (sunk || []).forEach(s => s.cells.forEach(k => sunkMap.set(k, s.by)));
-  const shipCells = opts.reveal ? new Set(opts.reveal.flatMap(s => s.cells)) : null;
-  let h = '<div class="ocean' + (opts.firing ? ' firing' : '') + '" style="grid-template-columns:auto repeat(' + COLS + ',1fr)"><div></div>';
-  for (let c = 0; c < COLS; c++) h += '<div class="lab">' + LETTERS[c] + '</div>';
-  for (let r = 0; r < ROWS; r++){
-    h += '<div class="lab">' + (r + 1) + '</div>';
-    for (let c = 0; c < COLS; c++){
-      const i = r * COLS + c, s = cells[i];
-      let cls = 'u', style = '';
-      if (sunkMap.has(i)){ cls = 's'; style = '--tc:' + (teams[sunkMap.get(i)] || {}).color; }
-      else if (s === 2){ cls = 'h'; style = '--tc:' + (teams[by[i]] || {}).color; }
-      else if (s === 1) cls = 'm';
-      else if (shipCells && shipCells.has(i)) cls = 'r';
-      if (opts.pending === i) cls += ' pend';
-      if (opts.flash === i) cls += ' flash';
-      h += '<div class="c ' + cls + '" data-i="' + i + '" style="' + style + '" title="' + cellName(i) + '"></div>';
-    }
-  }
-  return h + '</div>';
-}
-
-let lastFlash = -1;
-function renderHost(){
-  if (!H || practice) return;
-  if (H.phase === 'lobby'){
-    show('hostLobby');
-    $('hlCode').textContent = H.code;
-    $('hlTeams').innerHTML = H.teams.length
-      ? H.teams.map((t, i) => '<span class="pill" style="background:' + t.color + (conns.has(i) ? '' : ';opacity:.45') + '">' + esc(t.name) + ' (' + t.members.length + ')</span>').join('')
-      : '<span class="sub">Waiting for teams…</span>';
-    [...$('hlTime').children].forEach(b => b.classList.toggle('on', +b.dataset.m === H.minutes));
-    pushState();
-    return;
-  }
-  show('hostGame');
-  $('hgCode').textContent = H.code;
-  const flash = H.lastShot !== lastFlash ? H.lastShot : -1; lastFlash = H.lastShot;
-  const pub = publicState();
-  $('hgOcean').innerHTML = oceanHTML(H.cells, H.by, pub.sunk, H.teams, {flash, reveal: revealShips ? H.ships : null});
-  $('hgFleet').innerHTML = '<b style="font-size:.85rem;margin-right:4px">Enemy fleet:</b>' + H.ships.map(s => '<span class="' + (s.sunkBy != null ? 'sunk' : '') + '">' + s.name + ' (' + s.size + ')</span>').join('');
-  const order = rankTeams();
-  $('hgLb').innerHTML = order.map((i, k) => { const t = H.teams[i];
-    return '<li class="' + (conns.has(i) ? '' : 'off') + '"><span class="rk">' + (k + 1) + '</span><span class="sw" style="background:' + t.color + '"></span><span class="nm">' + esc(t.name) + '</span><span class="am">🚀' + t.ammo + ' · 🎯' + t.hits + '</span><span class="sc">' + t.score + '</span></li>'; }).join('') || '<li>No teams yet</li>';
-  $('hgFeed').innerHTML = H.feed.slice(0, 8).map(f => '<li>' + esc(f) + '</li>').join('') || '<li class="sub">Shots will show up here.</li>';
-  $('btnPause').textContent = H.phase === 'paused' ? 'Resume battle' : 'Pause: eyes up front';
-  $('btnPause').disabled = H.phase === 'over';
-  $('btnReveal').textContent = revealShips ? 'Hide ships' : 'Show hidden ships';
-  $('btnMissed').textContent = 'Discuss a missed mission (' + H.missed.length + ')';
-  if (!$('btnEnd').dataset.armed) $('btnEnd').textContent = H.phase === 'over' ? 'Show results' : 'End battle';
-  $('ovPause').classList.toggle('hidden', H.phase !== 'paused');
-  $('pauseHostHint').classList.remove('hidden');
-  renderClock();
-  pushState();
-}
-function fmtClock(ms){ const s = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-function renderClock(){
-  if (!H || practice || H.phase === 'lobby') return;
-  const el = $('hgClock');
-  if (!H.minutes){ el.textContent = H.phase === 'paused' ? '⏸' : ''; return; }
-  const left = H.phase === 'paused' ? H.remaining : H.phase === 'over' ? 0 : H.endAt - Date.now();
-  el.textContent = (H.phase === 'paused' ? '⏸ ' : '') + fmtClock(left);
-  el.classList.toggle('low', left < 60000);
-}
-
-$('hlTime').onclick = e => { const b = e.target.closest('button'); if (!b || !H) return; H.minutes = +b.dataset.m; saveHost(); renderHost(); };
-$('btnStart').onclick = () => {
-  if (!H) return;
-  if (!H.teams.length){ $('hlMsg').textContent = 'Wait for at least one team to join.'; return; }
-  H.phase = 'play'; H.endAt = H.minutes ? Date.now() + H.minutes * 60000 : 0;
-  log('⚓ Battle stations! ' + H.teams.length + ' teams vs. a hidden fleet of ' + H.ships.length + ' ships.');
-  saveHost(); renderHost();
+$("btnReady").onclick=()=>{
+  if(ships.size!==SHIPS||myReady) return;
+  myReady=true; $("setupModal").classList.add("hidden");
+  banner("opp", oppReady ? "Starting…" : "Waiting for "+oppName+" to place their ships…");
+  send({t:"ready"}); maybeStart();
 };
-$('btnPause').onclick = () => {
-  if (H.phase === 'play'){ H.phase = 'paused'; H.remaining = H.endAt - Date.now(); }
-  else if (H.phase === 'paused'){ H.phase = 'play'; if (H.minutes) H.endAt = Date.now() + H.remaining; }
-  saveHost(); renderHost();
-};
-$('ovPause').onclick = () => { if (H && !practice && H.phase === 'paused') $('btnPause').click(); };
-$('btnReveal').onclick = () => { revealShips = !revealShips; renderHost(); };
-$('btnEnd').onclick = () => {
-  if (H.phase === 'over'){ showHostOver(); return; }
-  if (sure($('btnEnd'), 'Click again to end')){ log('🏁 The teacher ended the battle.'); endBattle(); }
-};
-
-/* ---------- missed missions (for whole-class discussion) ---------- */
-function showMissed(){
-  const list = H.missed;
-  if (!list.length){ $('missedBody').innerHTML = '<h2>No missed missions yet</h2><p class="sub">When a team gets a mission wrong, it lands here so the class can talk it through.</p>'; }
-  else {
-    missedIdx = Math.max(0, Math.min(missedIdx, list.length - 1));
-    const m = list[missedIdx], q = m.q;
-    $('missedBody').innerHTML = '<div class="qhead"><span class="qtag">' + TIERS[q.tier].icon + ' ' + TIERS[q.tier].name + ' · missed mission ' + (missedIdx + 1) + ' of ' + list.length + '</span><span class="sub">Team ' + esc(m.team) + '</span></div>' +
-      '<p class="prompt">' + esc(q.prompt) + '</p>' + tableHTML(q) +
-      (q.tier === 2 ? '<ol type="a">' + q.choices.map(c => '<li>' + esc(c.text) + '</li>').join('') + '</ol>' : '') +
-      (q.given ? '<p class="sub">Their answer: <b>' + esc(q.given) + '</b></p>' : '') +
-      (missedWork ? '<div class="work" style="background:#eef2f7">' + workHTML(q) + '</div>' : '<p class="sub">Turn and talk: what would you check first?</p>');
-  }
-  $('btnMissPrev').disabled = missedIdx <= 0; $('btnMissNext').disabled = missedIdx >= list.length - 1;
-  $('btnMissShow').disabled = !list.length; $('btnMissShow').textContent = missedWork ? 'Hide the work' : 'Show the work';
-  $('ovMissed').classList.remove('hidden');
-}
-$('btnMissed').onclick = () => { missedIdx = H.missed.length - 1; missedWork = false; showMissed(); };
-$('btnMissPrev').onclick = () => { missedIdx--; missedWork = false; showMissed(); };
-$('btnMissNext').onclick = () => { missedIdx++; missedWork = false; showMissed(); };
-$('btnMissShow').onclick = () => { missedWork = !missedWork; showMissed(); };
-$('btnMissClose').onclick = () => $('ovMissed').classList.add('hidden');
-
-function resultsHTML(teams, order, mine){
-  const top = order.slice(0, 3).map(i => teams[i]);
-  const pod = [top[1] ? '<div class="p2">2nd<big>' + esc(top[1].name) + '</big>' + top[1].score + '</div>' : '',
-               top[0] ? '<div class="p1">🏆 1st<big>' + esc(top[0].name) + '</big>' + top[0].score + '</div>' : '',
-               top[2] ? '<div class="p3">3rd<big>' + esc(top[2].name) + '</big>' + top[2].score + '</div>' : ''].join('');
-  let h = '<h2 style="text-align:center">Battle over!</h2><div class="podium">' + pod + '</div>';
-  if (teams[0] && teams[0].right){
-    h += '<table class="res"><tr><th>Team</th><th>Score</th><th>Recon</th><th>Rate Scan</th><th>Command</th><th>Hits</th><th>Sunk</th></tr>' +
-      order.map(i => { const t = teams[i]; const cell = k => t.right[k] + '/' + (t.right[k] + t.wrong[k]);
-        return '<tr' + (i === mine ? ' style="font-weight:800"' : '') + '><td><span class="sw" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + t.color + '"></span> ' + esc(t.name) + '</td><td>' + t.score + '</td><td>' + cell(1) + '</td><td>' + cell(2) + '</td><td>' + cell(3) + '</td><td>' + t.hits + '</td><td>' + t.sinks + '</td></tr>'; }).join('') + '</table>' +
-      '<p class="hint">Mission columns show correct / attempted.</p>';
-  }
-  return h;
-}
-function showHostOver(){
-  $('overBody').innerHTML = resultsHTML(H.teams, rankTeams(), -1) +
-    '<div class="row" style="margin-top:12px"><button id="btnOverMissed" class="alt">Discuss missed missions</button><button id="btnOverBoard" class="ghost">Back to the ocean</button><button id="btnNewGame" class="ghost">New battle</button></div>';
-  $('ovOver').classList.remove('hidden');
-  $('btnOverMissed').onclick = () => { $('ovOver').classList.add('hidden'); $('btnMissed').click(); };
-  $('btnOverBoard').onclick = () => $('ovOver').classList.add('hidden');
-  $('btnNewGame').onclick = () => {
-    if (!sure($('btnNewGame'), 'Click again: new fleet, scores reset')) return;
-    const keepTeams = H.teams.map(t => Object.assign(t, {score:0, ammo:0, hits:0, sinks:0, shots:0, right:[0,0,0,0], wrong:[0,0,0,0]}));
-    const mins = H.minutes;
-    H = newHostState(H.code, false); H.teams = keepTeams; H.minutes = mins; revealShips = false;
-    $('ovOver').classList.add('hidden'); saveHost(); renderHost();
-  };
-}
-
-$('btnHost').onclick = () => { practice = false; H = null; startHostPeer(randCode(), 0); };
-$('btnResume').onclick = () => {
-  try { H = JSON.parse(localStorage.getItem(HOST_KEY)); } catch (e) { H = null; }
-  if (!H) return;
-  practice = false; startHostPeer(H.code, 0);
-  if (H.phase === 'over') setTimeout(showHostOver, 800);
-};
-(function offerResume(){
-  try {
-    const s = JSON.parse(localStorage.getItem(HOST_KEY) || 'null');
-    if (s && Date.now() - s.saved < 4 * 3600 * 1000 && s.teams && s.teams.length){
-      $('resumeBox').classList.remove('hidden');
-      $('btnResume').textContent = 'Resume hosting game ' + s.code + ' (' + s.teams.length + ' teams)';
-    }
-  } catch (e) {}
-})();
-
-/* =====================================================================
-   TEAM DEVICE
-   ===================================================================== */
-const TEAM_KEY = 'linear-fleet-team';
-let tPeer = null, tConn = null, me = null; // me = {code, name, members}
-let S = null, myId = -1, ammo = 0;          // latest state from host
-let mission = {stage:'choose', q:null, tier:0, lockUntil:0, typist:0, ok:null, given:''};
-let pendingCell = -1, flashCell = -1, retryTimer = null;
-
-function teamSend(msg){
-  if (practice){ hostAction(0, msg); if (msg.t !== 'fire') pushState(); return; }
-  send(tConn, msg);
-}
-
-function joinGame(info){
-  me = info;
-  try { sessionStorage.setItem(TEAM_KEY, JSON.stringify(me)); } catch (e) {}
-  if (typeof Peer === 'undefined'){ $('landMsg').textContent = 'Could not load the game network. Check the internet, or use Practice mode.'; return; }
-  $('landMsg').className = 'msg'; $('landMsg').textContent = 'Connecting…';
-  connectTeam();
-}
-function connectTeam(){
-  clearTimeout(retryTimer);
-  if (tPeer) { try { tPeer.destroy(); } catch (e) {} }
-  tPeer = new Peer();
-  tPeer.on('error', e => {
-    if (e.type === 'peer-unavailable'){
-      if (myId < 0){ $('landMsg').className = 'msg bad'; $('landMsg').textContent = 'No game found with code ' + me.code + '. Check the letters on the board.'; show('landing'); }
-      else retryLater();
-      return;
-    }
-    if (myId < 0){ $('landMsg').className = 'msg bad'; $('landMsg').textContent = 'Connection problem (' + e.type + '). Try again.'; }
-    else retryLater();
-  });
-  tPeer.on('open', () => {
-    tConn = tPeer.connect(PREFIX + me.code, {reliable:true});
-    tConn.on('open', () => { $('ovConn').classList.add('hidden'); tConn.send({t:'join', name:me.name, members:me.members}); });
-    tConn.on('data', teamRecv);
-    tConn.on('close', () => { if (S && S.phase !== 'over') retryLater(); });
-  });
-}
-function retryLater(){
-  $('ovConn').classList.remove('hidden');
-  clearTimeout(retryTimer); retryTimer = setTimeout(connectTeam, 3000);
-}
-
-$('btnJoin').onclick = () => {
-  const code = $('joinCode').value.trim().toUpperCase(), name = $('teamName').value.trim();
-  const members = [...document.querySelectorAll('.mem')].map(i => i.value.trim()).filter(Boolean);
-  const msg = $('landMsg'); msg.className = 'msg bad';
-  if (code.length !== 4) return void (msg.textContent = 'Type the 4-letter code from the board.');
-  if (!name) return void (msg.textContent = 'Give your team a name.');
-  if (members.length < 2) return void (msg.textContent = 'Type the first names of everyone on your team.');
-  practice = false; joinGame({code, name, members});
-};
-$('btnPractice').onclick = () => {
-  practice = true; H = newHostState('PRAC', true);
-  const members = [...document.querySelectorAll('.mem')].map(i => i.value.trim()).filter(Boolean);
-  H.teams.push({name:$('teamName').value.trim() || 'Practice', color:COLORS[5], members, score:0, ammo:0, hits:0, sinks:0, shots:0, right:[0,0,0,0], wrong:[0,0,0,0]});
-  H.phase = 'play'; myId = 0; me = {name:H.teams[0].name, members};
-  pushState();
-};
-(function offerRejoin(){
-  try {
-    const s = JSON.parse(sessionStorage.getItem(TEAM_KEY) || 'null');
-    if (s && s.code && s.name){
-      $('rejoinBox').classList.remove('hidden');
-      $('btnRejoin').textContent = 'Rejoin as ' + s.name + ' (game ' + s.code + ')';
-      $('btnRejoin').onclick = () => { practice = false; joinGame(s); };
-    }
-  } catch (e) {}
-})();
-
-function teamRecv(d){
-  if (!d || typeof d !== 'object') return;
-  if (d.t === 'welcome'){ myId = d.id; $('landMsg').textContent = ''; return; }
-  if (d.t === 'state'){
-    const prevPhase = S && S.phase;
-    S = d; myId = d.you; ammo = d.ammo;
-    S.skew = Date.now() - d.now;
-    if (prevPhase && prevPhase !== 'over' && S.phase === 'over') setTimeout(showTeamOver, 600);
-    renderTeam();
-  }
-  if (d.t === 'fired'){
-    pendingCell = -1;
-    if (d.res === 'blocked'){ renderTeam(); return; }
-    flashCell = d.cell; boom(d.res, d.cell, d.ship);
-    renderTeam();
+function maybeStart(){
+  if(myReady&&oppReady&&isHost){
+    send({t:"go"}); startPlay();
   }
 }
-
-function boom(res, cell, ship){
-  const old = document.querySelector('.fx'); if (old) old.remove();
-  const fx = document.createElement('div');
-  fx.className = 'fx ' + res;
-  fx.innerHTML = '<div><div class="fxword">' + (res === 'sunk' ? 'SUNK!' : res === 'hit' ? 'HIT!' : 'SPLASH') + '</div><div class="fxsub">' +
-    (res === 'sunk' ? 'You sank the ' + esc(ship) + '! +350' : res === 'hit' ? cellName(cell) + ' · +100' : cellName(cell) + ' · nothing there') + '</div></div>';
-  document.body.appendChild(fx);
-  setTimeout(() => fx.classList.add('out'), res === 'miss' ? 700 : 1100);
-  setTimeout(() => fx.remove(), res === 'miss' ? 1100 : 1500);
+function startPlay(){
+  phase="play"; setView("attack");
+  banner("you","Battle! Sink all "+SHIPS+" of "+oppName+"'s ships first!");
+  event("You both attack at the same time. Go!");
+  renderAll();
 }
 
-function renderTeam(){
-  if (!S) return;
-  if (S.phase === 'lobby'){ show('teamWait'); $('twTitle').textContent = me.name; return; }
-  show('teamPlay');
-  const t = S.teams[myId] || {name:me.name, score:0, rank:'-'};
-  $('tpScore').textContent = t.score; $('tpName').textContent = t.name;
-  $('tpAmmo').textContent = ammo; $('tpRank').textContent = practice ? '-' : ordinal(t.rank) + ' of ' + S.teams.length;
-  $('ovPause').classList.toggle('hidden', S.phase !== 'paused');
-  const firing = ammo > 0 && S.phase === 'play' && pendingCell < 0;
-  $('tpFireHint').classList.toggle('hidden', !firing);
-  $('tpFireHint').textContent = '🚀 ' + ammo + ' torpedo' + (ammo === 1 ? '' : 'es') + ' ready. Tap an unknown square to fire!';
-  $('tpOcean').innerHTML = oceanHTML(S.cells, S.by, S.sunk, S.teams, {firing, pending:pendingCell, flash:flashCell});
-  flashCell = -1;
-  $('tpFeed').textContent = S.feed[0] || '';
-  renderClockTeam();
-  renderMission();
-}
-function ordinal(n){ const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
-function renderClockTeam(){
-  if (!S) return;
-  let txt = '--';
-  if (practice) txt = '∞';
-  else if (S.endAt){ const left = S.phase === 'paused' ? S.remaining : S.endAt - (Date.now() - S.skew); txt = fmtClock(S.phase === 'over' ? 0 : left); }
-  $('tpClock').textContent = txt;
-}
-setInterval(() => { if (S && !$('teamPlay').classList.contains('hidden')) renderClockTeam(); }, 1000);
+$("btnGot").onclick=()=>$("howModal").classList.add("hidden");
+$("btnHow").onclick=()=>$("howModal").classList.remove("hidden");
 
-$('tpOcean').addEventListener('click', e => {
-  const c = e.target.closest('.c'); if (!c || !S) return;
-  const i = +c.dataset.i;
-  if (ammo < 1 || S.phase !== 'play' || pendingCell >= 0 || S.cells[i] !== 0) return;
-  pendingCell = i; renderTeam();
-  teamSend({t:'fire', cell:i});
-  if (!practice) setTimeout(() => { if (pendingCell === i){ pendingCell = -1; renderTeam(); } }, 5000);
-});
-
-/* ---------- mission panel ---------- */
-function typistName(){
-  const m = (me && me.members) || [];
-  return m.length ? m[mission.typist % m.length] : '';
+/* ===== Switching between the two boards ===== */
+function setView(v){
+  view=v; notice=0;
+  $("attackView").classList.toggle("hidden",v!=="attack");
+  $("fleetView").classList.toggle("hidden",v!=="fleet");
+  renderSwitch();
 }
-function renderMission(){
-  const box = $('mission');
-  if (S.phase === 'over'){ box.innerHTML = '<h2>Battle over</h2><p class="sub">Eyes on the board for the results.</p><button id="btnMyRes" class="alt">See results</button>'; $('btnMyRes').onclick = showTeamOver; return; }
-  const who = typistName();
-  const typist = who ? '<div class="typist">⌨️ <b>' + esc(who) + '</b> is on the keyboard. Crew: check the work before you submit!</div>' : '';
-  if (mission.stage === 'choose'){
-    box.innerHTML = typist + '<h2>Choose your mission</h2><p class="sub">Harder missions earn more torpedoes.</p><div class="tiers">' +
-      [1,2,3].map(k => '<button class="tier" data-k="' + k + '"><span class="ic">' + TIERS[k].icon + '</span><span><b>' + TIERS[k].name + '</b><span>' + TIERS[k].desc + '</span></span><span class="tq">+' + TIERS[k].pts + ' · 🚀' + TIERS[k].ammo + '</span></button>').join('') + '</div>';
-    box.querySelectorAll('.tier').forEach(b => b.onclick = () => startMission(+b.dataset.k));
-    return;
-  }
-  const q = mission.q, T = TIERS[q.tier];
-  let h = typist + '<div class="qhead"><span class="qtag">' + T.icon + ' ' + T.name + ' mission</span><span class="tq" style="background:var(--navy2);color:#fff;border-radius:999px;padding:3px 10px;font-size:.8rem">+' + T.pts + ' · 🚀' + T.ammo + '</span></div>' +
-          '<p class="prompt">' + esc(q.prompt) + '</p>' + tableHTML(q);
-  if (mission.stage === 'question'){
-    if (q.tier === 1) h += '<div class="yn"><button data-a="1">Linear</button><button data-a="0" class="alt">Not linear</button></div>';
-    else if (q.tier === 2) h += '<div class="choices">' + q.choices.map((c, i) => '<button data-a="' + i + '">' + String.fromCharCode(97 + i) + ') ' + esc(c.text) + '</button>').join('') + '</div>';
-    else h += '<div class="ansrow"><span class="fx0">f(x) =</span><input id="fxIn" type="text" placeholder="e.g. 3x − 2" autocomplete="off" autocapitalize="off" spellcheck="false"><button id="btnSubmit">Submit</button></div><p id="fxMsg" class="msg bad"></p><p class="hint">Type things like 2x+5, -x+3, 0.5x-1 or 1/2x-1.</p>';
-    h += '<p style="margin-top:10px"><button class="ghost" id="btnBack" style="padding:6px 12px;font-size:.85rem">← Pick a different mission</button></p>';
-    box.innerHTML = h;
-    box.querySelectorAll('[data-a]').forEach(b => b.onclick = () => answer(b.dataset.a));
-    $('btnBack').onclick = () => { mission.stage = 'choose'; renderMission(); };
-    if (q.tier === 3){
-      const inp = $('fxIn'); inp.value = mission.draft || '';
-      inp.oninput = () => mission.draft = inp.value;
-      inp.onkeydown = e => { if (e.key === 'Enter') answer(inp.value); };
-      $('btnSubmit').onclick = () => answer(inp.value);
-      setTimeout(() => inp.focus(), 0);
-    }
-    return;
-  }
-  // feedback
-  const ok = mission.ok;
-  h += '<div class="fb ' + (ok ? 'good' : 'bad') + '"><h3>' + (ok ? '✅ Correct! +' + T.pts + ' points and ' + T.ammo + ' torpedo' + (T.ammo > 1 ? 'es' : '') + '.' : '❌ Not quite. Read the work together while you reload.') + '</h3>' +
-       (!ok && mission.given ? '<div>Your answer: <b>' + esc(mission.given) + '</b></div>' : '') +
-       '<div class="work">' + workHTML(q) + '</div></div>' +
-       '<button id="btnNext" style="width:100%;margin-top:10px"></button>';
-  box.innerHTML = h;
-  const btn = $('btnNext');
-  const tick = () => {
-    if (!btn.isConnected) return;
-    const s = Math.ceil((mission.lockUntil - Date.now()) / 1000);
-    if (s > 0){ btn.disabled = true; btn.textContent = 'Reloading… ' + s; setTimeout(tick, 250); }
-    else { btn.disabled = false; btn.textContent = ok ? 'Next mission (pass the keyboard!)' : 'Try a new mission (pass the keyboard!)'; }
+function renderSwitch(){
+  const b=$("btnSwitch");
+  b.innerHTML=(view==="attack"?"Show My Fleet Board":"Show Attack Board")+" ➜"+(notice?'<span class="dot">!</span>':"");
+}
+$("btnSwitch").onclick=()=>{ setView(view==="attack"?"fleet":"attack"); };
+function news(forView){ if(view!==forView){ notice=1; renderSwitch(); } }
+
+/* ===== Attacking (both players at once) ===== */
+function banner(kind,text){ const b=$("banner"); b.className="banner "+kind; b.textContent=text; }
+function pickCell(id,r,c){
+  if(phase!=="play"||outgoing.has(id)||pending.has(id)) return;
+  selected={id,r,c}; $("askCell").textContent=id;
+  const q=atkData[r][c];
+  $("askQ").textContent="Slope through "+fmtPt(q[0],q[1])+" and "+fmtPt(q[2],q[3]);
+  $("answer").value=""; $("askMsg").textContent=""; $("ask").classList.remove("hidden"); $("answer").focus();
+  renderAll();
+}
+$("btnFire").onclick=fire;
+$("answer").addEventListener("keydown",e=>{ if(e.key==="Enter") fire(); });
+const LOCK_MS=20000; let lockUntil=0;
+function startLock(){
+  const tick=()=>{
+    const s=Math.ceil((lockUntil-Date.now())/1000);
+    if(s>0 && phase==="play"){
+      $("askMsg").className="msg bad"; $("askMsg").textContent="Not quite. Check your work, then try again in "+s+"…";
+      $("btnFire").disabled=true; setTimeout(tick,250);
+    } else { $("btnFire").disabled=false; $("askMsg").className="msg"; $("askMsg").textContent="Ready. Try again!"; }
   };
   tick();
-  btn.onclick = () => { mission.stage = 'choose'; mission.typist++; renderMission(); };
 }
-function startMission(k){
-  if (S.phase !== 'play') return;
-  mission = Object.assign(mission, {stage:'question', tier:k, q:GEN[k](), draft:'', given:'', ok:null});
-  renderMission();
-}
-function answer(a){
-  if (S.phase !== 'play') return;
-  const q = mission.q;
-  let ok, given = '';
-  if (q.tier === 1){ ok = (a === '1') === q.linear; given = a === '1' ? 'Linear' : 'Not linear'; }
-  else if (q.tier === 2){ const c = q.choices[+a]; ok = c.ok; given = c.text; }
-  else {
-    const r = checkExpr(a, q.m, q.b);
-    if (r === 'empty' || r === 'invalid'){ $('fxMsg').textContent = r === 'empty' ? 'Type your function first.' : 'Use numbers, x, +, −, / and parentheses only (like 3x − 2).'; return; }
-    ok = r; given = 'f(x) = ' + a;
+function fire(){
+  if(!selected||phase!=="play"||Date.now()<lockUntil) return;
+  const {id,r,c}=selected, q=atkData[r][c], txt=$("answer").value;
+  if(parseAnswer(txt)===null){ $("askMsg").className="msg bad"; $("askMsg").textContent="Type a number, a fraction like 3/4, or the word undefined."; return; }
+  if(isCorrect(txt,q)){
+    pending.add(id); $("ask").classList.add("hidden"); selected=null;
+    $("result").className="msg good"; $("result").textContent="Correct! Fired at "+id+". Pick your next square!";
+    send({t:"attack",cell:id});
+  } else {
+    lockUntil=Date.now()+LOCK_MS; $("answer").value=""; startLock();
   }
-  mission.ok = ok; mission.given = given; mission.stage = 'feedback';
-  mission.lockUntil = ok ? 0 : Date.now() + TIERS[q.tier].lock * 1000;
-  teamSend(ok ? {t:'right', tier:q.tier} : {t:'wrong', tier:q.tier, q:Object.assign({}, q, {given})});
-  renderMission();
+  renderAll();
 }
-function showTeamOver(){
-  if (!S) return;
-  const teams = S.teams, order = teams.map((t, i) => i).sort((a, b) => teams[a].rank - teams[b].rank);
-  $('overBody').innerHTML = resultsHTML(practice ? H.teams : teams, order, myId) +
-    '<p style="text-align:center;font-weight:700">' + (practice ? 'Practice complete: ' + teams[0].score + ' points.' : 'Your team finished ' + ordinal((teams[myId] || {}).rank || 0) + '.') + '</p>' +
-    '<button id="btnOverClose" class="ghost" style="width:100%">Close</button>';
-  $('ovOver').classList.remove('hidden');
-  $('btnOverClose').onclick = () => $('ovOver').classList.add('hidden');
+function handleAttack(id){
+  const hit=ships.has(id);
+  incoming.set(id,hit?"hit":"miss");
+  const lost = hitsOnMe()>=SHIPS;
+  send({t:"result",cell:id,hit,gameOver:lost});
+  event(oppName+" attacked "+id+(hit?" and HIT one of your ships!":" and missed."));
+  if(!lost) showAlert(hit,id);
+  news("fleet");
+  if(lost) finish("lost");
+  renderAll();
 }
+function showAlert(hit,cell){
+  const old=document.querySelector(".alert"); if(old) old.remove();
+  const d=document.createElement("div"); d.className="alert "+(hit?"hit":"miss");
+  d.setAttribute("role","status");
+  const who=oppName||"Your partner";
+  d.innerHTML='<div class="ic">'+(hit?"💥":"🌊")+'</div><div><b>'+(hit?"You've been hit!":"Close call! It was a miss.")+'</b><span>'+who.replace(/[&<>"]/g,"")+' fired at '+cell+(hit?" and sank one of your ships.":" and missed.")+'</span></div>';
+  document.body.appendChild(d);
+  setTimeout(()=>{ d.classList.add("out"); setTimeout(()=>d.remove(),350); },2600);
+}
+function showFx(hit,cell){
+  const old=document.querySelector(".fx"); if(old) old.remove();
+  const d=document.createElement("div"); d.className="fx"+(hit?"":" miss");
+  d.innerHTML='<div class="fxbox">'+
+    (hit?'<div class="boom"></div>':'<div class="drop">💧</div>')+
+    '<svg class="fxship" viewBox="0 0 100 56"><use href="#ship"/></svg>'+
+    '<svg class="fxwave" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M0 6 q6.25 -8 12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 t12.5 0 V12 H0 Z" fill="currentColor"/></svg>'+
+    '<div class="fxword">'+(hit?"HIT!":"MISS")+'</div>'+
+    '<div class="fxsub">'+(hit?"You sunk a battleship at "+cell+"!":"Nothing at "+cell+". Splash!")+'</div></div>';
+  const close=()=>{ d.classList.add("out"); setTimeout(()=>d.remove(),350); };
+  d.onclick=close; document.body.appendChild(d); setTimeout(close,hit?2200:1400);
+}
+function handleResult(m){
+  pending.delete(m.cell);
+  outgoing.set(m.cell,m.hit?"hit":"miss");
+  if(!finished) showFx(m.hit,m.cell);
+  $("result").className="msg "+(m.hit?"good":"");
+  $("result").textContent = m.hit ? "HIT! You sunk a battleship at "+m.cell+"!" : "Miss at "+m.cell+".";
+  if(m.gameOver) finish("won");
+  renderAll();
+}
+const hitsOnMe=()=>[...incoming.values()].filter(v=>v==="hit").length;
+const myHits=()=>[...outgoing.values()].filter(v=>v==="hit").length;
+
+/* ===== Rendering ===== */
+function paint(td,st,hasShip,pick,sel){
+  td.className=(st?st+" ":"")+(pick?"pick ":"")+(sel?"sel ":"");
+  const slot=td.querySelector(".slot"); slot.innerHTML = hasShip ? SHIP : "";
+  let mark=td.querySelector(".mark"); if(mark) mark.remove();
+  if(st){ mark=document.createElement("span"); mark.className="mark"; mark.textContent=st==="hit"?"HIT":st==="pending"?"FIRED":"MISS"; td.appendChild(mark); }
+}
+function renderAll(){
+  if(!$("myGrid").rows.length) return;
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++){
+    const id=cellId(r,c), st=incoming.get(id);
+    paint($("s"+id),null,ships.has(id),false,false);
+    paint($("m"+id),st,ships.has(id),false,false);
+    const ao=outgoing.get(id)||(pending.has(id)?"pending":undefined);
+    paint($("a"+id),ao,ao==="hit",!ao&&phase==="play",selected&&selected.id===id);
+  }
+  $("shipCount").textContent=ships.size;
+  $("btnReady").disabled=myReady||ships.size!==SHIPS;
+  $("myScore").textContent=myHits(); $("oppScore").textContent=hitsOnMe();
+}
+
+/* ===== Ending ===== */
+/* Click-twice confirm (pop-up confirm boxes can be blocked inside Google Sites). */
+$("btnEnd").onclick=()=>{
+  const b=$("btnEnd");
+  if(!(b.dataset.armed && Date.now()-b.dataset.armed<4000)){
+    b.dataset.armed=Date.now(); b.dataset.orig=b.dataset.orig||b.textContent; b.textContent="Click again to end the game";
+    setTimeout(()=>{ if(b.dataset.armed){ delete b.dataset.armed; b.textContent=b.dataset.orig; } },4000);
+    return;
+  }
+  delete b.dataset.armed; b.textContent=b.dataset.orig;
+  send({t:"end"}); finish("ended");
+};
+function finish(why){
+  if(finished) return; finished=true; phase="over";
+  $("setupModal").classList.add("hidden"); $("howModal").classList.add("hidden"); $("btnHow").classList.add("hidden");
+  $("ask").classList.add("hidden"); selected=null;
+  renderAll(); banner("over","Game over");
+  // wait a moment so any shot still in flight is counted (both players can finish at nearly the same time)
+  setTimeout(()=>{
+    const mine=myHits(), theirs=hitsOnMe();
+    let title;
+    if(mine>=SHIPS && theirs>=SHIPS) title="It's a tie! You both sunk every ship!";
+    else if(mine>=SHIPS) title="🎉 You win! You sunk all "+SHIPS+" ships!";
+    else if(theirs>=SHIPS) title="Your whole fleet was sunk. "+oppName+" wins!";
+    else title = mine>theirs ? "🎉 You win!" : mine<theirs ? oppName+" wins!" : "It's a tie!";
+    $("overTitle").textContent=title;
+    $("overDetail").textContent=myName+": "+mine+" ships sunk   |   "+oppName+": "+theirs+" ships sunk";
+    renderAll(); show("over");
+  }, why==="won"?2400:1500);
+}
+$("btnAgain").onclick=()=>location.reload();
 </script>
 </body>
 </html>
