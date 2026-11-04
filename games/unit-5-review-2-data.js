@@ -208,7 +208,7 @@ const Q = [
       { t: 'expr', vr: 'n', q: 'Write a rule that represents the ' + v('n') + 'th term of the sequence.', answer: '2^(n-1)', key: 'aₙ = 1(2)ⁿ⁻¹', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['Geometric rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '.',
                 v('a') + '<sub>1</sub> is the first term. ' + v('r') + ' is what you multiply by each time.',
-                'Type exponents with ^ and put the exponent in parentheses, like 3(4)^(n-1).'] },
+                'Tap ^ to go up into the exponent, type ' + v('n') + ' ' + M + ' 1 there, then tap ↓ to come back down.'] },
       { t: 'num', q: 'Find the 10th term of the sequence.', answer: 512, prefix: v('a') + '<sub>10</sub> =',
         hints: ['Use your rule and replace ' + v('n') + ' with 10.', 'Do the exponent first: 2' + sup('9') + ' means 2 multiplied by itself 9 times.'] }
     ] },
@@ -242,7 +242,7 @@ const Q = [
       { t: 'expr', vr: 'n', q: 'Write a rule for the ' + v('n') + 'th term of this geometric sequence.', answer: '(1/3)^(n-1)', key: 'aₙ = 1(1/3)ⁿ⁻¹', prefix: v('a') + '<sub>' + v('n') + '</sub> =', keypad: true,
         hints: ['Geometric rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '.',
                 'To find ' + v('r') + ', divide any term by the term before it: ' + fr('1', '3') + ' ÷ 1 = ?',
-                'Type fractions with / and put them in parentheses, like (2/5)^(n-1).'] },
+                'Type the fraction with / inside parentheses, like (2/5). Then tap ^ and type ' + v('n') + ' ' + M + ' 1 up in the exponent.'] },
       { t: 'num', q: 'Determine the 7th term.', answer: 1 / 729, key: '1/729', prefix: v('a') + '<sub>7</sub> =',
         hints: ['Replace ' + v('n') + ' with 7 in your rule.', '(' + fr('1', '3') + ')' + sup('6') + ' = ' + fr('1' + sup('6'), '3' + sup('6')) + '. Type it as a fraction like 1/100.'] }
     ] },
@@ -397,7 +397,7 @@ function check(part, input) {
     if (same(f)) return { ok: true };
     // common slip: 2^n-1 instead of 2^(n-1)
     const fixed = body.replace(/\^([a-z0-9]+)([-+][0-9]+)/, '^($1$2)');
-    if (fixed !== body && same(tryParse(fixed, vr))) return { ok: false, msg: 'So close! Put the exponent in parentheses: ^(n−1).' };
+    if (fixed !== body && same(tryParse(fixed, vr))) return { ok: false, msg: 'So close! The whole n − 1 has to be up in the exponent.' };
     return { ok: false };
   }
   return { ok: false };

@@ -138,6 +138,11 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .ans .pre{font-size:1.25rem;white-space:nowrap}
 .ans input{flex:1 1 10rem;min-width:0;min-height:3.4rem;border-radius:12px;border:2px solid var(--line);background:#000;padding:0 .9rem;font:600 1.3rem var(--mono)}
 .keys{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.mf{flex:1 1 10rem;min-width:0;min-height:3.4rem;border-radius:12px;border:2px solid var(--line);background:#000;padding:.55rem .9rem;font:600 1.4rem/1.6 var(--mono);white-space:pre;overflow-x:auto;cursor:text;outline:none}
+.mf:focus{border-color:var(--cyan)}
+.mf.empty::before{content:attr(data-ph);color:var(--mute);font-weight:500;pointer-events:none}
+.mf sup{font-size:.68em;vertical-align:.75em;display:inline-block;min-width:.7em;padding:0 .15em;border-radius:4px;background:rgba(51,214,255,.16);color:var(--cyan)}
+.mfh{color:var(--mute);font-size:.92rem;margin:.5rem 0 0}
 .keys button{min-width:2.8rem;min-height:2.6rem;border-radius:10px;border:2px solid var(--line);background:var(--panel2);font:600 1.05rem var(--mono);cursor:pointer}
 .fb{margin-top:.8rem;min-height:3rem;display:block;padding:.6rem 1rem;border-radius:12px;background:var(--panel2);border-left:6px solid var(--k,var(--mute));font-size:1.1rem}
 .fb:empty{display:none}
@@ -289,7 +294,7 @@ function renderStation() {
   let parts = '';
   for (let k = 0; k < S.part; k++) {
     const sk = st.sk[k];
-    parts += '<div class="part ' + (sk ? 'sk' : 'ok') + '"><p class="pq">' + (P.length > 1 ? 'Part ' + (k + 1) + ': ' : '') + P[k].q + '</p><div class="got">' + (sk ? 'Skipped. Ask your teacher about this one.' : '✓ ' + esc(st.got && st.got[k] || U.keyOf(P[k]))) + '</div></div>';
+    parts += '<div class="part ' + (sk ? 'sk' : 'ok') + '"><p class="pq">' + (P.length > 1 ? 'Part ' + (k + 1) + ': ' : '') + P[k].q + '</p><div class="got">' + (sk ? 'Skipped. Ask your teacher about this one.' : '✓ ' + (P[k].t === 'expr' && st.got && st.got[k] ? esc(st.got[k]).replace(/\^\(([^()]*)\)/g, '<sup>$1</sup>') : esc(st.got && st.got[k] || U.keyOf(P[k])))) + '</div></div>';
   }
   const p = P[S.part];
   let inp = '';
@@ -299,11 +304,18 @@ function renderStation() {
       const L = (p.labels || 'ABCDEF')[i], bad = tried.includes(i);
       return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + '><span class="k">' + L + '</span><span>' + c + '</span></button>';
     }).join('') + '</div>';
+  } else if (p.t === 'expr') {
+    // math field: ^ raises the cursor into an exponent box, ↓ brings it back down
+    inp = '<form class="ans" id="ansf" autocomplete="off">' + (p.prefix ? '<span class="pre">' + p.prefix + '</span>' : '') +
+      '<div class="mf" id="ans" contenteditable="true" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer"></div>' +
+      '<button class="btn fill cyan" type="submit">Check</button></form>' +
+      '<div class="keys" id="keys">' + [p.vr || 'n', 'xʸ', '↓', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '"' + (k === 'xʸ' ? ' title="Exponent" aria-label="Exponent"' : k === '↓' ? ' title="Out of the exponent" aria-label="Out of the exponent"' : '') + '>' + esc(k) + '</button>').join('') + '</div>' +
+      '<p class="mfh">Tap <b>xʸ</b> (or type ^) to go up into the exponent. Tap <b>↓</b> to come back down.</p>';
   } else {
     inp = '<form class="ans" id="ansf" autocomplete="off">' + (p.prefix ? '<span class="pre">' + p.prefix + '</span>' : '') +
       '<input id="ans" inputmode="' + (p.t === 'num' ? 'decimal' : 'text') + '" placeholder="' + esc(p.placeholder || 'Type your answer') + '" spellcheck="false" autocapitalize="off">' +
       '<button class="btn fill cyan" type="submit">Check</button></form>' +
-      (p.keypad || p.t === 'expr' ? '<div class="keys" id="keys">' + [p.vr || 'n', '^', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '">' + esc(k) + '</button>').join('') + '</div>' : '');
+      (p.keypad ? '<div class="keys" id="keys">' + [p.vr || 'n', '^', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '">' + esc(k) + '</button>').join('') + '</div>' : '');
   }
   const hints = p.hints || [];
   const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
@@ -317,6 +329,27 @@ function renderStation() {
     '<section><div class="steps">' + steps + '</div>' + parts + '<button class="link" id="leave">Wrong station? Pick a different one</button></section></div>';
 
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
+  else if (p.t === 'expr') {
+    const a = $('#ans');
+    if (st.draft && st.draft[S.part]) mfSet(a, st.draft[S.part]);
+    $('#ansf').onsubmit = e => { e.preventDefault(); submit(mfText(a), a); };
+    a.addEventListener('keydown', e => {
+      if (e.key === '^') { e.preventDefault(); mfUp(a); }
+      else if (e.key === 'Enter') { e.preventDefault(); submit(mfText(a), a); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); mfDown(a); }
+    });
+    a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfUp(a); } });   // phone keyboards
+    a.addEventListener('input', () => { a.classList.toggle('empty', !mfText(a)); st.draft = st.draft || []; st.draft[S.part] = mfText(a); });
+    a.classList.toggle('empty', !mfText(a));
+    $('#keys').addEventListener('pointerdown', e => e.preventDefault());   // keep the cursor where it is
+    $('#keys').onclick = e => {
+      const b = e.target.closest('[data-k]'); if (!b) return;
+      const k = b.dataset.k;
+      if (k === 'xʸ') mfUp(a); else if (k === '↓') mfDown(a); else mfInsert(a, k === '−' ? '-' : k);
+      a.classList.toggle('empty', !mfText(a));
+    };
+    if (matchMedia('(pointer:fine)').matches) mfFocusEnd(a);
+  }
   else {
     const a = $('#ans');
     $('#ansf').onsubmit = e => { e.preventDefault(); submit(a.value, a); };
@@ -354,7 +387,58 @@ function submit(val, el) {
   f.className = 'fb bad';
   f.innerHTML = (r.msg ? esc(r.msg) : 'Not quite. Explainer, talk it through again and check the Recorder’s work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Scan the <b>Need a hint?</b> QR code on your station sheet.</span>' : '');
-  if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
+  if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
+  else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
+}
+
+/* ---------- math field helpers (contenteditable with <sup> exponents) ---------- */
+const ZW = '\u200b';
+function mfText(el) {   // DOM -> plain text the checker understands: 2<sup>n-1</sup> -> 2^(n-1)
+  let out = '';
+  el.childNodes.forEach(nd => {
+    if (nd.nodeType === 3) out += nd.textContent;
+    else if (nd.nodeName === 'SUP') { const t = mfText(nd).trim(); if (t) out += '^(' + t + ')'; }
+    else if (nd.nodeName !== 'BR') out += mfText(nd);
+  });
+  return out.replace(/\u200b/g, '').replace(/\u2212/g, '-').replace(/\u00a0/g, ' ');
+}
+function mfSet(el, txt) {   // plain text -> DOM, so a wrong answer stays on screen as typed
+  el.innerHTML = esc(txt).replace(/\^\(([^()]*)\)/g, '<sup>$1</sup>').replace(/\^([a-z0-9]+)/gi, '<sup>$1</sup>');
+}
+function mfCaret(el) {
+  const sel = getSelection();
+  if (!sel.rangeCount || !el.contains(sel.anchorNode)) { mfFocusEnd(el); }
+  return getSelection().getRangeAt(0);
+}
+function mfFocusEnd(el) {
+  el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+}
+function mfInsert(el, txt) {
+  const r = mfCaret(el); r.deleteContents();
+  const t = document.createTextNode(txt); r.insertNode(t);
+  r.setStartAfter(t); r.collapse(true); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  el.dispatchEvent(new Event('input'));
+}
+function mfUp(el) {
+  const r = mfCaret(el);
+  if (r.startContainer.parentNode && r.startContainer.parentNode.closest && r.startContainer.parentNode.closest('sup')) return;   // already up
+  r.deleteContents();
+  const s = document.createElement('sup'); s.textContent = ZW; r.insertNode(s);
+  const r2 = document.createRange(); r2.setStart(s.firstChild, 1); r2.collapse(true);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r2);
+  el.dispatchEvent(new Event('input'));
+}
+function mfDown(el) {
+  const r = mfCaret(el);
+  let n = r.startContainer; n = n.nodeType === 3 ? n.parentNode : n;
+  const s = n.closest && n.closest('sup');
+  if (!s || !el.contains(s)) return;
+  let after = s.nextSibling;
+  if (!after || after.nodeType !== 3) { after = document.createTextNode(ZW); s.after(after); }
+  else if (!after.textContent.startsWith(ZW)) after.textContent = ZW + after.textContent;   // a hidden spacer so typing lands outside the exponent
+  const r2 = document.createRange(); r2.setStart(after, 1); r2.collapse(true);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r2);
 }
 function advance() {
   const q = U.byN(S.cur), st = qs(S.cur);
