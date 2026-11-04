@@ -57,6 +57,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .num.done{border-color:var(--green);color:var(--green)}
 .num.done::after{content:"\2713";position:absolute;top:2px;right:7px;font-size:.8rem}
 .num:disabled{opacity:.3;cursor:default}
+.num.busy{border-color:var(--orange);color:var(--orange)}
 .num small{display:block;font:500 .6rem var(--body);letter-spacing:.08em;text-transform:uppercase}
 .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
 .field{display:flex;flex-direction:column;gap:.35rem;flex:1 1 14rem}
@@ -144,7 +145,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KEY = 'u5r2-state';
-let S = load(), session = null, online = null, newSession = false;
+let picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', sid: '', screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return s; } catch (e) {} return blank(); }
@@ -214,8 +215,9 @@ function stationGrid(cls) {
 function renderPick() {
   const first = !doneList().length;
   view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 2' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
-    '<p style="color:var(--mute);margin-top:-.4rem">Find the number on the sheet in front of you.</p><div class="nums" id="qnums">' + stationGrid() + '</div></section>' +
+    '<p style="color:var(--mute);margin-top:-.4rem">Find the number on the sheet in front of you.' + (first && U.dbBase() ? ' Orange stations already have a group, so pick a different one if you can.' : '') + '</p><div class="nums" id="qnums">' + stationGrid() + '</div></section>' +
     '<button class="link" id="back">Change group number</button>';
+  markBusy();
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
   $('#back').onclick = () => { S.screen = 'setup'; render(); };
 }
@@ -306,24 +308,64 @@ function advance() {
     st.done = true; st.secs = (st.secs || 0) + Math.round((Date.now() - S.at) / 1000);
     const left = U.READY.filter(x => !(S.q['q' + x.n] && S.q['q' + x.n].done));
     if (!left.length) { S.finished = true; S.screen = 'finished'; render(); sync(true); return; }
-    S.screen = 'between'; S.next = left[Math.floor(Math.random() * left.length)].n;
-    render(); sync(true); pickQuiet(left);
+    S.screen = 'between'; S.next = nextInOrder(left);
+    if (!U.dbBase()) { render(); sync(true); return; }
+    picking = true; render();
+    const done = () => { if (!picking) return; picking = false; render(); sync(true); };
+    pickQuiet(left).then(done, done); setTimeout(done, 3000);
     return;
   }
   render(); sync();
 }
-// prefer a station nobody else is standing at right now (when the board is connected)
+// Without the live board: go to the next unfinished station in number order (5 -> 6 -> 7 ...).
+// Groups that start at different stations then stay apart, like a rotation.
+function nextInOrder(left) {
+  const after = left.filter(x => x.n > S.cur);
+  return (after[0] || left[0]).n;
+}
+// With the live board: estimate when each station will be free, from the groups standing at it
+// (time they arrived + that station's estimated minutes) and the groups walking to it, and send
+// this group to the unfinished station it can start soonest. Ties go to the next one in order.
+const WALK = 45000;
+function freeAt(groups, now) {
+  const until = {}, count = {};
+  Object.values(groups || {}).forEach(x => {
+    if (!x || x.gid === S.gid || x.finished || now - (x.updated || 0) > 120000) return;
+    let n = 0, t = 0;
+    if (x.cur) { n = x.cur; const q = U.byN(n); t = Math.max((x.at || now) + (q ? q.est : 3) * 60000, now + 60000); }
+    else if (x.next) { n = x.next; const q = U.byN(n); t = now + WALK + (q ? q.est : 3) * 60000; }
+    if (!n) return;
+    count[n] = (count[n] || 0) + 1; until[n] = Math.max(until[n] || 0, t);
+  });
+  return { until, count };
+}
 async function pickQuiet(left) {
   if (!U.dbBase() || !S.sid) return;
   const g = await U.dbRead('sessions/' + S.sid + '/groups');
   if (!g || S.screen !== 'between') return;
-  const busy = {}, now = Date.now();
-  Object.values(g).forEach(x => { if (x && x.gid !== S.gid && now - (x.updated || 0) < 120000) { const n = x.cur || x.next; if (n) busy[n] = (busy[n] || 0) + 1; } });
-  const min = Math.min(...left.map(x => busy[x.n] || 0)), best = left.filter(x => (busy[x.n] || 0) === min);
-  if ((busy[S.next] || 0) > min) { S.next = best[Math.floor(Math.random() * best.length)].n; render(); sync(true); }
+  const now = Date.now(), { until, count } = freeAt(g, now), arrive = now + WALK;
+  const order = left.slice().sort((a, b) => ((a.n - S.cur + 18) % 18) - ((b.n - S.cur + 18) % 18));
+  let best = null, bestWait = Infinity;
+  order.forEach(x => {
+    const wait = Math.max(0, (until[x.n] || 0) - arrive) + (count[x.n] || 0) * 1000;   // small nudge toward empty stations
+    if (wait < bestWait) { best = x; bestWait = wait; }
+  });
+  if (best) S.next = best.n;
+}
+// on the "pick a station" screen, show which stations already have a group
+async function markBusy() {
+  if (!U.dbBase() || !S.sid) return;
+  const g = await U.dbRead('sessions/' + S.sid + '/groups');
+  if (!g || S.screen !== 'pick') return;
+  const { count } = freeAt(g, Date.now());
+  document.querySelectorAll('#qnums [data-q]').forEach(b => {
+    const c = count[b.dataset.q]; if (!c || b.disabled) return;
+    b.classList.add('busy'); b.insertAdjacentHTML('beforeend', '<small>' + (c === 1 ? '1 group' : c + ' groups') + '</small>');
+  });
 }
 
 function renderBetween() {
+  if (picking) { view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p class="go">Finding your next station\u2026</p></section>'; return; }
   const prev = U.byN(S.cur), st = qs(S.cur), d = doneList().length;
   view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p>Station ' + prev.n + ' complete' + (st.sk.some(Boolean) ? ' (you skipped a part, so your teacher may check in)' : '') + '. That’s ' + d + ' of ' + U.READY.length + '.</p>' +
     '<p class="go">Now move to Station <b>' + S.next + '</b></p><p style="color:var(--mute)">Bring your paper. Switch jobs if your teacher says so.</p>' +

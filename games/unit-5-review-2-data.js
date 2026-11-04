@@ -299,6 +299,10 @@ const Q = [
     ] }
 ];
 
+// estimated minutes a group of 3 needs at each station (writing the work, explaining, typing)
+const EST = { 1: 3, 2: 2, 3: 3, 4: 3, 5: 5, 6: 4, 7: 2, 8: 2, 9: 3, 10: 3, 11: 5, 12: 5, 13: 4, 14: 5, 15: 3, 16: 3, 17: 2, 18: 4 };
+Q.forEach(q => { q.est = EST[q.n] || 3; });
+
 /* ---------- answer checking ---------- */
 function clean(s) {
   return String(s).toLowerCase()
