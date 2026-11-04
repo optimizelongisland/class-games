@@ -69,6 +69,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .nums .num.done:disabled{opacity:.55}
 .num.busy{--h:25!important;border-style:dashed}
 .num small{display:block;font:600 .6rem var(--body);letter-spacing:.08em;text-transform:uppercase}
+.nums.g4 .num small,.nums.g6 .num small{font:700 clamp(.62rem,.5rem + .3vw,.8rem) var(--body);letter-spacing:.14em;opacity:.85;margin-bottom:.1rem}
 .pers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:560px}
 .per{min-height:5.5rem;border-radius:20px;border:3px solid var(--c);background:transparent;color:var(--c);font:800 clamp(1.5rem,1rem + 1.6vw,2.2rem) var(--disp);cursor:pointer}
 .per.on{background:var(--c);color:#000;box-shadow:0 0 0 4px #fff}
@@ -171,7 +172,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
     <div class="meta" id="meta"></div>
   </header>
   <main id="view"></main>
-  <div class="foot"><button class="link" id="restart">New group on this device? Start over</button><a href="unit-5-review-2-teacher.html">Teacher board</a></div>
+  <div class="foot"><button class="link" id="restart">New team on this device? Start over</button><a href="unit-5-review-2-teacher.html">Teacher board</a></div>
 </div>
 <div class="toast" id="toast" hidden></div>
 <script src="unit-5-review-2-data.js"></script>
@@ -196,7 +197,7 @@ function practiceFor(k) {
 }
 const qs = n => (S.q['q' + n] = S.q['q' + n] || { w: [], sk: [], h: 0, secs: 0, done: false, wa: [] });
 const doneList = () => U.READY.filter(q => S.q['q' + q.n] && S.q['q' + q.n].done).map(q => q.n);
-const label = () => 'Group ' + S.num + (people().length ? ' · ' + people().join(' & ') : '');
+const label = () => 'Team ' + S.num + (people().length ? ' · ' + people().join(' & ') : '');
 
 /* ---------- live board sync ---------- */
 let pushT = 0;
@@ -229,9 +230,9 @@ function render() {
 }
 
 function renderResume() {
-  view.innerHTML = '<section class="card"><p class="lab">New class period</p><h2>Is this a new group?</h2>' +
+  view.innerHTML = '<section class="card"><p class="lab">New class period</p><h2>Is this a new team?</h2>' +
     '<p>This computer was last used by <b>' + esc(label()) + '</b> (' + doneList().length + ' stations done).</p>' +
-    '<div class="row"><button class="btn fill cyan big" id="fresh">We are a new group</button><button class="btn line violet" id="keep">Keep going as ' + esc(label()) + '</button></div></section>';
+    '<div class="row"><button class="btn fill cyan big" id="fresh">We are a new team</button><button class="btn line violet" id="keep">Keep going as ' + esc(label()) + '</button></div></section>';
   $('#fresh').onclick = () => { S = blank(); newSession = false; render(); };
   $('#keep').onclick = () => { newSession = false; S.sid = U.dbBase() ? U.periodSession(S.period).id : 'local'; render(); sync(true); };
 }
@@ -239,11 +240,11 @@ function renderResume() {
 function renderSetup() {
   const pc = ['var(--pink)', 'var(--cyan)', 'var(--green)', 'var(--yellow)'];
   const pers = U.PERIODS.map((p, i) => '<button class="per' + (S.period === p ? ' on' : '') + '" style="--c:' + pc[i % 4] + '" data-p="' + p + '">Period ' + p + '</button>').join('');
-  let nums = ''; for (let i = 1; i <= 16; i++) nums += '<button class="num' + (S.num === i ? ' on' : '') + '" style="--h:' + hue(i) + '" data-g="' + i + '">' + i + '</button>';
-  const nm = [0, 1, 2].map(k => '<label class="field"><span class="lab" style="margin:0">' + (k === 0 ? 'Partner 1 first name' : k === 1 ? 'Partner 2 first name' : 'Partner 3 (only if you are a group of 3)') + '</span>' +
+  let nums = ''; for (let i = 1; i <= 16; i++) nums += '<button class="num' + (S.num === i ? ' on' : '') + '" style="--h:' + hue(i) + '" data-g="' + i + '"><small>Team</small>' + i + '</button>';
+  const nm = [0, 1, 2].map(k => '<label class="field"><span class="lab" style="margin:0">' + (k === 0 ? 'Partner 1 first name' : k === 1 ? 'Partner 2 first name' : 'Partner 3 (only if you are a team of 3)') + '</span>' +
     '<input data-n="' + k + '" maxlength="16" value="' + esc(S.names[k] || '') + '" autocomplete="off" autocapitalize="words" spellcheck="false"' + (k === 0 && !S.names[0] ? ' class="need"' : '') + '></label>').join('');
   view.innerHTML = '<section class="card"><p class="lab">Step 1</p><h2>What period are you in?</h2><div class="pers" id="pers">' + pers + '</div></section>' +
-    '<section class="card"><p class="lab">Step 2</p><h2>What is your partner group number?</h2><div class="nums g4" id="gnums">' + nums + '</div></section>' +
+    '<section class="card"><p class="lab">Step 2</p><h2>What is your team number?</h2><p style="color:var(--mute);margin-top:-.4rem">Use the team number your teacher gave you and your partner. <b style="color:var(--fg)">This is not a station.</b> You pick your station on the next screen.</p><div class="nums g4" id="gnums">' + nums + '</div></section>' +
     '<section class="card"><p class="lab">Step 3</p><h2>Type your first names</h2><p style="color:var(--mute);margin-top:-.4rem">First names only. Each of you gets your own practice sheet at the end.</p><div class="names" id="names">' + nm + '</div></section>' +
     '<section class="card"><p class="lab">Your jobs</p><div class="roles">' +
     '<div class="role r1"><b>✏️ Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div>' +
@@ -251,7 +252,7 @@ function renderSetup() {
     '<p style="color:var(--mute);margin:.8rem 0 0">🔄 Switch jobs at every station.</p></section>' +
     '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button><span id="need" style="color:var(--yellow)"></span></div>';
   const check = () => {
-    const miss = [!S.period && 'your period', !S.num && 'your group number', !people().length && 'at least one first name'].filter(Boolean);
+    const miss = [!S.period && 'your period', !S.num && 'your team number', !people().length && 'at least one first name'].filter(Boolean);
     $('#go').disabled = !!miss.length;
     $('#need').textContent = miss.length ? 'Still need ' + miss.join(', ') + '.' : '';
   };
@@ -269,14 +270,14 @@ function renderSetup() {
 function stationGrid(cls) {
   return U.Q.map(q => {
     const d = S.q['q' + q.n] && S.q['q' + q.n].done;
-    return '<button class="num' + (d ? ' done' : '') + '" style="--h:' + Math.round(((q.n - 1) * 360 / 18 + 190) % 360) + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
+    return '<button class="num' + (d ? ' done' : '') + '" style="--h:' + Math.round(((q.n - 1) * 360 / 18 + 190) % 360) + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '><small>Station</small>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
   }).join('');
 }
 function renderPick() {
   const first = !doneList().length;
-  view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 2' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
-    '<p style="color:var(--mute);margin-top:-.4rem">Find the number on the sheet in front of you.' + (first && U.dbBase() ? ' Orange stations already have a group, so pick a different one if you can.' : '') + '</p><div class="nums g6" id="qnums">' + stationGrid() + '</div></section>' +
-    '<button class="link" id="back">Change period, group or names</button>';
+  view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 4' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
+    '<p style="color:var(--mute);margin-top:-.4rem">Tap the big station number printed at the top of the paper in front of you.' + (first && U.dbBase() ? ' Orange stations already have a team, so pick a different one if you can.' : '') + '</p><div class="nums g6" id="qnums">' + stationGrid() + '</div></section>' +
+    '<button class="link" id="back">Change period, team or names</button>';
   markBusy();
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
   $('#back').onclick = () => { S.screen = 'setup'; render(); };
@@ -522,7 +523,7 @@ async function markBusy() {
   const { count } = freeAt(g, Date.now());
   document.querySelectorAll('#qnums [data-q]').forEach(b => {
     const c = count[b.dataset.q]; if (!c || b.disabled) return;
-    b.classList.add('busy'); b.insertAdjacentHTML('beforeend', '<small>' + (c === 1 ? '1 group' : c + ' groups') + '</small>');
+    b.classList.add('busy'); b.insertAdjacentHTML('beforeend', '<small>' + (c === 1 ? '1 team here' : c + ' teams here') + '</small>');
   });
 }
 
@@ -542,13 +543,13 @@ function renderFinished() {
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
     '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now open your own practice sheet and tap <b>Save as PDF</b>.</p>' + sheetLinks() +
     '<div class="nums g6" style="max-width:760px;margin:1rem auto 0">' + stationGrid() + '</div>' +
-    '<div class="row" style="justify-content:center;margin-top:1.4rem"><button class="btn line violet" id="again">New group? Start over on this device</button></div></section>';
-  $('#again').onclick = () => { if (confirm('Open your practice sheets first! Start over for a new group?')) startOver(); };
+    '<div class="row" style="justify-content:center;margin-top:1.4rem"><button class="btn line violet" id="again">New team? Start over on this device</button></div></section>';
+  $('#again').onclick = () => { if (confirm('Open your practice sheets first! Start over for a new team?')) startOver(); };
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
 function startOver() { S = blank(); newSession = false; try { localStorage.removeItem(KEY); } catch (e) {} render(); scrollTo(0, 0); }
-$('#restart').onclick = () => { if (confirm('Start over as a new group? This clears ' + (S.num ? label() : 'this device') + '’s progress on this device.')) startOver(); };
+$('#restart').onclick = () => { if (confirm('Start over as a new team? This clears ' + (S.num ? label() : 'this device') + '’s progress on this device.')) startOver(); };
 if (new URLSearchParams(location.search).has('new')) { S = blank(); try { localStorage.removeItem(KEY); history.replaceState(null, '', location.pathname + location.search.replace(/[?&]new(=[^&]*)?/, '').replace(/^&/, '?')); } catch (e) {} }
 
 /* ---------- start ---------- */
