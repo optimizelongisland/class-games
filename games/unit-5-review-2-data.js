@@ -127,7 +127,7 @@ const Q = [
     ] },
   { n: 5, ready: true, title: 'Reading a graph',
     text: 'The graph below represents the function ' + v('y') + ' = ' + v('f') + '(' + v('x') + ').',
-    graph: { label: 'Curve starting at the closed point (-5, -3), rising to a high point at (0, 2), crossing the x-axis at 4, dipping to about -1.7 near x = 7, and ending at the closed point (8, -1).',
+    graph: { x: [-7, 10], y: [-5, 5], label: 'Curve starting at the closed point (-5, -3), rising to a high point at (0, 2), crossing the x-axis at 4, dipping to about -1.7 near x = 7, and ending at the closed point (8, -1).',
       curves: [[[-5, -3], [-2.65, 0], [-0.6, 1.75], [0.4, 2], [2, 1.35], [4, 0], [6, -1.45], [7, -1.72], [7.65, -1.5], [8, -1]]],
       dots: [[-5, -3], [8, -1]] },
     parts: [
