@@ -171,7 +171,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
     <div class="meta" id="meta"></div>
   </header>
   <main id="view"></main>
-  <div class="foot"><a href="unit-5-review-2-teacher.html">Teacher board</a></div>
+  <div class="foot"><button class="link" id="restart">New group on this device? Start over</button><a href="unit-5-review-2-teacher.html">Teacher board</a></div>
 </div>
 <div class="toast" id="toast" hidden></div>
 <script src="unit-5-review-2-data.js"></script>
@@ -541,11 +541,19 @@ function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
     '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now open your own practice sheet and tap <b>Save as PDF</b>.</p>' + sheetLinks() +
-    '<div class="nums g6" style="max-width:760px;margin:1rem auto 0">' + stationGrid() + '</div></section>';
+    '<div class="nums g6" style="max-width:760px;margin:1rem auto 0">' + stationGrid() + '</div>' +
+    '<div class="row" style="justify-content:center;margin-top:1.4rem"><button class="btn line violet" id="again">New group? Start over on this device</button></div></section>';
+  $('#again').onclick = () => { if (confirm('Open your practice sheets first! Start over for a new group?')) startOver(); };
 }
+
+// fresh start for a new pair on this device (also: open the page with ?new=1)
+function startOver() { S = blank(); newSession = false; try { localStorage.removeItem(KEY); } catch (e) {} render(); scrollTo(0, 0); }
+$('#restart').onclick = () => { if (confirm('Start over as a new group? This clears ' + (S.num ? label() : 'this device') + '’s progress on this device.')) startOver(); };
+if (new URLSearchParams(location.search).has('new')) { S = blank(); try { localStorage.removeItem(KEY); history.replaceState(null, '', location.pathname + location.search.replace(/[?&]new(=[^&]*)?/, '').replace(/^&/, '?')); } catch (e) {} }
 
 /* ---------- start ---------- */
 (function init() {
+  if (S.num && !S.period) { S = blank(); try { localStorage.removeItem(KEY); } catch (e) {} }   // saved by the older version without periods
   // a different class (another period or another day) picking up this device: ask before reusing it
   const stale = S.num && S.last && (Date.now() - S.last > 30 * 60000 || (U.dbBase() && S.period && S.sid !== U.periodSession(S.period).id));
   if (stale && S.screen !== 'setup') newSession = true;
