@@ -34,7 +34,7 @@ for q in qs:
             h += '<ol class="chs' + (' wide' if any(len(re.sub(r'<[^>]+>', '', c)) > 30 for c in p['choices']) else '') + '" style="' + ('grid-template-columns:repeat(3,1fr);grid-template-rows:auto' if len(p['choices']) == 3 else 'grid-template-rows:repeat(' + str((len(p['choices']) + 1) // 2) + ',auto)') + '">' + ''.join(
                 '<li><b>' + p['labels'][k] + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
         parts.append(h + '</div>')
-    pages.append(f'''<section class="page{' dense' if q['graph'] and (len(q['parts']) > 1 or any(p['choices'] for p in q['parts'])) else ''}">
+    pages.append(f'''<section class="page{' open' if not q['graph'] and not any(p['choices'] for p in q['parts']) else ''}{' dense' if q['graph'] and (len(q['parts']) > 1 or any(p['choices'] for p in q['parts'])) else ''}">
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>
   <div class="q">{q['text']}</div>
   {('<div class="g">' + q['graph'] + '</div>') if q['graph'] else ''}
@@ -66,11 +66,13 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.g-curve{stroke:#111;stroke-width:3.6;fill:none}.g-dot{fill:#111}
 .g-num{fill:#222;font:500 15px 'IBM Plex Sans',Arial}.g-title{fill:#222;font:600 15px 'IBM Plex Sans',Arial}.g-dot.open{fill:#fff;stroke:#111;stroke-width:3}.rt{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:bottom}.rt svg{width:.55em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}.rt>span{border-top:2px solid currentColor;padding:.08em .12em 0 .08em;margin-top:1px}.rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);border:0;padding:0}
 .nw{white-space:nowrap}
-.terms{display:inline-block;margin-top:.2in;font-size:1.1em}
+.terms{display:block;text-align:center;margin-top:.25in;font-size:1.15em;word-spacing:.15em}
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 .1em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
 .parts{font-size:19pt;line-height:1.35}
 .part{margin-top:.85in}
+.page.open .part{margin-top:1.4in}
+.page.open .part:first-child{margin-top:.9in}
 .part p{margin:0}
 .pl{font-weight:700}
 .chs{list-style:none;margin:.3in 0 0;padding:0 0 0 .3in;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;gap:.5in .4in}
