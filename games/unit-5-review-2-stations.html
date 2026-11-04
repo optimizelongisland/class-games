@@ -384,7 +384,7 @@ function submit(val, el) {
   const f = $('#fb');
   f.className = 'fb bad';
   f.innerHTML = (r.msg ? esc(r.msg) : 'Not quite. Explainer, talk it through again and check the Recorder’s work.') +
-    (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Scan the <b>Need a hint?</b> QR code on your station sheet.</span>' : '');
+    (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
   if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
   else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
 }
