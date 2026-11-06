@@ -267,7 +267,13 @@ $('check').onclick = () => {
   $('msg').innerHTML = right + ' of 12 correct.' + (wrong ? ' Fix the <span style="color:#ff7b7b">red</span> card' + (wrong > 1 ? 's' : '') + '.' : '') + (empty ? ' ' + empty + ' box' + (empty > 1 ? 'es' : '') + ' still empty.' : '');
 };
 function restart(){leaving.clear(); state = fresh(); selected = null; $('msg').textContent = ''; $('win').classList.remove('show'); save(); render()}
-$('reset').onclick = () => { if (confirm('Start over? This clears your matches.')) restart() };
+let resetArm = null; // no pop-up: Google Sites blocks confirm(), so ask on the button itself
+$('reset').onclick = () => {
+  const btn = $('reset');
+  if (resetArm){ clearTimeout(resetArm); resetArm = null; btn.textContent = 'Start over'; restart(); return }
+  btn.textContent = 'Tap again to clear';
+  resetArm = setTimeout(() => { resetArm = null; btn.textContent = 'Start over' }, 4000);
+};
 $('again').onclick = restart;
 render();
 SYSTEMS.forEach(s => celebrate(s.n));
