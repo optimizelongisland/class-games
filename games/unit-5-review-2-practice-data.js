@@ -49,8 +49,8 @@ U.PRACTICE = {
       ans: '<b>Not a function.</b> ' + nw(x + ' = 1') + ' goes to two different ' + nw(y + '-values') + ', 2 and ' + M + '2.' },
     tries: [
       { q: 'Is this graph a function? Explain.',
-        graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[-4, 2], [-1, -1]] }, { p: [[-1, -1], [2, 2]] }, { p: [[2, -1], [3, -0.5], [4, 1]] }], dots: [[2, 2], [2, -1, true]] },
-        ans: 'Yes. At ' + nw(x + ' = 2') + ' the dot at (2, ' + M + '1) is <b>open</b>, so only (2, 2) is on the graph. Every vertical line hits the graph once.' },
+        graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-4, 3], [-2, -2], [1, 1]]), { p: [[1, 3], [4, 3]] }], dots: [[1, 1], [1, 3, true]] },
+        ans: 'Yes. At ' + nw(x + ' = 1') + ' the dot at (1, 3) is <b>open</b>, so only (1, 1) is on the graph. Every vertical line hits the graph once.' },
       { q: 'Is this graph a function? Explain.',
         graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[2, -2], [-1, -1], [-2, 0], [-1, 1], [2, 2]] }], dots: [[2, 2], [2, -2]] },
         ans: 'No. A vertical line at ' + nw(x + ' = ' + M + '1') + ' hits the graph at ' + nw(y + ' = ' + M + '1') + ' and ' + nw(y + ' = 1') + '.' }] },
