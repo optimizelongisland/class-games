@@ -97,6 +97,11 @@ U.PRACTICE = {
         nw(fx() + ' = 4') + ' means "where is the height 4?" That is at ' + nw(x + ' = ' + M + '1') + '.',
         fx('f', 3) + ' means "go to ' + nw(x + ' = 3') + ', how high is the graph?" It is ' + M + '2.'],
       ans: 'Domain ' + nw(M + '4' + le + x + le + '6') + ', range ' + nw(M + '2' + le + y + le + '4') + ', ' + nw(x + ' = ' + M + '1') + ', ' + nw(fx('f', 3) + ' = ' + M + '2') },
+      parts: [
+        { q: 'State the domain.', how: 'Read left to right. The graph starts at ' + nw(x + ' = ' + M + '4') + ' and ends at ' + nw(x + ' = 6') + '. Both dots are closed, so use ≤.', ans: nw(M + '4' + le + x + le + '6') },
+        { q: 'State the range.', how: 'Read bottom to top. The lowest point is ' + nw(y + ' = ' + M + '2') + ' and the highest point is ' + nw(y + ' = 4') + '.', ans: nw(M + '2' + le + y + le + '4') },
+        { q: 'Find ' + x + ' when ' + nw(fx() + ' = 4') + '.', how: nw(fx() + ' = 4') + ' means "where is the height 4?" Go across from 4 on the ' + y + '-axis. The graph touches it at ' + nw(x + ' = ' + M + '1') + '.', ans: nw(x + ' = ' + M + '1') },
+        { q: 'Find ' + fx('f', 3) + '.', how: fx('f', 3) + ' means "go to ' + nw(x + ' = 3') + '. How high is the graph?" It is at ' + nw(y + ' = ' + M + '2') + '.', ans: nw(fx('f', 3) + ' = ' + M + '2') }],
     tries: [
       { q: 'State the domain and range of this function. Then find ' + fx('f', 1) + '.',
         graph: { x: [-6, 5], y: [-3, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-5, 0], [-3, 3], [1, -1], [4, 2]])], dots: [[-5, 0], [4, 2]] },
@@ -170,6 +175,10 @@ U.PRACTICE = {
         'Rule: ' + nw(an('n') + ' = ' + an('1') + '(' + v('r') + ')' + sup(n + ' ' + M + ' 1')) + ', so ' + nw(an('n') + ' = 3(3)' + sup(n + ' ' + M + ' 1')) + '.',
         nw(an('6') + ' = 3(3)' + sup(5) + ' = 3(243) = 729') + '.'],
       ans: 'Geometric, ' + nw(an('n') + ' = 3(3)' + sup(n + ' ' + M + ' 1')) + ', ' + nw(an('6') + ' = 729') },
+      parts: [
+        { q: 'Is it arithmetic, geometric, or neither?', how: 'Differences: 6, 18, 54 (not the same). Ratios: 9 ÷ 3 = 3, 27 ÷ 9 = 3 (the same). Same ratio means geometric, with ' + nw(v('r') + ' = 3') + '.', ans: '<b>Geometric</b>' },
+        { q: 'Write a rule.', how: 'Use ' + nw(an('n') + ' = ' + an('1') + '(' + v('r') + ')' + sup(n + ' ' + M + ' 1')) + ' with ' + nw(an('1') + ' = 3') + ' and ' + nw(v('r') + ' = 3') + '.', ans: nw(an('n') + ' = 3(3)' + sup(n + ' ' + M + ' 1')) },
+        { q: 'Find the 6th term.', how: 'Put in ' + nw(n + ' = 6') + ': ' + nw(an('6') + ' = 3(3)' + sup(5) + ' = 3(243)') + '.', ans: nw(an('6') + ' = 729') }],
     tries: [
       { q: 'For 2, 10, 50, 250, … : arithmetic, geometric, or neither? Write a rule and find the 6th term.', ans: 'Geometric, ' + nw(an('n') + ' = 2(5)' + sup(n + ' ' + M + ' 1')) + ', ' + nw(an('6') + ' = 6250') },
       { q: 'Is 1, 4, 9, 16, … arithmetic, geometric, or neither? Explain.', ans: 'Neither. The differences (3, 5, 7) change and the ratios (4, 2.25, …) change.' }] },
@@ -180,6 +189,9 @@ U.PRACTICE = {
         'Rule: ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + ', so ' + nw(an('n') + ' = 6 + 5(' + n + ' ' + M + ' 1)') + ' (or ' + nw('5' + n + ' + 1') + ').',
         nw(an('10') + ' = 6 + 5(9) = 51') + '.'],
       ans: nw(an('n') + ' = 6 + 5(' + n + ' ' + M + ' 1)') + ', ' + nw(an('10') + ' = 51') },
+      parts: [
+        { q: 'Write a rule.', how: 'Differences: 5, 5, 5, so it is arithmetic with ' + nw(v('d') + ' = 5') + '. Use ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + ' with ' + nw(an('1') + ' = 6') + '.', ans: nw(an('n') + ' = 6 + 5(' + n + ' ' + M + ' 1)') + ' (or ' + nw('5' + n + ' + 1') + ')' },
+        { q: 'Find the 10th term.', how: 'Put in ' + nw(n + ' = 10') + ': ' + nw(an('10') + ' = 6 + 5(9) = 6 + 45') + '.', ans: nw(an('10') + ' = 51') }],
     tries: [
       { q: 'For 2, 8, 14, 20, … : write a rule and find the 15th term.', ans: nw(an('n') + ' = 2 + 6(' + n + ' ' + M + ' 1)') + ', ' + nw(an('15') + ' = 86') },
       { q: 'For 20, 17, 14, 11, … : write a rule and find the 10th term.', ans: nw(an('n') + ' = 20 ' + M + ' 3(' + n + ' ' + M + ' 1)') + ', ' + nw(an('10') + ' = ' + M + '7') }] },
@@ -191,6 +203,9 @@ U.PRACTICE = {
         'Rule: ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + ', so ' + nw(an('n') + ' = 5 + 5(' + n + ' ' + M + ' 1)') + '.',
         nw(an('10') + ' = 5 + 5(9) = 50') + '.'],
       ans: nw(an('n') + ' = 5 + 5(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('10') + ' = 50') },
+      parts: [
+        { q: 'Write a rule.', how: 'From ' + an('1') + ' to ' + an('5') + ' is 4 jumps, and the total change is ' + nw('25 ' + M + ' 5 = 20') + '. Each jump is ' + nw('20 ÷ 4 = 5') + ', so ' + nw(v('d') + ' = 5') + '. Use ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + '.', ans: nw(an('n') + ' = 5 + 5(' + n + ' ' + M + ' 1)') },
+        { q: 'Find the 10th term.', how: 'Put in ' + nw(n + ' = 10') + ': ' + nw(an('10') + ' = 5 + 5(9) = 5 + 45') + '.', ans: nw(an('10') + ' = 50') }],
     tries: [
       { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 2') + ' and ' + nw(an('4') + ' = 20') + '. Find the 11th term.', ans: nw(an('n') + ' = 2 + 6(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('11') + ' = 62') },
       { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 10') + ' and ' + nw(an('3') + ' = 4') + '. Find the 12th term.', ans: nw(an('n') + ' = 10 ' + M + ' 3(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('12') + ' = ' + M + '23') }] },
@@ -201,6 +216,9 @@ U.PRACTICE = {
         'Rule: ' + nw(an('n') + ' = 1(' + fr('1', '2') + ')' + sup(n + ' ' + M + ' 1')) + '.',
         nw(an('6') + ' = (' + fr('1', '2') + ')' + sup(5) + ' = ' + fr('1', '32')) + '. Raise the top and the bottom to the 5th power.'],
       ans: nw(an('n') + ' = 1(' + fr('1', '2') + ')' + sup(n + ' ' + M + ' 1')) + ', ' + nw(an('6') + ' = ' + fr('1', '32')) },
+      parts: [
+        { q: 'Write a rule.', how: 'Ratio: ' + nw(fr('1', '2') + ' ÷ 1 = ' + fr('1', '2')) + '. Check: ' + nw(fr('1', '4') + ' ÷ ' + fr('1', '2') + ' = ' + fr('1', '2')) + '. Use ' + nw(an('n') + ' = ' + an('1') + '(' + v('r') + ')' + sup(n + ' ' + M + ' 1')) + ' with ' + nw(an('1') + ' = 1') + '.', ans: nw(an('n') + ' = 1(' + fr('1', '2') + ')' + sup(n + ' ' + M + ' 1')) },
+        { q: 'Find the 6th term.', how: 'Put in ' + nw(n + ' = 6') + ': ' + nw(an('6') + ' = (' + fr('1', '2') + ')' + sup(5)) + '. Raise the top and the bottom to the 5th power: ' + nw('1' + sup(5) + ' = 1') + ' and ' + nw('2' + sup(5) + ' = 32') + '.', ans: nw(an('6') + ' = ' + fr('1', '32')) }],
     tries: [
       { q: 'For 1, ' + fr('1', '4') + ', ' + fr('1', '16') + ', ' + fr('1', '64') + ', … : write a rule and find the 5th term.', ans: nw(an('n') + ' = 1(' + fr('1', '4') + ')' + sup(n + ' ' + M + ' 1')) + ', ' + nw(an('5') + ' = ' + fr('1', '256')) },
       { q: 'For 9, 3, 1, ' + fr('1', '3') + ', … : write a rule and find the 6th term.', ans: nw(an('n') + ' = 9(' + fr('1', '3') + ')' + sup(n + ' ' + M + ' 1')) + ', ' + nw(an('6') + ' = ' + fr('1', '27')) }] },
@@ -212,6 +230,9 @@ U.PRACTICE = {
         'Lowest ' + y + ': ' + M + '1 at the closed dot (≤). Highest ' + y + ': 5 at the open dot (&lt;).',
         'An open dot means that exact point is <b>not</b> included.'],
       ans: 'Domain ' + nw(M + '4' + le + x + lt + '3') + ', range ' + nw(M + '1' + le + y + lt + '5') },
+      parts: [
+        { q: 'State the domain.', how: 'Left end: closed dot at ' + nw(x + ' = ' + M + '4') + ', so use ≤. Right end: open dot at ' + nw(x + ' = 3') + ', so use &lt; (that point is <b>not</b> included).', ans: nw(M + '4' + le + x + lt + '3') },
+        { q: 'State the range.', how: 'Lowest ' + y + ': ' + M + '1 at the closed dot, so use ≤. Highest ' + y + ': 5 at the open dot, so use &lt;.', ans: nw(M + '1' + le + y + lt + '5') }],
     tries: [
       { q: 'State the domain and range.',
         graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-2, 3], [0, -1], [2, 1], [4, -3]])], dots: [[-2, 3, true], [4, -3]] },
@@ -227,6 +248,9 @@ U.PRACTICE = {
         'Domain: ' + x + ' starts at ' + M + '2 and never stops, so ' + nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ').',
         'Range: ' + y + ' starts at 1 and keeps rising, so ' + nw(y + ' ≥ 1') + ' (also written ' + nw('1' + le + y + lt + '∞') + ').'],
       ans: 'Domain ' + nw(x + ' ≥ ' + M + '2') + ', range ' + nw(y + ' ≥ 1') },
+      parts: [
+        { q: 'State the domain.', how: 'The graph starts at the closed dot where ' + nw(x + ' = ' + M + '2') + '. The arrow means it keeps going to the right forever.', ans: nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ')' },
+        { q: 'State the range.', how: 'The lowest point is the dot at ' + nw(y + ' = 1') + '. The arrow keeps going up forever.', ans: nw(y + ' ≥ 1') + ' (also written ' + nw('1' + le + y + lt + '∞') + ')' }],
     tries: [
       { q: 'State the domain and range.',
         graph: { x: [-2, 10], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 43 }, (_, i) => { const t = Math.sqrt(18) * i / 42; return [1 + t * t / 2, t - 3]; }), arrow: true }], dots: [[1, -3]] },
@@ -257,4 +281,50 @@ U.PRACTICE = {
       { q: 'If ' + fx('g') + ' = ' + fr('4' + x + ' ' + M + ' 6', '2') + ', find ' + x + ' when ' + nw(fx('g') + ' = 9') + '.', ans: nw(x + ' = 6') },
       { q: 'If ' + fx('h') + ' = ' + fr('2' + x, '3') + ' + 1, find ' + x + ' when ' + nw(fx('h') + ' = 7') + '.', ans: nw(x + ' = 9') }] }
 };
+
+// Answer choices for every "your turn" problem, so online practice works like the stations:
+// students tap a choice and it checks itself. right = index of the correct choice.
+const m = s => s.replace(/-(?=\d)/g, M);            // '-3' -> '−3'
+const iv = (a, o1, v_, o2, b) => nw(m(String(a)) + o1 + v_ + o2 + m(String(b)));
+const dr = (d, r) => 'Domain ' + d + ', range ' + r;
+const ar = (a1, d) => nw(an('n') + ' = ' + m(String(a1)) + (d < 0 ? ' ' + M + ' ' + (-d) : ' + ' + d) + '(' + n + ' ' + M + ' 1)');
+const gr = (a1, r) => nw(an('n') + ' = ' + a1 + '(' + r + ')' + sup(n + ' ' + M + ' 1'));
+const MC = {
+  '1.0': [['Yes, it is a function.', 'No, it fails at ' + nw(x + ' = 1') + '.', 'No, it fails at ' + nw(x + ' = ' + M + '2') + '.', 'No, a function can’t have a jump.'], 0],
+  '1.1': [['Yes, every ' + nw(x + '-value') + ' has a ' + nw(y + '-value') + '.', 'Yes, it passes the vertical line test.', 'No, the vertical line ' + nw(x + ' = ' + M + '1') + ' hits it twice.', 'No, because it has two dots.'], 2],
+  '2.1': [['No, 0 is used twice as a ' + nw(y + '-value') + '.', 'Yes, the ' + nw(x + '-values') + ' are all different.', 'No, ' + M + '2 shows up twice.', 'Yes, the ' + nw(y + '-values') + ' are all different.'], 1],
+  '3.0': [['9', '3', fr('3', '2'), m('-3')], 1],
+  '3.1': [['2', fr('1', '2'), m('-2'), m('-1')], 2],
+  '4.0': [[m('-8'), '16', m('-26'), '2'], 0],
+  '4.1': [['30', '42', '34', '26'], 1],
+  '5.0': [[dr(iv(-5, le, x, le, 4), iv(-1, le, y, le, 3)) + ', ' + nw(fx('f', 1) + ' = ' + M + '1'), dr(iv(-1, le, x, le, 3), iv(-5, le, y, le, 4)) + ', ' + nw(fx('f', 1) + ' = ' + M + '1'), dr(iv(-5, le, x, le, 4), iv(-1, le, y, le, 3)) + ', ' + nw(fx('f', 1) + ' = 0'), dr(iv(-6, le, x, le, 5), iv(-3, le, y, le, 4)) + ', ' + nw(fx('f', 1) + ' = ' + M + '1')], 0],
+  '5.1': [[nw(x + ' = 3'), nw(x + ' = ' + M + '1'), nw(x + ' = ' + M + '3'), nw(x + ' = 4')], 2],
+  '6.0': [[nw(x + sup(2) + ' + 5' + x + ' ' + M + ' 7'), nw(x + sup(2) + ' ' + M + ' 3' + x + ' ' + M + ' 7'), nw(x + sup(2) + ' + 5' + x + ' + 1'), nw('3' + x + sup(2) + ' ' + M + ' 3' + x + ' + 1')], 0],
+  '6.1': [[nw('4' + x + sup(2) + ' + 2' + x + ' + 4'), nw('2' + x + sup(2) + ' + 2' + x + ' + 6'), nw('2' + x + sup(2) + ' ' + M + ' 6' + x + ' + 4'), nw('2' + x + sup(2) + ' ' + M + ' 6' + x + ' + 6')], 3],
+  '7.0': [[iv(-3, le, x, le, 4), iv(-2, le, x, le, 5), iv(-2, lt, x, lt, 5), iv(-4, le, x, le, 6)], 1],
+  '7.1': [[iv(0, le, x, le, 6), iv(1, le, x, lt, 3), iv(0, le, x, lt, 6), iv(0, lt, x, le, 6)], 2],
+  '8.0': [[iv(30, le, y, le, 40), iv(0, le, y, le, 6), iv(10, le, y, le, 50), iv(0, le, y, le, 60)], 2],
+  '8.1': [[iv(0, le, y, le, 4), iv(0, le, y, le, 48), iv(0, le, y, le, 56), iv(2, le, y, le, 48)], 1],
+  '9.0': [['1, 5, 9, 13, 17', '4, 8, 12, 16, 20', '5, 9, 13, 17, 21', '1, 4, 7, 10, 13'], 0],
+  '9.1': [['10, 13, 16, 19, 22', '7, 4, 1, ' + M + '2, ' + M + '5', '10, 7, 4, 1, ' + M + '2', M + '3, 7, 17, 27, 37'], 2],
+  '10.0': [['4, 7, 10, 13, 16', '12, 36, 108, 324, 972', '4, 12, 36, 108, 324', '4, 12, 24, 36, 48'], 2],
+  '10.1': [['5, 10, 20, 40, 80', '5, ' + M + '10, 20, ' + M + '40, 80', M + '10, 20, ' + M + '40, 80, ' + M + '160', '5, 3, 1, ' + M + '1, ' + M + '3'], 1],
+  '11.0': [['Arithmetic, ' + ar(2, 8) + ', ' + nw(an('6') + ' = 42'), 'Geometric, ' + gr(2, 5) + ', ' + nw(an('6') + ' = 6250'), 'Geometric, ' + gr(5, 2) + ', ' + nw(an('6') + ' = 160'), 'Geometric, ' + gr(2, 5) + ', ' + nw(an('6') + ' = 1250')], 1],
+  '11.1': [['Arithmetic, it goes up by 3 each time.', 'Geometric, it multiplies by 4 each time.', 'Neither. The differences (3, 5, 7) change and the ratios change.', 'Arithmetic, the differences go up by 2.'], 2],
+  '12.0': [[ar(2, 6) + ', ' + nw(an('15') + ' = 86'), ar(2, 6) + ', ' + nw(an('15') + ' = 92'), ar(6, 2) + ', ' + nw(an('15') + ' = 34'), ar(2, 8) + ', ' + nw(an('15') + ' = 114')], 0],
+  '12.1': [[ar(20, 3) + ', ' + nw(an('10') + ' = 47'), ar(20, -3) + ', ' + nw(an('10') + ' = ' + M + '10'), ar(11, -3) + ', ' + nw(an('10') + ' = ' + M + '16'), ar(20, -3) + ', ' + nw(an('10') + ' = ' + M + '7')], 3],
+  '13.0': [[ar(2, 6) + ', ' + nw(an('11') + ' = 62'), ar(2, 6) + ', ' + nw(an('11') + ' = 68'), ar(2, 18) + ', ' + nw(an('11') + ' = 182'), ar(2, 5) + ', ' + nw(an('11') + ' = 52')], 0],
+  '13.1': [[ar(10, 3) + ', ' + nw(an('12') + ' = 43'), ar(10, -6) + ', ' + nw(an('12') + ' = ' + M + '56'), ar(10, -3) + ', ' + nw(an('12') + ' = ' + M + '23'), ar(10, -3) + ', ' + nw(an('12') + ' = ' + M + '26')], 2],
+  '14.0': [[gr(1, fr('1', '4')) + ', ' + nw(an('5') + ' = ' + fr('1', '256')), gr(1, fr('1', '4')) + ', ' + nw(an('5') + ' = ' + fr('1', '1024')), gr(1, '4') + ', ' + nw(an('5') + ' = 256'), gr(fr('1', '4'), '1') + ', ' + nw(an('5') + ' = ' + fr('1', '4'))], 0],
+  '14.1': [[gr(9, '3') + ', ' + nw(an('6') + ' = 2187'), gr(9, fr('1', '3')) + ', ' + nw(an('6') + ' = ' + fr('1', '9')), gr(9, fr('1', '3')) + ', ' + nw(an('6') + ' = ' + fr('1', '27')), gr(9, fr('1', '3')) + ', ' + nw(an('6') + ' = ' + fr('1', '81'))], 2],
+  '15.0': [[dr(iv(-2, le, x, le, 4), iv(-3, le, y, le, 3)), dr(iv(-2, lt, x, le, 4), iv(-3, le, y, lt, 3)), dr(iv(-2, le, x, lt, 4), iv(-3, lt, y, le, 3)), dr(iv(-3, le, x, lt, 3), iv(-2, lt, y, le, 4))], 1],
+  '15.1': [[dr(iv(-3, le, x, lt, 3), iv(-2, lt, y, le, 4)), dr(iv(-3, le, x, le, 3), iv(-2, le, y, le, 4)), dr(iv(-3, lt, x, le, 3), iv(-2, le, y, lt, 4)), dr(iv(-2, lt, x, le, 4), iv(-3, le, y, lt, 3))], 0],
+  '16.0': [[dr(nw(x + ' ≥ 1'), nw(y + ' ≥ ' + M + '3')), dr(nw(x + ' ≥ ' + M + '3'), nw(y + ' ≥ 1')), dr(iv(1, le, x, le, 10), iv(-3, le, y, le, 1)), dr(nw(x + ' ≤ 1'), nw(y + ' ≤ ' + M + '3'))], 0],
+  '16.1': [[dr('all real numbers', 'all real numbers'), dr(nw(x + ' ≥ 1'), nw(y + ' ≥ ' + M + '2')), dr('all real numbers', nw(y + ' ≥ ' + M + '2')), dr(iv(-2, le, x, le, 4), nw(y + ' ≥ ' + M + '2'))], 2],
+  '17.1': [['2', M + '2', fr('1', '2'), M + fr('1', '2')], 3],
+  '18.0': [[nw(x + ' = 12'), nw(x + ' = 6'), nw(x + ' = 3'), nw(x + ' = ' + fr('3', '2'))], 1],
+  '18.1': [[nw(x + ' = 9'), nw(x + ' = 12'), nw(x + ' = 3'), nw(x + ' = 6')], 0]
+};
+Object.keys(MC).forEach(k => { const [s_, i] = k.split('.'), t = U.PRACTICE[s_].tries[+i]; t.choices = MC[k][0]; t.right = MC[k][1]; });
+U.PRACTICE[2].tries[0].right = 1; U.PRACTICE[17].tries[0].right = 1;
 })();
