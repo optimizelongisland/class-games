@@ -115,7 +115,7 @@ U.PRACTICE = {
 
   7: { topic: 'Domain from a graph',
     ex: { q: 'What is the domain of the function shown?',
-      graph: { x: [-5, 6], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-3, 2], [-1, 3.5], [4, -1]])], dots: [[-3, 2], [4, -1]] },
+      graph: { x: [-5, 6], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-3, 2], [-1, 4], [4, -1]])], dots: [[-3, 2], [4, -1]] },
       steps: ['Domain = all the ' + nw(x + '-values') + ' the graph covers, left to right.',
         'The left end is at ' + nw(x + ' = ' + M + '3') + ' and the right end is at ' + nw(x + ' = 4') + '.',
         'Both dots are closed (filled in), so use ≤ on both sides.'],
