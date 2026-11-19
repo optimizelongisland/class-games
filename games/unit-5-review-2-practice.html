@@ -114,11 +114,16 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 <body>
 <a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
 <div id="app"></div>
-<script src="unit-5-review-2-data.js"></script>
-<script src="unit-5-review-2-practice-data.js"></script>
+<script src="unit-5-review-2-data.js?v=29"></script>
+<script src="unit-5-review-2-practice-data.js?v=29"></script>
 <script>
 'use strict';
 const U = window.U5R2, P = U.PRACTICE, app = document.getElementById('app');
+// works even if the browser still has an older copy of the problem file
+Object.keys(P).forEach(n => P[n].tries.forEach(t => {
+  if (!t.sub) t.sub = [{ q: null, t: t.choices ? 'mc' : 'none', choices: t.choices, right: t.right, ans: t.ans }];
+  t.sub.forEach(s => { if (!s.t) s.t = s.choices ? 'mc' : 'none'; if (s.t === 'mc') s.answer = s.right; });
+}));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const prm = new URLSearchParams(location.search);
 const name = (prm.get('name') || '').replace(/[^\p{L}\p{M}' .&-]/gu, '').trim().slice(0, 40);
@@ -166,7 +171,7 @@ function online() {
     cards.push({ kind: 'ex', n });
     P[n].tries.forEach(t => { k++; cards.push({ kind: 'try', n, t, k }); });
   });
-  const total = k, store = 'u5r2-online:' + location.search;
+  const total = k, store = 'u5r2-online2:' + location.search;
   let st = { i: 0, step: 0, res: {} };
   try { const s = JSON.parse(localStorage.getItem(store) || 'null'); if (s && s.i < cards.length + 1) st = s; } catch (e) { }
   const save = () => { try { localStorage.setItem(store, JSON.stringify(st)); } catch (e) { } };
@@ -174,7 +179,18 @@ function online() {
   const printURL = location.search + sep + 'print=1';
   const go = i => { st.i = i; st.step = 0; st.solved = false; st.wrong = []; st.miss = false; st.msg = ''; st.typed = ''; st.got = []; save(); draw(); window.scrollTo(0, 0); };
 
+  // never leave a blank page: if saved progress or an old cached file breaks drawing, start fresh and say so
   function draw() {
+    try { drawCard(); }
+    catch (e) {
+      if (!draw.retried) { draw.retried = true; st = { i: 0, step: 0, res: {} }; save(); try { drawCard(); return; } catch (e2) { } }
+      app.innerHTML = '<main class="paper card"><h2>Almost there!</h2><p class="bigq">Your browser is still holding an older copy of this page.</p>' +
+        '<p>Press <b>Ctrl + Shift + R</b> (on a Mac: <b>Cmd + Shift + R</b>) to reload it. Your code still works.</p>' +
+        '<div class="acts"><button class="btn" id="rl">Reload now</button></div></main>';
+      document.getElementById('rl').onclick = () => location.reload();
+    }
+  }
+  function drawCard() {
     const done = Object.keys(st.res).length;
     const top = '<div class="bar"><span class="prog"><b>' + (name ? esc(name) + '’s practice' : 'My practice') + '</b> · ' + done + ' of ' + total + ' problems done</span>' +
       '<a class="btn ghost" href="' + printURL + '">🖨️ Print or save as PDF</a></div>' +
