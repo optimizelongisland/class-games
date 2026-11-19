@@ -81,6 +81,8 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .opt.ok{border-color:#15803d;background:#ecfdf3}.opt.no{border-color:#b42318;background:#fef3f2}
 .fbk{font-size:1.1rem;line-height:1.9;border-radius:12px;padding:.8rem 1rem;margin-top:.8rem;background:var(--soft)}.fbk.good{background:#ecfdf3}.fbk.bad{background:#fef3f2}
 .hint{color:var(--mute);margin:.8rem 0 0}
+.part{border-left:4px solid var(--accent);background:var(--soft);border-radius:0 12px 12px 0;padding:.6rem 1rem;margin:.8rem 0;animation:pop .25s ease}
+.part p{margin:.2rem 0}.part .pq{font-size:1.1rem}.part .how{color:var(--ink);line-height:1.8}.part .pa{font-weight:700}
 .back{display:block;margin-top:1.4rem;font:600 .95rem var(--body);background:none;border:0;padding:0;color:var(--mute);cursor:pointer}
 .done h1{margin-bottom:.4rem}.miss li{margin:.4rem 0}
 
@@ -114,13 +116,14 @@ function sheet() {
   const body = list.map(n => {
     const p = P[n], e = p.ex;
     const tries = p.tries.map(t => {
-      k++; key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + t.ans + '</li>');
+      k++; key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + (t.right !== undefined && !/^[A-D][.)]/.test(t.ans) ? '<b>' + 'ABCD'[t.right] + ')</b> ' : '') + t.ans + '</li>');
       return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
         (t.choices ? '<ol class="ch">' + t.choices.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>' : '') + '<div class="work" aria-label="space for your work"></div></div>';
     }).join('');
     return '<section class="stn"><h2><span class="n">' + n + '</span>' + p.topic + '</h2>' +
       '<div class="ex"><p class="tag">Worked example</p><p style="margin:0">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
-      '<ol>' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="a" style="margin:0">Answer: ' + e.ans + '</p></div>' +
+      (p.parts ? p.parts.map((pt, i) => '<div class="part"><p class="pq"><b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('')
+        : '<ol>' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="a" style="margin:0">Answer: ' + e.ans + '</p>') + '</div>' +
       '<p class="tag" style="color:var(--accent2)">Your turn</p>' + tries + '</section>';
   }).join('');
   app.innerHTML = '<div class="bar"><a class="btn ghost" href="' + location.search.replace(/[?&]print=1/, '').replace(/^&/, '?') + '">← Practice online</a><button class="btn" id="pdf">⬇️ Save as PDF</button><a class="btn ghost" href="?' + (name ? 'name=' + encodeURIComponent(name) + '&' : '') + 'edit=1&q=' + list.join(',') + '">Add or remove stations</a></div>' +
@@ -148,7 +151,7 @@ function online() {
   const save = () => { try { localStorage.setItem(store, JSON.stringify(st)); } catch (e) { } };
   const sep = location.search ? '&' : '?';
   const printURL = location.search + sep + 'print=1';
-  const go = i => { st.i = i; st.step = 0; st.shown = false; st.picked = -1; save(); draw(); window.scrollTo(0, 0); };
+  const go = i => { st.i = i; st.step = 0; st.picked = -1; st.wrong = []; save(); draw(); window.scrollTo(0, 0); };
 
   function draw() {
     const done = Object.keys(st.res).length;
@@ -159,27 +162,30 @@ function online() {
     const c = cards[st.i], p = P[c.n];
     let body = '';
     if (c.kind === 'ex') {
-      const e = p.ex, n = e.steps.length, all = st.step >= n;
-      body = '<p class="tag">Worked example · watch how it’s done</p><p class="bigq">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
-        '<ol class="steps">' + e.steps.slice(0, st.step).map(s => '<li>' + s + '</li>').join('') + '</ol>' +
-        (all ? '<p class="a">Answer: ' + e.ans + '</p><div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
-          : '<div class="acts"><button class="btn" id="stp">' + (st.step ? 'Next step' : 'Show step 1') + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
-            '<button class="btn ghost" id="allst">Show all steps</button></div>');
-    } else {
-      const t = c.t, m = /^([A-D])[.)]/.exec(String(t.ans).replace(/<[^>]+>/g, '')), right = m ? 'ABCD'.indexOf(m[1]) : -1;
-      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '');
-      if (t.choices && right >= 0) {
-        body += '<div class="opts">' + t.choices.map((ch, i) => '<button class="opt' + (st.picked === i ? (i === right ? ' ok' : ' no') : '') + (st.picked >= 0 && i === right ? ' ok' : '') + '" data-i="' + i + '"' + (st.picked >= 0 ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
-        if (st.picked >= 0) body += '<div class="fbk ' + (st.picked === right ? 'good' : 'bad') + '">' + (st.picked === right ? '✅ Correct! ' : '❌ Not quite. ') + t.ans + '</div><div class="acts"><button class="btn" id="nx">Next ➜</button></div>';
-      } else if (!st.shown) {
-        body += (t.choices ? '<ol class="ch">' + t.choices.map((ch, i) => '<li>' + 'ABCD'[i] + ') ' + ch + '</li>').join('') + '</ol>' : '') +
-          '<p class="hint">Work it out on scrap paper first. Then check your answer.</p><div class="acts"><button class="btn" id="chk">Check my answer</button><button class="btn ghost" id="peek">See the example again</button></div>';
+      const e = p.ex, parts = p.parts;
+      if (parts) {
+        const n = parts.length, all = st.step >= n, lab = i => '(' + 'abcdef'[i] + ')';
+        body = '<p class="tag">Worked example · watch how it’s done</p><p class="bigq">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+          parts.slice(0, st.step).map((pt, i) => '<div class="part"><p class="pq"><b>' + lab(i) + '</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('') +
+          (all ? '<div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
+            : '<div class="acts"><button class="btn" id="stp">Show part ' + lab(st.step) + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
+              '<button class="btn ghost" id="allst">Show all parts</button></div>');
       } else {
-        const r = st.res[c.k];
-        body += '<div class="fbk">Answer: ' + t.ans + '</div>' +
-          (r ? '<div class="acts"><button class="btn" id="nx">Next ➜</button></div>'
-            : '<p class="hint">Did you get it?</p><div class="acts"><button class="btn good" id="yes">👍 I got it</button><button class="btn bad" id="no">✏️ I missed it</button></div>');
+        const n = e.steps.length, all = st.step >= n;
+        body = '<p class="tag">Worked example · watch how it’s done</p><p class="bigq">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+          '<ol class="steps">' + e.steps.slice(0, st.step).map(s => '<li>' + s + '</li>').join('') + '</ol>' +
+          (all ? '<p class="a">Answer: ' + e.ans + '</p><div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
+            : '<div class="acts"><button class="btn" id="stp">' + (st.step ? 'Next step' : 'Show step 1') + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
+              '<button class="btn ghost" id="allst">Show all steps</button></div>');
       }
+    } else {
+      const t = c.t, right = t.right, wrong = st.wrong || [], solved = st.picked === right;
+      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+        '<p class="hint" style="margin-top:0">Work it out, then tap your answer.</p>' +
+        '<div class="opts">' + t.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
+      if (solved) body += '<div class="fbk good">✅ Correct! ' + t.ans + '</div><div class="acts"><button class="btn" id="nx">Next ➜</button></div>';
+      else if (wrong.length) body += '<div class="fbk bad">❌ Not quite. Check your work and try again.</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
+      else body += '<div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
     }
     app.innerHTML = top + '<main class="paper card"><h2 class="st"><span class="n">' + c.n + '</span>' + p.topic + '</h2>' + body +
       (st.i > 0 ? '<button class="back" id="bk">← Back</button>' : '') + '</main>';
@@ -188,13 +194,12 @@ function online() {
     if ($('allst')) $('allst').onclick = () => { st.step = 99; save(); draw(); };
     if ($('nx')) $('nx').onclick = () => go(st.i + 1);
     if ($('bk')) $('bk').onclick = () => go(st.i - 1);
-    if ($('chk')) $('chk').onclick = () => { st.shown = true; save(); draw(); };
     if ($('peek')) $('peek').onclick = () => { const j = cards.findIndex(x => x.kind === 'ex' && x.n === c.n); go(j); };
-    if ($('yes')) $('yes').onclick = () => { st.res[c.k] = 'good'; go(st.i + 1); };
-    if ($('no')) $('no').onclick = () => { st.res[c.k] = 'miss'; go(st.i + 1); };
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
-      const t = c.t, m = /^([A-D])[.)]/.exec(String(t.ans).replace(/<[^>]+>/g, ''));
-      st.picked = +b.dataset.i; st.res[c.k] = st.picked === 'ABCD'.indexOf(m[1]) ? 'good' : 'miss'; save(); draw();
+      const i = +b.dataset.i;
+      if (i === c.t.right) { st.picked = i; if (!st.res[c.k]) st.res[c.k] = 'good'; }
+      else { st.wrong = (st.wrong || []).concat(i); st.res[c.k] = 'miss'; }
+      save(); draw();
     });
   }
 
