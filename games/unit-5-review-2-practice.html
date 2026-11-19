@@ -197,7 +197,6 @@ function online() {
       body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + (t.sub ? ' · part ' + PL(j) + ' of ' + t.sub.length : '') + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
         (t.sub ? t.sub.slice(0, j).map((s, i) => '<div class="part"><p class="pq"><b>' + PL(i) + '</b> ' + s.q + '</p><p class="pa">✅ ' + s.choices[s.right] + '</p></div>').join('') +
           '<p class="bigq sq"><b>' + PL(j) + '</b> ' + cur.q + '</p>' : '') +
-        '<p class="hint" style="margin-top:0">Work it out, then tap your answer.</p>' +
         '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
       if (solved) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div><div class="acts">' + (last ? '<button class="btn" id="nx">Next ➜</button>' : '<button class="btn" id="sbn">Next: part ' + PL(j + 1) + ' ➜</button>') + '</div>';
       else if (wrong.length) body += '<div class="fbk bad">❌ Not quite. Check your work and try again.</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
