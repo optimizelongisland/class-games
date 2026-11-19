@@ -136,9 +136,9 @@ U.PRACTICE = {
         'Lowest point: 20 (at hour 5). Highest point: 60 (at hour 2).'],
       ans: nw('20' + le + y + le + '60') },
     tries: [
-      { q: 'The graph shows a plant’s height (cm) over 6 weeks. What is the range?',
-        graph: { x: [0, 6], y: [0, 60], gy: 10, ticks: { x: 1, y: 10 }, xTitle: 'Weeks', yTitle: 'Height (cm)', curves: [sm([[0, 10], [6, 50]])] },
-        ans: nw('10' + le + y + le + '50') },
+      { q: 'The graph shows the water level (inches) in a rain barrel over 6 days. What is the range?',
+        graph: { x: [0, 6], y: [0, 60], gy: 10, ticks: { x: 1, y: 10 }, xTitle: 'Days', yTitle: 'Water level (in.)', curves: [sm([[0, 40], [2, 10], [4, 50], [6, 30]])], dots: [[0, 40], [6, 30]] },
+        ans: nw('10' + le + y + le + '50') + '. The lowest point is 10 (day 2) and the highest is 50 (day 4). The start and end values are not the answer.' },
       { q: 'A ball starts on the ground, goes up to 48 feet, and lands back on the ground. What is the range of its height?', ans: nw('0' + le + y + le + '48') }] },
 
   9: { topic: 'First 5 terms from a formula (arithmetic)',
