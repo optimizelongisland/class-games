@@ -123,7 +123,7 @@ U.PRACTICE = {
       ans: nw(M + '3' + le + x + le + '4') },
     tries: [
       { q: 'What is the domain of this function?',
-        graph: { x: [-4, 6], y: [-4, 5], ticks: { x: 1, y: 1 }, curves: [[[-2, -3], [0, -1.2], [2, 0.6], [3.5, 2.1], [5, 4]]], dots: [[-2, -3], [5, 4]] },
+        graph: { x: [-4, 6], y: [-4, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-2, -3], [1, 2], [3, 0], [5, 4]])], dots: [[-2, -3], [5, 4]] },
         ans: nw(M + '2' + le + x + le + '5') },
       { q: 'What is the domain of this function? Look carefully at the dots.',
         graph: { x: [-2, 7], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [[[0, 1], [6, 3]]], dots: [[0, 1], [6, 3, true]] },
