@@ -63,9 +63,9 @@ U.PRACTICE = {
       ans: '<b>Not a function.</b>' },
     tries: [
       { q: 'Which relation is a function?', choices: ['{(1, 2), (1, 3), (2, 4)}', '{(0, 5), (1, 5), (2, 5)}', '{(4, 1), (5, 2), (4, 3)}', '{(6, 0), (6, 1), (6, 2)}'],
-        ans: 'B. Every ' + nw(x + '-value') + ' (0, 1, 2) is different. Repeating the ' + nw(y + '-value') + ' 5 is allowed.' },
+        ans: 'B. The ' + nw(x + '-values') + ' (0, 1, 2) do not repeat. Repeating the ' + nw(y + '-value') + ' 5 is allowed.' },
       { q: 'Is {(' + M + '2, 0), (0, ' + M + '2), (2, 0), (4, 6)} a function? Explain.',
-        ans: 'Yes. The ' + nw(x + '-values') + ' ' + M + '2, 0, 2, 4 are all different.' }] },
+        ans: 'Yes. The ' + nw(x + '-values') + ' ' + M + '2, 0, 2, 4 do not repeat.' }] },
 
   3: { topic: 'Evaluate a function with a fraction and a square root',
     ex: { q: 'If ' + fx() + ' = ' + fr(rt(x + ' + 5'), '2' + x + ' ' + M + ' 3') + ', find ' + fx('f', 4) + '.',
@@ -292,7 +292,7 @@ const gr = (a1, r) => nw(an('n') + ' = ' + a1 + '(' + r + ')' + sup(n + ' ' + M 
 const MC = {
   '1.0': [['Yes, it is a function.', 'No, it fails at ' + nw(x + ' = 1') + '.', 'No, it fails at ' + nw(x + ' = ' + M + '2') + '.', 'No, a function can’t have a jump.'], 0],
   '1.1': [['Yes, every ' + nw(x + '-value') + ' has a ' + nw(y + '-value') + '.', 'Yes, it passes the vertical line test.', 'No, the vertical line ' + nw(x + ' = ' + M + '1') + ' hits it twice.', 'No, because it has two dots.'], 2],
-  '2.1': [['No, 0 is used twice as a ' + nw(y + '-value') + '.', 'Yes, the ' + nw(x + '-values') + ' are all different.', 'No, ' + M + '2 shows up twice.', 'Yes, the ' + nw(y + '-values') + ' are all different.'], 1],
+  '2.1': [['No, 0 is used twice as a ' + nw(y + '-value') + '.', 'Yes, the ' + nw(x + '-values') + ' do not repeat.', 'No, ' + M + '2 shows up twice.', 'Yes, the ' + nw(y + '-values') + ' do not repeat.'], 1],
   '3.0': [['9', '3', fr('3', '2'), m('-3')], 1],
   '3.1': [['2', fr('1', '2'), m('-2'), m('-1')], 2],
   '4.0': [[m('-8'), '16', m('-26'), '2'], 0],
