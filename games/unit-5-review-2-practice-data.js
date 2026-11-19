@@ -220,17 +220,17 @@ U.PRACTICE = {
 
   16: { topic: 'Domain and range when the graph keeps going',
     ex: { q: 'State the domain and range of the function.',
-      graph: { x: [-4, 8], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 31 }, (_, i) => { const t = i / 10; return [-2 + t * t, t + 1]; }), arrow: true }], dots: [[-2, 1]] },
+      graph: { x: [-4, 8], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 33 }, (_, i) => { const t = Math.sqrt(10) * i / 32; return [-2 + t * t, t + 1]; }), arrow: true }], dots: [[-2, 1]] },
       steps: ['The graph starts at the closed dot (' + M + '2, 1) and the arrow means it keeps going to the right and up forever.',
         'Domain: ' + x + ' starts at ' + M + '2 and never stops, so ' + nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ').',
         'Range: ' + y + ' starts at 1 and keeps rising, so ' + nw(y + ' ≥ 1') + ' (also written ' + nw('1' + le + y + lt + '∞') + ').'],
       ans: 'Domain ' + nw(x + ' ≥ ' + M + '2') + ', range ' + nw(y + ' ≥ 1') },
     tries: [
       { q: 'State the domain and range.',
-        graph: { x: [-2, 10], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 41 }, (_, i) => { const t = i / 10; return [1 + t * t / 2, t - 3]; }), arrow: true }], dots: [[1, -3]] },
+        graph: { x: [-2, 10], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 43 }, (_, i) => { const t = Math.sqrt(18) * i / 42; return [1 + t * t / 2, t - 3]; }), arrow: true }], dots: [[1, -3]] },
         ans: 'Domain ' + nw(x + ' ≥ 1') + ', range ' + nw(y + ' ≥ ' + M + '3') },
       { q: 'State the domain and range. (Both ends have arrows.)',
-        graph: { x: [-3, 5], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 41 }, (_, i) => { const xx = -1.5 + i * 0.125; return [xx, (xx - 1) ** 2 - 2]; }), arrow: 'both' }] },
+        graph: { x: [-3, 5], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 49 }, (_, i) => { const xx = 1 - Math.sqrt(7) + i * Math.sqrt(7) / 24; return [xx, (xx - 1) ** 2 - 2]; }), arrow: 'both' }] },
         ans: 'Domain: all real numbers. Range ' + nw(y + ' ≥ ' + M + '2') }] },
 
   17: { topic: 'Geometric sequence with a negative ratio',
