@@ -41,12 +41,11 @@ const sm = keys => {
 U.PRACTICE = {
   1: { topic: 'Is the graph a function?',
     ex: { q: 'Is the graph below a function? Explain.',
-      graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[-4, -3], [1, 2]] }, { p: [[1, -2], [4, 1]] }], dots: [[1, 2], [1, -2]] },
+      graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 73 }, (_, i) => [+(3 * Math.cos(i * Math.PI / 36)).toFixed(3), +(3 * Math.sin(i * Math.PI / 36)).toFixed(3)]) }] },
       steps: ['Slide a vertical line across the graph from left to right.',
-        'At ' + nw(x + ' = 1') + ' both pieces end in a <b>closed</b> dot, so the points (1, 2) and (1, ' + M + '2) are both on the graph.',
-        'The vertical line at ' + nw(x + ' = 1') + ' hits the graph twice, so it fails the vertical line test.',
-        'If one of those dots were open, the graph would pass and be a function.'],
-      ans: '<b>Not a function.</b> ' + nw(x + ' = 1') + ' goes to two different ' + nw(y + '-values') + ', 2 and ' + M + '2.' },
+        'At ' + nw(x + ' = 0') + ' the line hits the circle at the top, (0, 3), and at the bottom, (0, ' + M + '3).',
+        'One ' + nw(x + '-value') + ' with two ' + nw(y + '-values') + ' means it fails the vertical line test.'],
+      ans: '<b>Not a function.</b> ' + nw(x + ' = 0') + ' goes to two different ' + nw(y + '-values') + ', 3 and ' + M + '3.' },
     tries: [
       { q: 'Is this graph a function? Explain.',
         graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-4, 3], [-2, -2], [1, 1]]), { p: [[1, 3], [4, 3]] }], dots: [[1, 1], [1, 3, true]] },
