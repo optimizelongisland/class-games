@@ -206,14 +206,14 @@ U.PRACTICE = {
 
   15: { topic: 'Domain and range with an open dot',
     ex: { q: 'State the domain and range of the function.',
-      graph: { x: [-5, 5], y: [-3, 6], ticks: { x: 1, y: 1 }, curves: [[[-4, -1], [3, 5]]], dots: [[-4, -1], [3, 5, true]] },
+      graph: { x: [-5, 5], y: [-3, 6], ticks: { x: 1, y: 1 }, curves: [sm([[-4, -1], [-2, 2], [0, 1], [3, 5]])], dots: [[-4, -1], [3, 5, true]] },
       steps: ['Left end: closed dot at ' + nw(x + ' = ' + M + '4') + ' (≤). Right end: open dot at ' + nw(x + ' = 3') + ' (&lt;).',
         'Lowest ' + y + ': ' + M + '1 at the closed dot (≤). Highest ' + y + ': 5 at the open dot (&lt;).',
         'An open dot means that exact point is <b>not</b> included.'],
       ans: 'Domain ' + nw(M + '4' + le + x + lt + '3') + ', range ' + nw(M + '1' + le + y + lt + '5') },
     tries: [
       { q: 'State the domain and range.',
-        graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [[[-2, 3], [4, -3]]], dots: [[-2, 3, true], [4, -3]] },
+        graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-2, 3], [0, -1], [2, 1], [4, -3]])], dots: [[-2, 3, true], [4, -3]] },
         ans: 'Domain ' + nw(M + '2' + lt + x + le + '4') + ', range ' + nw(M + '3' + le + y + lt + '3') },
       { q: 'State the domain and range.',
         graph: { x: [-4, 4], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-3, 0], [0, 4], [3, -2]])], dots: [[-3, 0], [3, -2, true]] },
@@ -243,7 +243,7 @@ U.PRACTICE = {
     tries: [
       { q: 'Which sequence is geometric with a common ratio of ' + M + '3?', choices: ['2, ' + M + '1, ' + M + '4, ' + M + '7, …', '2, ' + M + '6, 18, ' + M + '54, …', '2, 6, 18, 54, …', M + '2, ' + M + '6, ' + M + '18, ' + M + '54, …'],
         ans: 'B. Each term is the one before times ' + M + '3.' },
-      { q: 'Find the common ratio of 4, ' + M + '2, 1, ' + M + fr('1', '2') + ', …', ans: M + fr('1', '2') + ' (' + nw(M + '2 ÷ 4 = ' + M + fr('1', '2')) + ')' }] },
+      { q: 'Find the common ratio of 4,&ensp;' + M + '2,&ensp;1,&ensp;' + nw(M + fr('1', '2') + ',') + '&ensp;…', ans: M + fr('1', '2') + ' (' + nw(M + '2 ÷ 4 = ' + M + fr('1', '2')) + ')' }] },
 
   18: { topic: 'Solve for x when f(x) equals a number',
     ex: { q: 'If ' + fx() + ' = ' + fr('3' + x + ' + 4', '5') + ', find ' + x + ' when ' + nw(fx() + ' = 2') + '.',
