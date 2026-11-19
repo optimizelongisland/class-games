@@ -42,7 +42,7 @@ U.PRACTICE = {
   1: { topic: 'Is the graph a function?',
     ex: { q: 'Is the graph below a function? Explain.',
       graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[-4, -1], [-1, 3]] }, { p: [[-1, 3], [1, 1]] }, { p: Array.from({ length: 25 }, (_, i) => { const t = Math.sqrt(3) * i / 24; return [1 + t * t, 1.732 * t - 2]; }) }], dots: [[1, 1], [1, -2]] },
-      steps: ['Slide a vertical line across the graph from left to right.',
+      steps: ['Check if the graph passes the vertical line test: does any vertical line hit the graph more than once?',
         'At ' + nw(x + ' = 1') + ' both pieces have a <b>closed</b> dot: (1, 1) on the upside-down V and (1, ' + M + '2) at the start of the curve.',
         'The vertical line at ' + nw(x + ' = 1') + ' hits the graph twice, so it fails the vertical line test.',
         'If one of those dots were open, the graph would pass and be a function.'],
