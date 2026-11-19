@@ -492,9 +492,9 @@ function sheetLinks() {
   return '<div class="sheets">' + P.map((nm, k) => {
     const L = practiceFor(k), code = U.practiceCode(L);
     return '<div class="sh">' + (code ? '<p class="code"><span>' + esc(nm) + ', write down your code:</span><b>' + code + '</b></p>' : '') +
-      '<a href="' + U.practiceURL(nm, L, S.period) + '" target="_blank" rel="noopener">📝 Open ' + esc(nm) + '’s sheet here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
+      '<a href="' + U.practiceURL(nm, L, S.period) + '" target="_blank" rel="noopener">📝 Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
   }).join('') + '</div>' +
-  '<div class="codehelp"><b>To get your sheet on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Review #2 Practice Sheets</b></li><li>Type your code and tap <b>Open my sheet</b>, then <b>Save as PDF</b></li></ol></div>';
+  '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Review #2 Practice</b></li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
 }
 
 // Without the live board: go to the next unfinished station in number order (5 -> 6 -> 7 ...).
@@ -558,7 +558,7 @@ function renderBetween() {
 function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
-    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now open your own practice sheet and tap <b>Save as PDF</b>.</p>' + sheetLinks() +
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() +
     '<div class="nums g6" style="max-width:760px;margin:1rem auto 0">' + stationGrid() + '</div>' +
     '<div class="row" style="justify-content:center;margin-top:1.4rem"><button class="btn line violet" id="again">New team? Start over on this device</button></div></section>';
   $('#again').onclick = () => { if (confirm('Open your practice sheets first! Start over for a new team?')) startOver(); };
