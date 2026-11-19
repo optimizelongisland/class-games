@@ -58,7 +58,7 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .page.dense .q{margin-top:.14in;margin-bottom:0}.page.dense .graph{height:3.2in}.page.dense .parts{font-size:17pt}.page.dense .part{margin-top:.34in}
 .g{display:flex;justify-content:center;margin:.05in 0}
 .graph{width:auto;height:3.9in;max-width:6.4in}
-.g-grid{stroke:#9a9a9a;stroke-width:1}.g-axis{stroke:#111;stroke-width:2.6;fill:none}.g-arrow{fill:#111}
+.g-grid{stroke:#777;stroke-width:1.2}.g-axis{stroke:#111;stroke-width:2.6;fill:none}.g-arrow{fill:#111}
 .g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.g-curve{stroke:#111;stroke-width:3.6;fill:none}.g-dot{fill:#111}
 .g-num{fill:#222;font:500 15px 'IBM Plex Sans',Arial}.g-title{fill:#222;font:600 15px 'IBM Plex Sans',Arial}.g-dot.open{fill:#fff;stroke:#111;stroke-width:3}.rt{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:bottom}.rt svg{width:.55em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}.rt>span{border-top:2px solid currentColor;padding:.08em .12em 0 .08em;margin-top:1px}.rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);border:0;padding:0}
 .nw{white-space:nowrap!important}
