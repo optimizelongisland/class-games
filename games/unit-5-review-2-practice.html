@@ -72,6 +72,8 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .card .st .n{display:inline-grid;place-items:center;min-width:2.3rem;height:2.3rem;border-radius:10px;background:var(--ink);color:#fff;font-size:1.1rem}
 .bigq{font-size:1.2rem;line-height:2;margin:.2rem 0 .6rem}
 .qparts p{margin:0}
+.try .sq{margin:.3rem 0 0 1em}
+.bigq.sq{margin:.4rem 0}
 .qparts p+p{padding-left:1em}
 .card .graph{max-width:360px}
 .steps{margin:.6rem 0 .8rem 1.3rem;padding:0;font-size:1.1rem}.steps li{margin:.4rem 0;animation:pop .25s ease}
@@ -120,9 +122,16 @@ function sheet() {
   const body = list.map(n => {
     const p = P[n], e = p.ex;
     const tries = p.tries.map(t => {
-      k++; key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + (t.right !== undefined && !/^[A-D][.)]/.test(t.ans) ? '<b>' + 'ABCD'[t.right] + ')</b> ' : '') + t.ans + '</li>');
+      k++;
+      const chs = cs => '<ol class="ch">' + cs.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>';
+      if (t.sub) {
+        key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + t.sub.map((s, i) => '<b>' + PL(i) + ' ' + 'ABCD'[s.right] + ')</b> ' + s.choices[s.right]).join('; ') + '</li>');
+        return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+          t.sub.map((s, i) => '<p class="q sq"><b>' + PL(i) + '</b> ' + s.q + '</p>' + chs(s.choices)).join('') + '<div class="work" aria-label="space for your work"></div></div>';
+      }
+      key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + (t.right !== undefined && !/^[A-D][.)]/.test(t.ans) ? '<b>' + 'ABCD'[t.right] + ')</b> ' : '') + t.ans + '</li>');
       return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
-        (t.choices ? '<ol class="ch">' + t.choices.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>' : '') + '<div class="work" aria-label="space for your work"></div></div>';
+        (t.choices ? chs(t.choices) : '') + '<div class="work" aria-label="space for your work"></div></div>';
     }).join('');
     return '<section class="stn"><h2><span class="n">' + n + '</span>' + p.topic + '</h2>' +
       '<div class="ex"><p class="tag">Worked example</p>' + exQ(e, p) + (e.graph ? U.graph(e.graph) : '') +
@@ -183,17 +192,21 @@ function online() {
               '<button class="btn ghost" id="allst">Show all steps</button></div>');
       }
     } else {
-      const t = c.t, right = t.right, wrong = st.wrong || [], solved = st.picked === right;
-      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+      const t = c.t, j = t.sub ? Math.min(st.step, t.sub.length - 1) : 0, cur = t.sub ? t.sub[j] : t, last = !t.sub || j === t.sub.length - 1;
+      const right = cur.right, wrong = st.wrong || [], solved = st.picked === right;
+      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + (t.sub ? ' · part ' + PL(j) + ' of ' + t.sub.length : '') + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+        (t.sub ? t.sub.slice(0, j).map((s, i) => '<div class="part"><p class="pq"><b>' + PL(i) + '</b> ' + s.q + '</p><p class="pa">✅ ' + s.choices[s.right] + '</p></div>').join('') +
+          '<p class="bigq sq"><b>' + PL(j) + '</b> ' + cur.q + '</p>' : '') +
         '<p class="hint" style="margin-top:0">Work it out, then tap your answer.</p>' +
-        '<div class="opts">' + t.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
-      if (solved) body += '<div class="fbk good">✅ Correct! ' + t.ans + '</div><div class="acts"><button class="btn" id="nx">Next ➜</button></div>';
+        '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
+      if (solved) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div><div class="acts">' + (last ? '<button class="btn" id="nx">Next ➜</button>' : '<button class="btn" id="sbn">Next: part ' + PL(j + 1) + ' ➜</button>') + '</div>';
       else if (wrong.length) body += '<div class="fbk bad">❌ Not quite. Check your work and try again.</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
       else body += '<div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
     }
     app.innerHTML = top + '<main class="paper card"><h2 class="st"><span class="n">' + c.n + '</span>' + p.topic + '</h2>' + body +
       (st.i > 0 ? '<button class="back" id="bk">← Back</button>' : '') + '</main>';
     const $ = id => document.getElementById(id);
+    if ($('sbn')) $('sbn').onclick = () => { st.step++; st.picked = -1; st.wrong = []; save(); draw(); };
     if ($('stp')) $('stp').onclick = () => { st.step++; save(); draw(); };
     if ($('allst')) $('allst').onclick = () => { st.step = 99; save(); draw(); };
     if ($('nx')) $('nx').onclick = () => go(st.i + 1);
@@ -201,7 +214,8 @@ function online() {
     if ($('peek')) $('peek').onclick = () => { const j = cards.findIndex(x => x.kind === 'ex' && x.n === c.n); go(j); };
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
       const i = +b.dataset.i;
-      if (i === c.t.right) { st.picked = i; if (!st.res[c.k]) st.res[c.k] = 'good'; }
+      const t = c.t, j = t.sub ? Math.min(st.step, t.sub.length - 1) : 0, cur = t.sub ? t.sub[j] : t, last = !t.sub || j === t.sub.length - 1;
+      if (i === cur.right) { st.picked = i; if (last && !st.res[c.k]) st.res[c.k] = 'good'; }
       else { st.wrong = (st.wrong || []).concat(i); st.res[c.k] = 'miss'; }
       save(); draw();
     });
@@ -219,6 +233,7 @@ function online() {
   draw();
 }
 
+const PL = i => '(' + 'abcdef'[i] + ')';
 function exQ(e, p, cls) {
   const c = cls ? ' class="' + cls + '"' : ' style="margin:0"';
   if (!(e.lead && p.parts)) return '<p' + c + '>' + e.q + '</p>';

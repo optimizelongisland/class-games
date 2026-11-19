@@ -107,7 +107,9 @@ U.PRACTICE = {
       { q: 'State the domain and range of this function. Then find ' + fx('f', 1) + '.',
         graph: { x: [-6, 5], y: [-3, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-5, 0], [-3, 3], [1, -1], [4, 2]])], dots: [[-5, 0], [4, 2]] },
         ans: 'Domain ' + nw(M + '5' + le + x + le + '4') + ', range ' + nw(M + '1' + le + y + le + '3') + ', ' + nw(fx('f', 1) + ' = ' + M + '1') },
-      { q: 'Using the graph from Try It #1, what is ' + x + ' when ' + nw(fx() + ' = 3') + '?', ans: nw(x + ' = ' + M + '3') }] },
+      { q: 'Use the same graph. What is ' + x + ' when ' + nw(fx() + ' = 3') + '?',
+        graph: { x: [-6, 5], y: [-3, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-5, 0], [-3, 3], [1, -1], [4, 2]])], dots: [[-5, 0], [4, 2]] },
+        ans: 'Find the height 3 on the graph. It happens at ' + nw(x + ' = ' + M + '3') + '.' }] },
 
   6: { topic: 'Subtract polynomials with a squared binomial',
     ex: { q: 'Subtract ' + nw('(' + x + ' + 3)' + sup(2)) + ' from ' + nw('(' + x + sup(2) + ' + 5' + x + ' + 2)') + '.',
@@ -298,7 +300,6 @@ const MC = {
   '3.1': [['2', fr('1', '2'), m('-2'), m('-1')], 2],
   '4.0': [[m('-8'), '16', m('-26'), '2'], 0],
   '4.1': [['30', '42', '34', '26'], 1],
-  '5.0': [[dr(iv(-5, le, x, le, 4), iv(-1, le, y, le, 3)) + ', ' + nw(fx('f', 1) + ' = ' + M + '1'), dr(iv(-1, le, x, le, 3), iv(-5, le, y, le, 4)) + ', ' + nw(fx('f', 1) + ' = ' + M + '1'), dr(iv(-5, le, x, le, 4), iv(-1, le, y, le, 3)) + ', ' + nw(fx('f', 1) + ' = 0'), dr(iv(-6, le, x, le, 5), iv(-3, le, y, le, 4)) + ', ' + nw(fx('f', 1) + ' = ' + M + '1')], 0],
   '5.1': [[nw(x + ' = 3'), nw(x + ' = ' + M + '1'), nw(x + ' = ' + M + '3'), nw(x + ' = 4')], 2],
   '6.0': [[nw(x + sup(2) + ' + 5' + x + ' ' + M + ' 7'), nw(x + sup(2) + ' ' + M + ' 3' + x + ' ' + M + ' 7'), nw(x + sup(2) + ' + 5' + x + ' + 1'), nw('3' + x + sup(2) + ' ' + M + ' 3' + x + ' + 1')], 0],
   '6.1': [[nw('4' + x + sup(2) + ' + 2' + x + ' + 4'), nw('2' + x + sup(2) + ' + 2' + x + ' + 6'), nw('2' + x + sup(2) + ' ' + M + ' 6' + x + ' + 4'), nw('2' + x + sup(2) + ' ' + M + ' 6' + x + ' + 6')], 3],
@@ -310,22 +311,60 @@ const MC = {
   '9.1': [['10, 13, 16, 19, 22', '7, 4, 1, ' + M + '2, ' + M + '5', '10, 7, 4, 1, ' + M + '2', M + '3, 7, 17, 27, 37'], 2],
   '10.0': [['4, 7, 10, 13, 16', '12, 36, 108, 324, 972', '4, 12, 36, 108, 324', '4, 12, 24, 36, 48'], 2],
   '10.1': [['5, 10, 20, 40, 80', '5, ' + M + '10, 20, ' + M + '40, 80', M + '10, 20, ' + M + '40, 80, ' + M + '160', '5, 3, 1, ' + M + '1, ' + M + '3'], 1],
-  '11.0': [['Arithmetic, ' + ar(2, 8) + ', ' + nw(an('6') + ' = 42'), 'Geometric, ' + gr(2, 5) + ', ' + nw(an('6') + ' = 6250'), 'Geometric, ' + gr(5, 2) + ', ' + nw(an('6') + ' = 160'), 'Geometric, ' + gr(2, 5) + ', ' + nw(an('6') + ' = 1250')], 1],
   '11.1': [['Arithmetic, it goes up by 3 each time.', 'Geometric, it multiplies by 4 each time.', 'Neither. The differences (3, 5, 7) change and the ratios change.', 'Arithmetic, the differences go up by 2.'], 2],
-  '12.0': [[ar(2, 6) + ', ' + nw(an('15') + ' = 86'), ar(2, 6) + ', ' + nw(an('15') + ' = 92'), ar(6, 2) + ', ' + nw(an('15') + ' = 34'), ar(2, 8) + ', ' + nw(an('15') + ' = 114')], 0],
-  '12.1': [[ar(20, 3) + ', ' + nw(an('10') + ' = 47'), ar(20, -3) + ', ' + nw(an('10') + ' = ' + M + '10'), ar(11, -3) + ', ' + nw(an('10') + ' = ' + M + '16'), ar(20, -3) + ', ' + nw(an('10') + ' = ' + M + '7')], 3],
-  '13.0': [[ar(2, 6) + ', ' + nw(an('11') + ' = 62'), ar(2, 6) + ', ' + nw(an('11') + ' = 68'), ar(2, 18) + ', ' + nw(an('11') + ' = 182'), ar(2, 5) + ', ' + nw(an('11') + ' = 52')], 0],
-  '13.1': [[ar(10, 3) + ', ' + nw(an('12') + ' = 43'), ar(10, -6) + ', ' + nw(an('12') + ' = ' + M + '56'), ar(10, -3) + ', ' + nw(an('12') + ' = ' + M + '23'), ar(10, -3) + ', ' + nw(an('12') + ' = ' + M + '26')], 2],
-  '14.0': [[gr(1, fr('1', '4')) + ', ' + nw(an('5') + ' = ' + fr('1', '256')), gr(1, fr('1', '4')) + ', ' + nw(an('5') + ' = ' + fr('1', '1024')), gr(1, '4') + ', ' + nw(an('5') + ' = 256'), gr(fr('1', '4'), '1') + ', ' + nw(an('5') + ' = ' + fr('1', '4'))], 0],
-  '14.1': [[gr(9, '3') + ', ' + nw(an('6') + ' = 2187'), gr(9, fr('1', '3')) + ', ' + nw(an('6') + ' = ' + fr('1', '9')), gr(9, fr('1', '3')) + ', ' + nw(an('6') + ' = ' + fr('1', '27')), gr(9, fr('1', '3')) + ', ' + nw(an('6') + ' = ' + fr('1', '81'))], 2],
-  '15.0': [[dr(iv(-2, le, x, le, 4), iv(-3, le, y, le, 3)), dr(iv(-2, lt, x, le, 4), iv(-3, le, y, lt, 3)), dr(iv(-2, le, x, lt, 4), iv(-3, lt, y, le, 3)), dr(iv(-3, le, x, lt, 3), iv(-2, lt, y, le, 4))], 1],
-  '15.1': [[dr(iv(-3, le, x, lt, 3), iv(-2, lt, y, le, 4)), dr(iv(-3, le, x, le, 3), iv(-2, le, y, le, 4)), dr(iv(-3, lt, x, le, 3), iv(-2, le, y, lt, 4)), dr(iv(-2, lt, x, le, 4), iv(-3, le, y, lt, 3))], 0],
-  '16.0': [[dr(nw(x + ' ≥ 1'), nw(y + ' ≥ ' + M + '3')), dr(nw(x + ' ≥ ' + M + '3'), nw(y + ' ≥ 1')), dr(iv(1, le, x, le, 10), iv(-3, le, y, le, 1)), dr(nw(x + ' ≤ 1'), nw(y + ' ≤ ' + M + '3'))], 0],
-  '16.1': [[dr('all real numbers', 'all real numbers'), dr(nw(x + ' ≥ 1'), nw(y + ' ≥ ' + M + '2')), dr('all real numbers', nw(y + ' ≥ ' + M + '2')), dr(iv(-2, le, x, le, 4), nw(y + ' ≥ ' + M + '2'))], 2],
   '17.1': [['2', M + '2', fr('1', '2'), M + fr('1', '2')], 3],
   '18.0': [[nw(x + ' = 12'), nw(x + ' = 6'), nw(x + ' = 3'), nw(x + ' = ' + fr('3', '2'))], 1],
   '18.1': [[nw(x + ' = 9'), nw(x + ' = 12'), nw(x + ' = 3'), nw(x + ' = 6')], 0]
 };
 Object.keys(MC).forEach(k => { const [s_, i] = k.split('.'), t = U.PRACTICE[s_].tries[+i]; t.choices = MC[k][0]; t.right = MC[k][1]; });
+// Multi-part tries: one question per part, each with its own choices (like the station game)
+const SUB = {
+  '5.0': ['Use this graph of ' + nw(y + ' = ' + fx()) + '.', [
+    ['State the domain.', [iv(-5, le, x, le, 4), iv(-1, le, x, le, 3), iv(-5, lt, x, lt, 4), iv(-6, le, x, le, 5)], 0, 'The graph starts at the closed dot ' + nw(x + ' = ' + M + '5') + ' and ends at the closed dot ' + nw(x + ' = 4') + '.'],
+    ['State the range.', [iv(-1, le, y, le, 3), iv(-5, le, y, le, 4), iv(0, le, y, le, 2), iv(-3, le, y, le, 4)], 0, 'The lowest point is ' + nw(y + ' = ' + M + '1') + ' and the highest point is ' + nw(y + ' = 3') + '.'],
+    ['Find ' + fx('f', 1) + '.', [m('-1'), '0', '1', '3'], 0, 'Go to ' + nw(x + ' = 1') + '. The graph is at height ' + M + '1, so ' + nw(fx('f', 1) + ' = ' + M + '1') + '.']]],
+  '11.0': ['Look at the sequence 2, 10, 50, 250, …', [
+    ['Is it arithmetic, geometric, or neither?', ['Arithmetic', 'Geometric', 'Neither'], 1, 'Geometric. Each term is 5 times the one before (10 ÷ 2 = 5).'],
+    ['Write a rule.', [gr(2, 5), gr(5, 2), ar(2, 8), gr(2, 10)], 0, 'Start at 2 and multiply by 5: ' + gr(2, 5) + '.'],
+    ['Find the 6th term.', ['6250', '1250', '160', '3125'], 0, nw(an('6') + ' = 2(5)' + sup('5') + ' = 2(3125) = 6250') + '.']]],
+  '12.0': ['Look at the sequence 2, 8, 14, 20, …', [
+    ['Write a rule.', [ar(2, 6), ar(6, 2), ar(2, 8), gr(2, 4)], 0, 'Start at 2 and add 6 each time: ' + ar(2, 6) + '.'],
+    ['Find the 15th term.', ['86', '92', '34', '90'], 0, nw(an('15') + ' = 2 + 6(14) = 2 + 84 = 86') + '.']]],
+  '12.1': ['Look at the sequence 20, 17, 14, 11, …', [
+    ['Write a rule.', [ar(20, 3), ar(20, -3), ar(11, -3), ar(17, -3)], 1, 'Start at 20 and subtract 3 each time: ' + ar(20, -3) + '.'],
+    ['Find the 10th term.', [m('-7'), m('-10'), '47', m('-4')], 0, nw(an('10') + ' = 20 ' + M + ' 3(9) = 20 ' + M + ' 27 = ' + M + '7') + '.']]],
+  '13.0': ['An arithmetic sequence has ' + nw(an('1') + ' = 2') + ' and ' + nw(an('4') + ' = 20') + '.', [
+    ['Write a rule.', [ar(2, 6), ar(2, 18), ar(2, 5), ar(20, 6)], 0, 'From ' + an('1') + ' to ' + an('4') + ' is 3 jumps: ' + nw('(20 ' + M + ' 2) ÷ 3 = 6') + ', so ' + nw(v('d') + ' = 6') + '. Rule: ' + ar(2, 6) + '.'],
+    ['Find the 11th term.', ['62', '68', '182', '52'], 0, nw(an('11') + ' = 2 + 6(10) = 62') + '.']]],
+  '13.1': ['An arithmetic sequence has ' + nw(an('1') + ' = 10') + ' and ' + nw(an('3') + ' = 4') + '.', [
+    ['Write a rule.', [ar(10, 3), ar(10, -6), ar(10, -3), ar(4, -3)], 2, 'From ' + an('1') + ' to ' + an('3') + ' is 2 jumps: ' + nw('(4 ' + M + ' 10) ÷ 2 = ' + M + '3') + ', so ' + nw(v('d') + ' = ' + M + '3') + '. Rule: ' + ar(10, -3) + '.'],
+    ['Find the 12th term.', [m('-23'), m('-26'), '43', m('-56')], 0, nw(an('12') + ' = 10 ' + M + ' 3(11) = 10 ' + M + ' 33 = ' + M + '23') + '.']]],
+  '14.0': ['Look at the sequence 1, ' + fr('1', '4') + ', ' + fr('1', '16') + ', ' + fr('1', '64') + ', …', [
+    ['Write a rule.', [gr(1, fr('1', '4')), gr(1, '4'), gr(fr('1', '4'), '1'), gr(4, fr('1', '4'))], 0, 'Start at 1 and multiply by ' + fr('1', '4') + ' each time: ' + gr(1, fr('1', '4')) + '.'],
+    ['Find the 5th term.', [fr('1', '256'), fr('1', '1024'), '256', fr('1', '64')], 0, nw(an('5') + ' = 1(' + fr('1', '4') + ')' + sup('4') + ' = ' + fr('1', '256')) + '.']]],
+  '14.1': ['Look at the sequence 9, 3, 1, ' + fr('1', '3') + ', …', [
+    ['Write a rule.', [gr(9, '3'), gr(9, fr('1', '3')), gr(3, fr('1', '3')), ar(9, -6)], 1, 'Start at 9 and multiply by ' + fr('1', '3') + ' each time: ' + gr(9, fr('1', '3')) + '.'],
+    ['Find the 6th term.', [fr('1', '27'), fr('1', '9'), fr('1', '81'), '2187'], 0, nw(an('6') + ' = 9(' + fr('1', '3') + ')' + sup('5') + ' = ' + fr('9', '243') + ' = ' + fr('1', '27')) + '.']]],
+  '15.0': ['Use the graph.', [
+    ['State the domain.', [iv(-2, le, x, le, 4), iv(-2, lt, x, le, 4), iv(-2, le, x, lt, 4), iv(-3, lt, x, le, 3)], 1, 'Open dot at ' + nw(x + ' = ' + M + '2') + ', so use &lt;. Closed dot at ' + nw(x + ' = 4') + ', so use ≤.'],
+    ['State the range.', [iv(-3, le, y, le, 3), iv(-3, le, y, lt, 3), iv(-3, lt, y, le, 3), iv(-2, le, y, lt, 4)], 1, 'Lowest point: the closed dot at ' + nw(y + ' = ' + M + '3') + ' (≤). Highest: the open dot at ' + nw(y + ' = 3') + ' (&lt;).']]],
+  '15.1': ['Use the graph.', [
+    ['State the domain.', [iv(-3, le, x, lt, 3), iv(-3, le, x, le, 3), iv(-3, lt, x, le, 3), iv(-2, lt, x, le, 4)], 0, 'Closed dot at ' + nw(x + ' = ' + M + '3') + ' (≤). Open dot at ' + nw(x + ' = 3') + ' (&lt;).'],
+    ['State the range.', [iv(-2, lt, y, le, 4), iv(-2, le, y, le, 4), iv(-2, le, y, lt, 4), iv(0, le, y, le, 4)], 0, 'Lowest point: the open dot at ' + nw(y + ' = ' + M + '2') + ' (&lt;). Highest: the peak at ' + nw(y + ' = 4') + ' (≤).']]],
+  '16.0': ['Use the graph.', [
+    ['State the domain.', [nw(x + ' ≥ 1'), nw(x + ' ≥ ' + M + '3'), iv(1, le, x, le, 10), nw(x + ' ≤ 1')], 0, 'The graph starts at the dot ' + nw(x + ' = 1') + ' and the arrow keeps going right.'],
+    ['State the range.', [nw(y + ' ≥ ' + M + '3'), nw(y + ' ≥ 1'), iv(-3, le, y, le, 1), nw(y + ' ≤ ' + M + '3')], 0, 'The lowest point is ' + nw(y + ' = ' + M + '3') + ' and the arrow keeps going up.']]],
+  '16.1': ['Use the graph. (Both ends have arrows.)', [
+    ['State the domain.', ['all real numbers', nw(x + ' ≥ 1'), iv(-2, le, x, le, 4), nw(x + ' ≥ ' + M + '2')], 0, 'Both arrows keep going left and right forever, so every ' + x + ' works.'],
+    ['State the range.', ['all real numbers', nw(y + ' ≥ ' + M + '2'), nw(y + ' ≤ ' + M + '2'), nw(y + ' ≥ 1')], 1, 'The lowest point is the vertex at ' + nw(y + ' = ' + M + '2') + ' and both arrows go up.']]]
+};
+Object.keys(SUB).forEach(k => {
+  const [s_, i] = k.split('.'), t = U.PRACTICE[s_].tries[+i], [lead, parts] = SUB[k];
+  t.q = lead; delete t.choices; delete t.right;
+  t.sub = parts.map(([q, ch, r, a], j) => {
+    const rot = ch.length === 4 ? (+s_ + +i + j) % 4 : 0, c2 = ch.map((_, z) => ch[(z + rot) % ch.length]);
+    return { q, choices: c2, right: (r - rot + ch.length) % ch.length, ans: a };
+  });
+});
 U.PRACTICE[2].tries[0].right = 1; U.PRACTICE[17].tries[0].right = 1;
 })();
