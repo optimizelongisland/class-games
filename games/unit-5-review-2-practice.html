@@ -53,6 +53,8 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .codebox .row{display:flex;flex-wrap:wrap;gap:.6rem}
 .codebox #cmsg{margin:.4rem 0 0;color:#b42318}
 .or{font:800 1.3rem var(--disp);margin:0}
+.nocode{font-size:1rem}
+.back2{display:inline-block;margin-bottom:.6rem;color:inherit;font-weight:600}
 
 /* build-your-own form */
 .form label{display:block;font-weight:600;margin:.6rem 0 .3rem}
@@ -218,18 +220,22 @@ function online() {
 function form() {
   document.title = 'Make a Practice Sheet: Unit 5 Review #2';
   const on = new Set(list);
-  app.innerHTML = '<main class="paper form"><h1>Get your practice</h1><p class="sub">Unit 5 Review #2</p>' +
+  const pick = prm.get('pick') || prm.get('edit');
+  const keep = prm.get('p') ? '&p=' + encodeURIComponent(prm.get('p')) : '';
+  app.innerHTML = '<main class="paper form">' + (!pick ? '<h1>Get your practice</h1><p class="sub">Unit 5 Review #2</p>' +
     '<form id="cf" class="codebox"><label for="cd">Type the code the stations game gave you</label><div class="row"><input type="text" id="cd" maxlength="20" placeholder="Example: Fox7K" autocomplete="off" autocapitalize="characters" value="' + esc(code) + '"><button class="btn" type="submit">Start my practice</button></div><p id="cmsg" class="empty">' + (code && !fromCode ? 'That code doesn’t look right. Check each letter and number and try again.' : '') + '</p></form>' +
-    '<h2 class="or">No code? Pick your own stations</h2><p class="sub">Pick the stations you want more practice on.</p>' +
+    '<a class="btn ghost nocode" href="?pick=1' + keep + '">No code? Click here</a></main>' :
+    '<a class="back2" href="?' + keep.slice(1) + '">← I have a code</a>' +
+    '<h1>Pick your own stations</h1><p class="sub">Pick the stations you want more practice on.</p>' +
     '<form id="f"><label for="nm">First name</label><input type="text" id="nm" maxlength="16" value="' + esc(name) + '" autocomplete="off">' +
     '<div class="picks">' + Object.keys(P).map(Number).map(n => '<label><input type="checkbox" value="' + n + '"' + (on.has(n) ? ' checked' : '') + '><span><b>' + n + '.</b> ' + P[n].topic + '</span></label>').join('') + '</div>' +
-    '<button class="btn" type="submit">Start practicing</button> <span id="msg" class="empty"></span></form></main>';
-  document.getElementById('cf').onsubmit = e => {
+    '<button class="btn" type="submit">Start practicing</button> <span id="msg" class="empty"></span></form></main>');
+  if (!pick) { document.getElementById('cf').onsubmit = e => {
     e.preventDefault();
     const c = document.getElementById('cd').value.trim();
     if (!U.readCode(c)) { document.getElementById('cmsg').textContent = 'That code doesn’t look right. Check each letter and number and try again.'; return; }
     location.search = '?code=' + encodeURIComponent(c.replace(/\s+/g, ''));
-  };
+  }; return; }
   document.getElementById('f').onsubmit = e => {
     e.preventDefault();
     const q = [...document.querySelectorAll('.picks input:checked')].map(i => i.value);
