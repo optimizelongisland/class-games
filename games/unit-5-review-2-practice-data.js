@@ -243,7 +243,7 @@ U.PRACTICE = {
     tries: [
       { q: 'Which sequence is geometric with a common ratio of ' + M + '3?', choices: ['2, ' + M + '1, ' + M + '4, ' + M + '7, …', '2, ' + M + '6, 18, ' + M + '54, …', '2, 6, 18, 54, …', M + '2, ' + M + '6, ' + M + '18, ' + M + '54, …'],
         ans: 'B. Each term is the one before times ' + M + '3.' },
-      { q: 'Find the common ratio of 4, ' + M + '2, 1, ' + M + fr('1', '2') + ', …', ans: M + fr('1', '2') + ' (' + nw(M + '2 ÷ 4 = ' + M + fr('1', '2')) + ')' }] },
+      { q: 'Find the common ratio of 4,&ensp;' + M + '2,&ensp;1,&ensp;' + nw(M + fr('1', '2') + ',') + '&ensp;…', ans: M + fr('1', '2') + ' (' + nw(M + '2 ÷ 4 = ' + M + fr('1', '2')) + ')' }] },
 
   18: { topic: 'Solve for x when f(x) equals a number',
     ex: { q: 'If ' + fx() + ' = ' + fr('3' + x + ' + 4', '5') + ', find ' + x + ' when ' + nw(fx() + ' = 2') + '.',
