@@ -87,6 +87,10 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .sheets{display:grid;gap:.7rem;max-width:640px;margin:1rem auto 0}
 .sheets a{display:flex;justify-content:space-between;align-items:center;gap:1rem;text-decoration:none;color:#000;background:var(--violet);border-radius:16px;padding:.9rem 1.2rem;font:800 1.25rem var(--disp)}
 .sheets a span{font:500 .95rem var(--body)}
+.sheets .sh{border:2px solid var(--violet);border-radius:18px;padding:.8rem}
+.sheets .code{margin:0 0 .6rem;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.3rem 1rem;font-size:1.05rem}
+.sheets .code b{font:800 2rem var(--disp);letter-spacing:.06em;color:var(--violet)}
+.codehelp{max-width:640px;margin:1rem auto 0;color:var(--mute);text-align:left}.codehelp ol{margin:.3rem 0 0 1.2rem;padding:0}
 .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
 .field{display:flex;flex-direction:column;gap:.35rem;flex:1 1 14rem}
 .field input{min-height:3.2rem;border-radius:12px;border:2px solid var(--line);background:#000;padding:0 .9rem;font-size:1.1rem}
@@ -484,10 +488,13 @@ function leaveStation() {
   pickQuiet(left).then(done, done); setTimeout(done, 3000);
 }
 function sheetLinks() {
-  return '<div class="sheets">' + people().map((nm, k) => {
-    const L = practiceFor(k);
-    return '<a href="' + U.practiceURL(nm, L, S.period) + '" target="_blank" rel="noopener">📝 ' + esc(nm) + '’s practice sheet<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a>';
-  }).join('') + '</div>';
+  const P = people();
+  return '<div class="sheets">' + P.map((nm, k) => {
+    const L = practiceFor(k), code = U.practiceCode(L);
+    return '<div class="sh">' + (code ? '<p class="code"><span>' + esc(nm) + ', write down your code:</span><b>' + code + '</b></p>' : '') +
+      '<a href="' + U.practiceURL(nm, L, S.period) + '" target="_blank" rel="noopener">📝 Open ' + esc(nm) + '’s sheet here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
+  }).join('') + '</div>' +
+  '<div class="codehelp"><b>To get your sheet on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Review #2 Practice Sheets</b></li><li>Type your code and tap <b>Open my sheet</b>, then <b>Save as PDF</b></li></ol></div>';
 }
 
 // Without the live board: go to the next unfinished station in number order (5 -> 6 -> 7 ...).

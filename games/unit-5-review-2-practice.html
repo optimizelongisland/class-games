@@ -48,6 +48,11 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .key h2{font:800 1.4rem var(--disp);margin:0 0 .6rem}
 .key li{margin:.3rem 0}
 .empty{color:var(--mute)}
+.nmline{font-weight:600;margin:0 0 .8rem}.nmline span{display:inline-block;width:14rem;border-bottom:1.5px solid var(--ink);margin-left:.4rem}
+.codebox{background:var(--soft);border-radius:14px;padding:.4rem 1rem 1rem;margin:1rem 0 1.4rem}
+.codebox .row{display:flex;flex-wrap:wrap;gap:.6rem}
+.codebox #cmsg{margin:.4rem 0 0;color:#b42318}
+.or{font:800 1.3rem var(--disp);margin:0}
 
 /* build-your-own form */
 .form label{display:block;font-weight:600;margin:.6rem 0 .3rem}
@@ -76,7 +81,9 @@ const U = window.U5R2, P = U.PRACTICE, app = document.getElementById('app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const prm = new URLSearchParams(location.search);
 const name = (prm.get('name') || '').replace(/[^\p{L}\p{M}' .&-]/gu, '').trim().slice(0, 40);
-const list = (prm.get('q') || '').split(',').map(Number).filter(n => P[n]).filter((n, i, a) => a.indexOf(n) === i).sort((a, b) => a - b);
+const code = (prm.get('code') || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 20);
+const fromCode = code ? U.readCode(code) : null;
+const list = fromCode || (prm.get('q') || '').split(',').map(Number).filter(n => P[n]).filter((n, i, a) => a.indexOf(n) === i).sort((a, b) => a - b);
 
 function sheet() {
   document.title = (name ? name + '’s ' : '') + 'Practice Sheet: Unit 5 Review #2';
@@ -96,8 +103,8 @@ function sheet() {
   }).join('');
   app.innerHTML = '<div class="bar"><button class="btn" id="pdf">⬇️ Save as PDF</button><a class="btn ghost" href="?' + (name ? 'name=' + encodeURIComponent(name) + '&' : '') + 'edit=1&q=' + list.join(',') + '">Add or remove stations</a></div>' +
     '<main class="paper"><div class="head"><div><h1>' + (name ? esc(name) + '’s ' : 'My ') + 'Practice Sheet</h1><p class="sub">Unit 5 Review #2 · Functions and sequences</p></div>' +
-    '<div class="who">' + (prm.get('p') ? 'Period ' + esc(prm.get('p')) + ' · ' : '') + new Date().toLocaleDateString() + '</div></div>' +
-    '<p>Read each worked example first, then try the problems below it on your own. Answers are on the last page. No peeking until you finish!</p>' +
+    '<div class="who">' + (fromCode ? 'Code ' + U.practiceCode(list) + ' · ' : '') + (prm.get('p') ? 'Period ' + esc(prm.get('p')) + ' · ' : '') + new Date().toLocaleDateString() + '</div></div>' +
+    (fromCode && !name ? '<p class="nmline">Name: <span></span></p>' : '') + '<p>Read each worked example first, then try the problems below it on your own. Answers are on the last page. No peeking until you finish!</p>' +
     body + '<section class="key"><h2>Answer key</h2><ol style="list-style:none;padding:0">' + key.join('') + '</ol></section></main>';
   document.getElementById('pdf').onclick = () => window.print();
 }
@@ -105,10 +112,18 @@ function sheet() {
 function form() {
   document.title = 'Make a Practice Sheet: Unit 5 Review #2';
   const on = new Set(list);
-  app.innerHTML = '<main class="paper form"><h1>Make a practice sheet</h1><p class="sub">Unit 5 Review #2. Pick the stations you want more practice on.</p>' +
+  app.innerHTML = '<main class="paper form"><h1>Get your practice sheet</h1><p class="sub">Unit 5 Review #2</p>' +
+    '<form id="cf" class="codebox"><label for="cd">Type the code the stations game gave you</label><div class="row"><input type="text" id="cd" maxlength="20" placeholder="Example: Fox7K" autocomplete="off" autocapitalize="characters" value="' + esc(code) + '"><button class="btn" type="submit">Open my sheet</button></div><p id="cmsg" class="empty">' + (code && !fromCode ? 'That code doesn’t look right. Check each letter and number and try again.' : '') + '</p></form>' +
+    '<h2 class="or">No code? Pick your own stations</h2><p class="sub">Pick the stations you want more practice on.</p>' +
     '<form id="f"><label for="nm">First name</label><input type="text" id="nm" maxlength="16" value="' + esc(name) + '" autocomplete="off">' +
     '<div class="picks">' + Object.keys(P).map(Number).map(n => '<label><input type="checkbox" value="' + n + '"' + (on.has(n) ? ' checked' : '') + '><span><b>' + n + '.</b> ' + P[n].topic + '</span></label>').join('') + '</div>' +
     '<button class="btn" type="submit">Make my sheet</button> <span id="msg" class="empty"></span></form></main>';
+  document.getElementById('cf').onsubmit = e => {
+    e.preventDefault();
+    const c = document.getElementById('cd').value.trim();
+    if (!U.readCode(c)) { document.getElementById('cmsg').textContent = 'That code doesn’t look right. Check each letter and number and try again.'; return; }
+    location.search = '?code=' + encodeURIComponent(c.replace(/\s+/g, ''));
+  };
   document.getElementById('f').onsubmit = e => {
     e.preventDefault();
     const q = [...document.querySelectorAll('.picks input:checked')].map(i => i.value);
@@ -118,7 +133,7 @@ function form() {
   };
 }
 
-if (list.length && !prm.get('edit')) sheet(); else form();
+if (list.length && !prm.get('edit') && !(code && !fromCode)) sheet(); else form();
 </script>
 </body>
 </html>
