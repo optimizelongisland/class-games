@@ -97,7 +97,7 @@ U.PRACTICE = {
         'Range: read bottom to top. The lowest point is ' + nw(y + ' = ' + M + '2') + ' and the highest is ' + nw(y + ' = 4') + '.',
         nw(fx() + ' = 4') + ' means "where is the height 4?" That is at ' + nw(x + ' = ' + M + '1') + '.',
         fx('f', 3) + ' means "go to ' + nw(x + ' = 3') + ', how high is the graph?" It is ' + M + '2.'],
-      ans: 'Domain ' + nw(M + '4' + le + x + le + '6') + ', range ' + nw(M + '2' + le + y + le + '4') + ', ' + nw(x + ' = ' + M + '1') + ', ' + nw(fx('f', 3) + ' = ' + M + '2') },
+      ans: 'Domain: ' + nw(M + '4' + le + x + le + '6') + '<br>Range: ' + nw(M + '2' + le + y + le + '4') + ', ' + nw(x + ' = ' + M + '1') + ', ' + nw(fx('f', 3) + ' = ' + M + '2') },
       parts: [
         { q: 'State the domain.', how: 'Read left to right. The graph starts at ' + nw(x + ' = ' + M + '4') + ' and ends at ' + nw(x + ' = 6') + '. Both dots are closed, so use ≤.', ans: nw(M + '4' + le + x + le + '6') },
         { q: 'State the range.', how: 'Read bottom to top. The lowest point is ' + nw(y + ' = ' + M + '2') + ' and the highest point is ' + nw(y + ' = 4') + '.', ans: nw(M + '2' + le + y + le + '4') },
@@ -106,7 +106,7 @@ U.PRACTICE = {
     tries: [
       { q: 'State the domain and range of this function. Then find ' + fx('f', 1) + '.',
         graph: { x: [-6, 5], y: [-3, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-5, 0], [-3, 3], [1, -1], [4, 2]])], dots: [[-5, 0], [4, 2]] },
-        ans: 'Domain ' + nw(M + '5' + le + x + le + '4') + ', range ' + nw(M + '1' + le + y + le + '3') + ', ' + nw(fx('f', 1) + ' = ' + M + '1') },
+        ans: 'Domain: ' + nw(M + '5' + le + x + le + '4') + '<br>Range: ' + nw(M + '1' + le + y + le + '3') + ', ' + nw(fx('f', 1) + ' = ' + M + '1') },
       { q: 'Use the same graph. What is ' + x + ' when ' + nw(fx() + ' = 3') + '?',
         graph: { x: [-6, 5], y: [-3, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-5, 0], [-3, 3], [1, -1], [4, 2]])], dots: [[-5, 0], [4, 2]] },
         ans: 'Find the height 3 on the graph. It happens at ' + nw(x + ' = ' + M + '3') + '.' }] },
@@ -232,17 +232,17 @@ U.PRACTICE = {
       steps: ['Left end: closed dot at ' + nw(x + ' = ' + M + '4') + ' (≤). Right end: open dot at ' + nw(x + ' = 3') + ' (&lt;).',
         'Lowest ' + y + ': ' + M + '1 at the closed dot (≤). Highest ' + y + ': 5 at the open dot (&lt;).',
         'An open dot means that exact point is <b>not</b> included.'],
-      ans: 'Domain ' + nw(M + '4' + le + x + lt + '3') + ', range ' + nw(M + '1' + le + y + lt + '5') },
+      ans: 'Domain: ' + nw(M + '4' + le + x + lt + '3') + '<br>Range: ' + nw(M + '1' + le + y + lt + '5') },
       parts: [
         { q: 'State the domain.', how: 'Left end: closed dot at ' + nw(x + ' = ' + M + '4') + ', so use ≤. Right end: open dot at ' + nw(x + ' = 3') + ', so use &lt; (that point is <b>not</b> included).', ans: nw(M + '4' + le + x + lt + '3') },
         { q: 'State the range.', how: 'Lowest ' + y + ': ' + M + '1 at the closed dot, so use ≤. Highest ' + y + ': 5 at the open dot, so use &lt;.', ans: nw(M + '1' + le + y + lt + '5') }],
     tries: [
       { q: 'State the domain and range.',
         graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-2, 3], [0, -1], [2, 1], [4, -3]])], dots: [[-2, 3, true], [4, -3]] },
-        ans: 'Domain ' + nw(M + '2' + lt + x + le + '4') + ', range ' + nw(M + '3' + le + y + lt + '3') },
+        ans: 'Domain: ' + nw(M + '2' + lt + x + le + '4') + '<br>Range: ' + nw(M + '3' + le + y + lt + '3') },
       { q: 'State the domain and range.',
         graph: { x: [-4, 4], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-3, 0], [0, 4], [3, -2]])], dots: [[-3, 0], [3, -2, true]] },
-        ans: 'Domain ' + nw(M + '3' + le + x + lt + '3') + ', range ' + nw(M + '2' + lt + y + le + '4') }] },
+        ans: 'Domain: ' + nw(M + '3' + le + x + lt + '3') + '<br>Range: ' + nw(M + '2' + lt + y + le + '4') }] },
 
   16: { topic: 'Domain and range when the graph keeps going',
     ex: { lead: 'Use the graph of the function.', q: 'State the domain and range of the function.',
@@ -250,17 +250,17 @@ U.PRACTICE = {
       steps: ['The graph starts at the closed dot (' + M + '2, 1) and the arrow means it keeps going to the right and up forever.',
         'Domain: ' + x + ' starts at ' + M + '2 and never stops, so ' + nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ').',
         'Range: ' + y + ' starts at 1 and keeps rising, so ' + nw(y + ' ≥ 1') + ' (also written ' + nw('1' + le + y + lt + '∞') + ').'],
-      ans: 'Domain ' + nw(x + ' ≥ ' + M + '2') + ', range ' + nw(y + ' ≥ 1') },
+      ans: 'Domain: ' + nw(x + ' ≥ ' + M + '2') + '<br>Range: ' + nw(y + ' ≥ 1') },
       parts: [
         { q: 'State the domain.', how: 'The graph starts at the closed dot where ' + nw(x + ' = ' + M + '2') + '. The arrow means it keeps going to the right forever.', ans: nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ')' },
         { q: 'State the range.', how: 'The lowest point is the dot at ' + nw(y + ' = 1') + '. The arrow keeps going up forever.', ans: nw(y + ' ≥ 1') + ' (also written ' + nw('1' + le + y + lt + '∞') + ')' }],
     tries: [
       { q: 'State the domain and range.',
         graph: { x: [-2, 10], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 43 }, (_, i) => { const t = Math.sqrt(18) * i / 42; return [1 + t * t / 2, t - 3]; }), arrow: true }], dots: [[1, -3]] },
-        ans: 'Domain ' + nw(x + ' ≥ 1') + ', range ' + nw(y + ' ≥ ' + M + '3') },
+        ans: 'Domain: ' + nw(x + ' ≥ 1') + '<br>Range: ' + nw(y + ' ≥ ' + M + '3') },
       { q: 'State the domain and range. (Both ends have arrows.)',
         graph: { x: [-3, 5], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 49 }, (_, i) => { const xx = 1 - Math.sqrt(7) + i * Math.sqrt(7) / 24; return [xx, (xx - 1) ** 2 - 2]; }), arrow: 'both' }] },
-        ans: 'Domain: all real numbers. Range ' + nw(y + ' ≥ ' + M + '2') }] },
+        ans: 'Domain: all real numbers<br>Range: ' + nw(y + ' ≥ ' + M + '2') }] },
 
   17: { topic: 'Geometric sequence with a negative ratio',
     ex: { q: 'Write the first 4 terms of a geometric sequence that starts at 5 and has a common ratio of ' + M + '3.',
@@ -289,7 +289,7 @@ U.PRACTICE = {
 // students tap a choice and it checks itself. right = index of the correct choice.
 const m = s => s.replace(/-(?=\d)/g, M);            // '-3' -> '−3'
 const iv = (a, o1, v_, o2, b) => nw(m(String(a)) + o1 + v_ + o2 + m(String(b)));
-const dr = (d, r) => 'Domain ' + d + ', range ' + r;
+const dr = (d, r) => 'Domain: ' + d + '<br>Range: ' + r;
 const ar = (a1, d) => nw(an('n') + ' = ' + m(String(a1)) + (d < 0 ? ' ' + M + ' ' + (-d) : ' + ' + d) + '(' + n + ' ' + M + ' 1)');
 const gr = (a1, r) => nw(an('n') + ' = ' + a1 + '(' + r + ')' + sup(n + ' ' + M + ' 1'));
 const MC = {
@@ -300,21 +300,12 @@ const MC = {
   '3.1': [['2', fr('1', '2'), m('-2'), m('-1')], 2],
   '4.0': [[m('-8'), '16', m('-26'), '2'], 0],
   '4.1': [['30', '42', '34', '26'], 1],
-  '5.1': [[nw(x + ' = 3'), nw(x + ' = ' + M + '1'), nw(x + ' = ' + M + '3'), nw(x + ' = 4')], 2],
-  '6.0': [[nw(x + sup(2) + ' + 5' + x + ' ' + M + ' 7'), nw(x + sup(2) + ' ' + M + ' 3' + x + ' ' + M + ' 7'), nw(x + sup(2) + ' + 5' + x + ' + 1'), nw('3' + x + sup(2) + ' ' + M + ' 3' + x + ' + 1')], 0],
-  '6.1': [[nw('4' + x + sup(2) + ' + 2' + x + ' + 4'), nw('2' + x + sup(2) + ' + 2' + x + ' + 6'), nw('2' + x + sup(2) + ' ' + M + ' 6' + x + ' + 4'), nw('2' + x + sup(2) + ' ' + M + ' 6' + x + ' + 6')], 3],
   '7.0': [[iv(-3, le, y, le, 4), iv(-2, le, x, le, 5), iv(-2, lt, x, lt, 5), iv(-4, le, x, le, 6)], 1],
   '7.1': [[iv(0, le, x, le, 6), iv(1, le, y, lt, 3), iv(0, le, x, lt, 6), iv(0, lt, x, le, 6)], 2],
   '8.0': [[iv(30, le, y, le, 40), iv(0, le, x, le, 6), iv(10, le, y, le, 50), iv(0, le, y, le, 60)], 2],
   '8.1': [[iv(0, le, x, le, 4), iv(0, le, y, le, 48), iv(0, le, y, le, 56), iv(2, le, y, le, 48)], 1],
-  '9.0': [['1, 5, 9, 13, 17', '4, 8, 12, 16, 20', '5, 9, 13, 17, 21', '1, 4, 7, 10, 13'], 0],
-  '9.1': [['10, 13, 16, 19, 22', '7, 4, 1, ' + M + '2, ' + M + '5', '10, 7, 4, 1, ' + M + '2', M + '3, 7, 17, 27, 37'], 2],
-  '10.0': [['4, 7, 10, 13, 16', '12, 36, 108, 324, 972', '4, 12, 36, 108, 324', '4, 12, 24, 36, 48'], 2],
-  '10.1': [['5, 10, 20, 40, 80', '5, ' + M + '10, 20, ' + M + '40, 80', M + '10, 20, ' + M + '40, 80, ' + M + '160', '5, 3, 1, ' + M + '1, ' + M + '3'], 1],
   '11.1': [['Arithmetic, it goes up by 3 each time.', 'Geometric, it multiplies by 4 each time.', 'Neither. The differences (3, 5, 7) change and the ratios change.', 'Arithmetic, the differences go up by 2.'], 2],
   '17.1': [['2', M + '2', fr('1', '2'), M + fr('1', '2')], 3],
-  '18.0': [[nw(x + ' = 12'), nw(x + ' = 6'), nw(x + ' = 3'), nw(x + ' = ' + fr('3', '2'))], 1],
-  '18.1': [[nw(x + ' = 9'), nw(x + ' = 12'), nw(x + ' = 3'), nw(x + ' = 6')], 0]
 };
 Object.keys(MC).forEach(k => { const [s_, i] = k.split('.'), t = U.PRACTICE[s_].tries[+i]; t.choices = MC[k][0]; t.right = MC[k][1]; });
 // Multi-part tries: one question per part, each with its own choices (like the station game)
@@ -328,9 +319,11 @@ const SUB = {
     ['Write a rule.', [gr(2, 5), gr(5, 2), ar(2, 8), gr(2, 10)], 0, 'Start at 2 and multiply by 5: ' + gr(2, 5) + '.'],
     ['Find the 6th term.', ['6250', '1250', '160', '3125'], 0, nw(an('6') + ' = 2(5)' + sup('5') + ' = 2(3125) = 6250') + '.']]],
   '12.0': ['Look at the sequence 2, 8, 14, 20, …', [
+    ['Is it arithmetic, geometric, or neither?', ['Arithmetic', 'Geometric', 'Neither'], 0, 'Arithmetic. It adds 6 each time.'],
     ['Write a rule.', [ar(2, 6), ar(6, 2), ar(2, 8), gr(2, 4)], 0, 'Start at 2 and add 6 each time: ' + ar(2, 6) + '.'],
     ['Find the 15th term.', ['86', '92', '34', '90'], 0, nw(an('15') + ' = 2 + 6(14) = 2 + 84 = 86') + '.']]],
   '12.1': ['Look at the sequence 20, 17, 14, 11, …', [
+    ['Is it arithmetic, geometric, or neither?', ['Arithmetic', 'Geometric', 'Neither'], 0, 'Arithmetic. It subtracts 3 each time.'],
     ['Write a rule.', [ar(20, 3), ar(20, -3), ar(11, -3), ar(17, -3)], 1, 'Start at 20 and subtract 3 each time: ' + ar(20, -3) + '.'],
     ['Find the 10th term.', [m('-7'), m('-10'), '47', m('-4')], 0, nw(an('10') + ' = 20 ' + M + ' 3(9) = 20 ' + M + ' 27 = ' + M + '7') + '.']]],
   '13.0': ['An arithmetic sequence has ' + nw(an('1') + ' = 2') + ' and ' + nw(an('4') + ' = 20') + '.', [
@@ -363,8 +356,47 @@ Object.keys(SUB).forEach(k => {
   t.q = lead; delete t.choices; delete t.right;
   t.sub = parts.map(([q, ch, r, a], j) => {
     const rot = ch.length === 4 ? (+s_ + +i + j) % 4 : 0, c2 = ch.map((_, z) => ch[(z + rot) % ch.length]);
-    return { q, choices: c2, right: (r - rot + ch.length) % ch.length, ans: a };
+    return { q, t: 'mc', choices: c2, right: (r - rot + ch.length) % ch.length, ans: a };
   });
 });
 U.PRACTICE[2].tries[0].right = 1; U.PRACTICE[17].tries[0].right = 1;
+
+// Typed answers, the same way the station game takes them:
+// num = a number (fractions OK), expr = a rule or expression, seq = terms separated by commas
+const anP = an('n') + ' =', rule = { t: 'expr', vr: 'n', prefix: anP, keypad: true };
+const TYPED = {
+  '5.0.2': { t: 'num', answer: -1, prefix: fx('f', 1) + ' =' },
+  '5.1': { t: 'num', answer: -3, prefix: x + ' =' },
+  '6.0': { t: 'expr', vr: 'x', answer: 'x^2+5x-7' },
+  '6.1': { t: 'expr', vr: 'x', answer: '2x^2-6x+6' },
+  '9.0': { t: 'seq', answer: [1, 5, 9, 13, 17], placeholder: 'e.g. 1, 2, 3, 4, 5' },
+  '9.1': { t: 'seq', answer: [10, 7, 4, 1, -2], placeholder: 'e.g. 1, 2, 3, 4, 5' },
+  '10.0': { t: 'seq', answer: [4, 12, 36, 108, 324], placeholder: 'e.g. 1, 2, 3, 4, 5' },
+  '10.1': { t: 'seq', answer: [5, -10, 20, -40, 80], placeholder: 'e.g. 1, 2, 3, 4, 5' },
+  '11.0.1': Object.assign({ answer: '2(5)^(n-1)' }, rule),
+  '11.0.2': { t: 'num', answer: 6250, prefix: an('6') + ' =' },
+  '12.0.1': Object.assign({ answer: '2+6(n-1)' }, rule),
+  '12.0.2': { t: 'num', answer: 86, prefix: an('15') + ' =' },
+  '12.1.1': Object.assign({ answer: '20-3(n-1)' }, rule),
+  '12.1.2': { t: 'num', answer: -7, prefix: an('10') + ' =' },
+  '13.0.0': Object.assign({ answer: '2+6(n-1)' }, rule),
+  '13.0.1': { t: 'num', answer: 62, prefix: an('11') + ' =' },
+  '13.1.0': Object.assign({ answer: '10-3(n-1)' }, rule),
+  '13.1.1': { t: 'num', answer: -23, prefix: an('12') + ' =' },
+  '14.0.0': Object.assign({ answer: '(1/4)^(n-1)' }, rule),
+  '14.0.1': { t: 'num', answer: 1 / 256, prefix: an('5') + ' =' },
+  '14.1.0': Object.assign({ answer: '9(1/3)^(n-1)' }, rule),
+  '14.1.1': { t: 'num', answer: 1 / 27, prefix: an('6') + ' =' },
+  '18.0': { t: 'num', answer: 6, prefix: x + ' =' },
+  '18.1': { t: 'num', answer: 9, prefix: x + ' =' }
+};
+// every try becomes a list of parts; a one-part try has no part label
+Object.keys(U.PRACTICE).forEach(s_ => U.PRACTICE[s_].tries.forEach((t, i) => {
+  if (!t.sub) t.sub = [{ q: null, t: 'mc', choices: t.choices, right: t.right, ans: t.ans }];
+  t.sub.forEach((pt, j) => {
+    const spec = TYPED[s_ + '.' + i + '.' + j] || (t.sub.length === 1 && TYPED[s_ + '.' + i]);
+    if (spec) { delete pt.choices; delete pt.right; Object.assign(pt, spec); }
+    if (pt.t === 'mc') pt.answer = pt.right;
+  });
+}));
 })();

@@ -71,6 +71,17 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .card .st{font:800 1.35rem/1.2 var(--disp);margin:0 0 1rem;display:flex;gap:.6rem;align-items:center}
 .card .st .n{display:inline-grid;place-items:center;min-width:2.3rem;height:2.3rem;border-radius:10px;background:var(--ink);color:#fff;font-size:1.1rem}
 .bigq{font-size:1.2rem;line-height:2;margin:.2rem 0 .6rem}
+.ans{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin:.4rem 0}
+.ans .pre{font-size:1.25rem;white-space:nowrap}
+.ans input{flex:1 1 10rem;min-width:0;min-height:3.2rem;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);padding:0 .9rem;font:600 1.25rem var(--body)}
+.ans input:focus,.mf:focus{border-color:var(--accent);outline:none}
+.mf{flex:1 1 10rem;min-width:0;min-height:3.2rem;border-radius:12px;border:2px solid var(--line);background:#fff;padding:.5rem .9rem;font:600 1.3rem/1.6 var(--body);white-space:pre;overflow-x:auto;cursor:text;outline:none}
+.mf.empty::before{content:attr(data-ph);color:var(--mute);font-weight:500;pointer-events:none}
+.mf sup{font-size:.68em;vertical-align:.75em;display:inline-block;min-width:.7em;padding:0 .15em;border-radius:4px;background:var(--soft);color:var(--accent)}
+.keys{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.keys button{min-width:2.8rem;min-height:2.6rem;border-radius:10px;border:2px solid var(--line);background:#fff;color:var(--ink);font:600 1.05rem var(--body);cursor:pointer}
+.mfh{color:var(--mute);font-size:.92rem;margin:.5rem 0 0}
+.fbk.info{background:var(--soft)}
 .qparts p{margin:0}
 .try .sq{margin:.3rem 0 0 1em}
 .bigq.sq{margin:.4rem 0}
@@ -124,14 +135,11 @@ function sheet() {
     const tries = p.tries.map(t => {
       k++;
       const chs = cs => '<ol class="ch">' + cs.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>';
-      if (t.sub) {
-        key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + t.sub.map((s, i) => '<b>' + PL(i) + ' ' + 'ABCD'[s.right] + ')</b> ' + s.choices[s.right]).join('; ') + '</li>');
-        return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
-          t.sub.map((s, i) => '<p class="q sq"><b>' + PL(i) + '</b> ' + s.q + '</p>' + chs(s.choices)).join('') + '<div class="work" aria-label="space for your work"></div></div>';
-      }
-      key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + (t.right !== undefined && !/^[A-D][.)]/.test(t.ans) ? '<b>' + 'ABCD'[t.right] + ')</b> ' : '') + t.ans + '</li>');
+      const one = t.sub.length === 1, kv = s => s.t === 'mc' ? (one && /^[A-D][.)]/.test(s.ans) ? s.ans : '<b>' + 'ABCD'[s.right] + ')</b> ' + (one ? s.ans : s.choices[s.right])) : (one ? s.ans : s.ans.replace(/\.$/, ''));
+      key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + (one ? kv(t.sub[0]) : t.sub.map((s, i) => '<b>' + PL(i) + '</b> ' + kv(s)).join('; ')) + '</li>');
       return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
-        (t.choices ? chs(t.choices) : '') + '<div class="work" aria-label="space for your work"></div></div>';
+        t.sub.map((s, i) => (one ? '' : '<p class="q sq"><b>' + PL(i) + '</b> ' + s.q + '</p>') + (s.t === 'mc' ? chs(s.choices) : '')).join('') +
+        '<div class="work" aria-label="space for your work"></div></div>';
     }).join('');
     return '<section class="stn"><h2><span class="n">' + n + '</span>' + p.topic + '</h2>' +
       '<div class="ex"><p class="tag">Worked example</p>' + exQ(e, p) + (e.graph ? U.graph(e.graph) : '') +
@@ -159,12 +167,12 @@ function online() {
     P[n].tries.forEach(t => { k++; cards.push({ kind: 'try', n, t, k }); });
   });
   const total = k, store = 'u5r2-online:' + location.search;
-  let st = { i: 0, step: 0, shown: false, picked: -1, res: {} };
+  let st = { i: 0, step: 0, res: {} };
   try { const s = JSON.parse(localStorage.getItem(store) || 'null'); if (s && s.i < cards.length + 1) st = s; } catch (e) { }
   const save = () => { try { localStorage.setItem(store, JSON.stringify(st)); } catch (e) { } };
   const sep = location.search ? '&' : '?';
   const printURL = location.search + sep + 'print=1';
-  const go = i => { st.i = i; st.step = 0; st.picked = -1; st.wrong = []; save(); draw(); window.scrollTo(0, 0); };
+  const go = i => { st.i = i; st.step = 0; st.solved = false; st.wrong = []; st.miss = false; st.msg = ''; st.typed = ''; st.got = []; save(); draw(); window.scrollTo(0, 0); };
 
   function draw() {
     const done = Object.keys(st.res).length;
@@ -192,32 +200,44 @@ function online() {
               '<button class="btn ghost" id="allst">Show all steps</button></div>');
       }
     } else {
-      const t = c.t, j = t.sub ? Math.min(st.step, t.sub.length - 1) : 0, cur = t.sub ? t.sub[j] : t, last = !t.sub || j === t.sub.length - 1;
-      const right = cur.right, wrong = st.wrong || [], solved = st.picked === right;
-      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + (t.sub ? ' · part ' + PL(j) + ' of ' + t.sub.length : '') + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
-        (t.sub ? t.sub.slice(0, j).map((s, i) => '<div class="part"><p class="pq"><b>' + PL(i) + '</b> ' + s.q + '</p><p class="pa">✅ ' + s.choices[s.right] + '</p></div>').join('') +
-          '<p class="bigq sq"><b>' + PL(j) + '</b> ' + cur.q + '</p>' : '') +
-        '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
+      const t = c.t, S = t.sub, one = S.length === 1, j = Math.min(st.step, S.length - 1), cur = S[j], last = j === S.length - 1;
+      const wrong = st.wrong || [], solved = !!st.solved, got = st.got || [];
+      const shown = (s, i) => s.t === 'mc' ? s.choices[s.right] : (s.prefix ? s.prefix + ' ' : '') + esc(got[i] || '');
+      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + (one ? '' : ' · part ' + PL(j) + ' of ' + S.length) + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+        (one ? '' : S.slice(0, j).map((s, i) => '<div class="part"><p class="pq"><b>' + PL(i) + '</b> ' + s.q + '</p><p class="pa">✅ ' + shown(s, i) + '</p></div>').join('') +
+          '<p class="bigq sq"><b>' + PL(j) + '</b> ' + cur.q + '</p>');
+      if (cur.t === 'mc') body += '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === cur.right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
+      else body += typedBox(cur, solved, st.typed || '');
       if (solved) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div><div class="acts">' + (last ? '<button class="btn" id="nx">Next ➜</button>' : '<button class="btn" id="sbn">Next: part ' + PL(j + 1) + ' ➜</button>') + '</div>';
-      else if (wrong.length) body += '<div class="fbk bad">❌ Not quite. Check your work and try again.</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
+      else if (st.miss) body += '<div class="fbk bad">❌ ' + esc(st.msg || 'Not quite. Check your work and try again.') + '</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
+      else if (st.msg) body += '<div class="fbk info">' + esc(st.msg) + '</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
       else body += '<div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
     }
     app.innerHTML = top + '<main class="paper card"><h2 class="st"><span class="n">' + c.n + '</span>' + p.topic + '</h2>' + body +
       (st.i > 0 ? '<button class="back" id="bk">← Back</button>' : '') + '</main>';
     const $ = id => document.getElementById(id);
-    if ($('sbn')) $('sbn').onclick = () => { st.step++; st.picked = -1; st.wrong = []; save(); draw(); };
+    if ($('sbn')) $('sbn').onclick = () => { st.step++; st.solved = false; st.wrong = []; st.miss = false; st.msg = ''; st.typed = ''; save(); draw(); };
     if ($('stp')) $('stp').onclick = () => { st.step++; save(); draw(); };
     if ($('allst')) $('allst').onclick = () => { st.step = 99; save(); draw(); };
     if ($('nx')) $('nx').onclick = () => go(st.i + 1);
     if ($('bk')) $('bk').onclick = () => go(st.i - 1);
     if ($('peek')) $('peek').onclick = () => { const j = cards.findIndex(x => x.kind === 'ex' && x.n === c.n); go(j); };
-    document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
-      const i = +b.dataset.i;
-      const t = c.t, j = t.sub ? Math.min(st.step, t.sub.length - 1) : 0, cur = t.sub ? t.sub[j] : t, last = !t.sub || j === t.sub.length - 1;
-      if (i === cur.right) { st.picked = i; if (last && !st.res[c.k]) st.res[c.k] = 'good'; }
-      else { st.wrong = (st.wrong || []).concat(i); st.res[c.k] = 'miss'; }
+    const answer = val => {
+      const t = c.t, j = Math.min(st.step, t.sub.length - 1), cur = t.sub[j], last = j === t.sub.length - 1, r = U.check(cur, val);
+      st.typed = cur.t === 'mc' ? '' : String(val);
+      if (r.empty) { st.msg = r.msg; st.miss = false; save(); draw(); return; }
+      if (r.ok) {
+        st.solved = true; st.msg = ''; st.miss = false;
+        if (cur.t !== 'mc') { st.got = st.got || []; st.got[j] = String(val).trim(); }
+        if (last && !st.res[c.k]) st.res[c.k] = 'good';
+      } else {
+        if (cur.t === 'mc') st.wrong = (st.wrong || []).concat(+val);
+        st.miss = true; st.msg = r.msg || ''; st.res[c.k] = 'miss';
+      }
       save(); draw();
-    });
+    };
+    document.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(+b.dataset.i));
+    if (c.kind === 'try') wireTyped(answer);
   }
 
   function finish(top) {
@@ -226,13 +246,103 @@ function online() {
     app.innerHTML = top + '<main class="paper card done"><h1>🎉 All done!</h1><p class="bigq">You got <b>' + good + ' of ' + total + '</b> on your own.</p>' +
       (miss.length ? '<p>Look these over again:</p><ul class="miss">' + miss.map(c => '<li><b>Problem ' + c.k + '</b> · Station ' + c.n + ': ' + P[c.n].topic + ' <button class="btn ghost sm" data-j="' + cards.indexOf(c) + '">Try again</button></li>').join('') + '</ul>' : '<p>Nice work. You’re ready for the test on these stations.</p>') +
       '<div class="acts"><a class="btn" href="' + printURL + '">🖨️ Print or save as PDF</a><button class="btn ghost" id="again">Start over</button></div></main>';
-    document.getElementById('again').onclick = () => { st = { i: 0, step: 0, shown: false, picked: -1, res: {} }; save(); draw(); };
+    document.getElementById('again').onclick = () => { st = { i: 0, step: 0, res: {} }; save(); draw(); };
     document.querySelectorAll('[data-j]').forEach(b => b.onclick = () => { const j = +b.dataset.j; delete st.res[cards[j].k]; go(j); });
   }
   draw();
 }
 
 const PL = i => '(' + 'abcdef'[i] + ')';
+/* ---------- typed answers, the same way the station game takes them ---------- */
+function typedBox(p, solved, val) {
+  const pre = p.prefix ? '<span class="pre">' + p.prefix + '</span>' : '';
+  if (p.t === 'expr') return '<form class="ans" id="ansf" autocomplete="off">' + pre +
+    '<div class="mf" id="ans" contenteditable="' + (solved ? 'false' : 'true') + '" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer" data-v="' + esc(val) + '"></div>' +
+    (solved ? '' : '<button class="btn" type="submit">Check</button>') + '</form>' +
+    (solved ? '' : '<div class="keys" id="keys">' + [p.vr || 'n', 'xʸ', '↓', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '"' + (k === 'xʸ' ? ' title="Exponent" aria-label="Exponent"' : k === '↓' ? ' title="Out of the exponent" aria-label="Out of the exponent"' : '') + '>' + esc(k) + '</button>').join('') + '</div>' +
+      '<p class="mfh">Tap <b>xʸ</b> (or type ^) to go up into the exponent. Tap <b>↓</b> to come back down.</p>');
+  return '<form class="ans" id="ansf" autocomplete="off">' + pre +
+    '<input id="ans" inputmode="' + (p.t === 'num' ? 'decimal' : 'text') + '" placeholder="' + esc(p.placeholder || 'Type your answer') + '" spellcheck="false" autocapitalize="off" value="' + esc(val) + '"' + (solved ? ' disabled' : '') + '>' +
+    (solved ? '' : '<button class="btn" type="submit">Check</button>') + '</form>';
+}
+function wireTyped(submit) {
+  const a = document.getElementById('ans'), f = document.getElementById('ansf');
+  if (!a || !f) return;
+  const fine = matchMedia('(pointer:fine)').matches;
+  if (a.classList.contains('mf')) {
+    if (a.dataset.v) mfSet(a, a.dataset.v);
+    a.classList.toggle('empty', !mfText(a));
+    if (a.getAttribute('contenteditable') !== 'true') return;
+    f.onsubmit = e => { e.preventDefault(); submit(mfText(a)); };
+    a.addEventListener('keydown', e => {
+      if (e.key === '^') { e.preventDefault(); mfUp(a); }
+      else if (e.key === 'Enter') { e.preventDefault(); submit(mfText(a)); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); mfDown(a); }
+    });
+    a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfUp(a); } });
+    a.addEventListener('input', () => a.classList.toggle('empty', !mfText(a)));
+    const keys = document.getElementById('keys');
+    keys.addEventListener('pointerdown', e => e.preventDefault());
+    keys.onclick = e => {
+      const b = e.target.closest('[data-k]'); if (!b) return;
+      const k = b.dataset.k;
+      if (k === 'xʸ') mfUp(a); else if (k === '↓') mfDown(a); else mfInsert(a, k === '−' ? '-' : k);
+      a.classList.toggle('empty', !mfText(a));
+    };
+    if (fine) mfFocusEnd(a);
+  } else {
+    if (a.disabled) return;
+    f.onsubmit = e => { e.preventDefault(); submit(a.value); };
+    if (fine) { a.focus(); a.select(); }
+  }
+}
+const ZW = '​';
+function mfText(el) {
+  let out = '';
+  el.childNodes.forEach(nd => {
+    if (nd.nodeType === 3) out += nd.textContent;
+    else if (nd.nodeName === 'SUP') { const t = mfText(nd).trim(); if (t) out += '^(' + t + ')'; }
+    else if (nd.nodeName !== 'BR') out += mfText(nd);
+  });
+  return out.replace(/​/g, '').replace(/−/g, '-').replace(/ /g, ' ');
+}
+function mfSet(el, txt) { el.innerHTML = esc(txt).replace(/\^\(([^()]*)\)/g, '<sup>$1</sup>').replace(/\^([a-z0-9]+)/gi, '<sup>$1</sup>'); }
+function mfFocusEnd(el) {
+  el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+}
+function mfCaret(el) {
+  const sel = getSelection();
+  if (!sel.rangeCount || !el.contains(sel.anchorNode)) mfFocusEnd(el);
+  return getSelection().getRangeAt(0);
+}
+function mfInsert(el, txt) {
+  const r = mfCaret(el); r.deleteContents();
+  const t = document.createTextNode(txt); r.insertNode(t);
+  r.setStartAfter(t); r.collapse(true); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  el.dispatchEvent(new Event('input'));
+}
+function mfUp(el) {
+  const r = mfCaret(el);
+  if (r.startContainer.parentNode && r.startContainer.parentNode.closest && r.startContainer.parentNode.closest('sup')) return;
+  r.deleteContents();
+  const s = document.createElement('sup'); s.textContent = ZW; r.insertNode(s);
+  const r2 = document.createRange(); r2.setStart(s.firstChild, 1); r2.collapse(true);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r2);
+  el.dispatchEvent(new Event('input'));
+}
+function mfDown(el) {
+  const r = mfCaret(el);
+  let n = r.startContainer; n = n.nodeType === 3 ? n.parentNode : n;
+  const s = n.closest && n.closest('sup');
+  if (!s || !el.contains(s)) return;
+  let after = s.nextSibling;
+  if (!after || after.nodeType !== 3) { after = document.createTextNode(ZW); s.after(after); }
+  else if (!after.textContent.startsWith(ZW)) after.textContent = ZW + after.textContent;
+  const r2 = document.createRange(); r2.setStart(after, 1); r2.collapse(true);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r2);
+}
+
 function exQ(e, p, cls) {
   const c = cls ? ' class="' + cls + '"' : ' style="margin:0"';
   if (!(e.lead && p.parts)) return '<p' + c + '>' + e.q + '</p>';
