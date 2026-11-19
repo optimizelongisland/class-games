@@ -9,9 +9,33 @@ const fx = (name, arg) => nw(v(name || 'f') + '(' + (arg === undefined ? x : arg
 const an = s => v('a') + '<sub>' + s + '</sub>';
 const le = ' ≤ ', lt = ' &lt; ';
 // smooth curve through key points, flat at each one (so a max/min is exactly where it says)
-const sm = keys => { const out = [keys[0]];
-  for (let i = 0; i < keys.length - 1; i++) { const [a, ya] = keys[i], [b, yb] = keys[i + 1];
-    for (let t = 1; t <= 8; t++) { const u = t / 8; out.push([a + (b - a) * u, +(ya + (yb - ya) * (1 - Math.cos(Math.PI * u)) / 2).toFixed(3)]); } }
+// Smooth curve through key points (quintic Hermite). Turning points stay exactly on the keys with a
+// flat top/bottom, the bend is matched on both sides of each turn so it doesn't look lumpy, and the
+// ends leave at a natural slope instead of starting flat.
+const sm = keys => {
+  const n = keys.length, h = [], d = [];
+  for (let i = 0; i < n - 1; i++) { h.push(keys[i + 1][0] - keys[i][0]); d.push((keys[i + 1][1] - keys[i][1]) / h[i]); }
+  const m = keys.map((_, i) => {
+    if (i === 0) return n > 2 && d[0] * d[1] < 0 ? d[0] * 0.9 : d[0];
+    if (i === n - 1) return n > 2 && d[n - 2] * d[n - 3] < 0 ? d[n - 2] * 0.9 : d[n - 2];
+    if (d[i - 1] * d[i] <= 0) return 0;
+    return 2 / (1 / d[i - 1] + 1 / d[i]) * (h[i - 1] + h[i]) / (h[i - 1] + h[i]);
+  });
+  const c = keys.map((_, i) => {
+    if (i === 0 || i === n - 1 || m[i] !== 0 || d[i - 1] === d[i]) return 0;
+    const k = 0.8 * Math.min(6 * Math.abs(d[i - 1]) / h[i - 1], 6 * Math.abs(d[i]) / h[i]);
+    return d[i - 1] > 0 ? -k : k;
+  });
+  const out = [keys[0]], N = 24;
+  for (let i = 0; i < n - 1; i++) {
+    const [x0, y0] = keys[i], y1 = keys[i + 1][1], H = h[i];
+    for (let t = 1; t <= N; t++) {
+      const u = t / N, u3 = u * u * u, u4 = u3 * u, u5 = u4 * u;
+      const y = y0 * (1 - 10 * u3 + 15 * u4 - 6 * u5) + H * m[i] * (u - 6 * u3 + 8 * u4 - 3 * u5) + H * H * c[i] * (u * u - 3 * u3 + 3 * u4 - u5) / 2 +
+        H * H * c[i + 1] * (u3 - 2 * u4 + u5) / 2 + H * m[i + 1] * (-4 * u3 + 7 * u4 - 3 * u5) + y1 * (10 * u3 - 15 * u4 + 6 * u5);
+      out.push([+(x0 + H * u).toFixed(3), +y.toFixed(3)]);
+    }
+  }
   return out; };
 
 U.PRACTICE = {
