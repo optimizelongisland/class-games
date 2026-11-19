@@ -1,4 +1,4 @@
-/* Unit 5 Review #2 (packet pages 102 to 107): questions, answer checking, hints and shared settings.
+/* Unit 5 Review #2: questions, answer checking, hints and shared settings.
    Used by unit-5-review-2-stations.html (students), unit-5-review-2-practice.html
    and unit-5-review-2-hints.html (the "Need a hint?" QR page).
    There is no live teacher board: nothing is sent anywhere, and everything stays on the device. */
@@ -189,7 +189,8 @@ const Q = [
       { t: 'seq', q: 'Type the first 5 terms, separated by commas.', pq: '', answer: [4, 7, 10, 13, 16], placeholder: 'e.g. 1, 2, 3, 4, 5',
         hints: ['The first term is ' + v('f') + '(1). Replace ' + v('n') + ' with 1.',
                 v('f') + '(1) = 3(1 ' + M + ' 1) + 4 = 3(0) + 4. Now do ' + v('f') + '(2), ' + v('f') + '(3), ' + v('f') + '(4), ' + v('f') + '(5).',
-                'Check: do the terms go up by the same amount each time? They should!'] }
+                'Check: do the terms go up by the same amount each time? They should!',
+                'Calculator tip: press the Y= key and type 3(X ' + M + ' 1) + 4 (use X for ' + v('n') + '). Then open the TABLE and read the y-values for X = 1, 2, 3, 4, 5.'] }
     ] },
   { n: 10, ready: true, title: 'Terms from a formula',
     text: 'Find the first 5 terms given the formula ' + nw(v('f') + '(' + v('n') + ') = 2(5)' + sup(v('n') + ' ' + M + ' 1')),
@@ -197,7 +198,8 @@ const Q = [
       { t: 'seq', q: 'Type the first 5 terms, separated by commas.', pq: '', answer: [2, 10, 50, 250, 1250], placeholder: 'e.g. 1, 2, 3, 4, 5',
         hints: ['The first term is ' + v('f') + '(1). Replace ' + v('n') + ' with 1: 2(5)' + sup('1 ' + M + ' 1') + ' = 2(5)' + sup('0') + '.',
                 'Anything to the 0 power is 1. Do the exponent BEFORE you multiply by 2.',
-                'Each term is 5 times the one before it.'] }
+                'Each term is 5 times the one before it.',
+                'Calculator tip: press the Y= key and type 2(5)^(X ' + M + ' 1) (use X for ' + v('n') + '). Then open the TABLE and read the y-values for X = 1, 2, 3, 4, 5.'] }
     ] },
   { n: 11, ready: true, title: 'Sequence: 1, 2, 4, 8, ...',
     text: 'Given the following: &nbsp;1, 2, 4, 8, 16, 32, …',
