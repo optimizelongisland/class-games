@@ -65,11 +65,11 @@ function graph(g) {
     s += '<path class="g-curve" d="' + curvePath(P, X, Y) + '"/>';
     if (c.arrow === 'both') {
       const [p, q] = [P[1], P[0]], ang = Math.atan2(Y(q[1]) - Y(p[1]), X(q[0]) - X(p[0])) * 180 / Math.PI;
-      s += '<path class="g-arrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';
+      s += '<path class="g-arrow g-carrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';
     }
     if (c.arrow) {
       const [p, q] = [P[P.length - 2], P[P.length - 1]], ang = Math.atan2(Y(q[1]) - Y(p[1]), X(q[0]) - X(p[0])) * 180 / Math.PI;
-      s += '<path class="g-arrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';
+      s += '<path class="g-arrow g-carrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';
     }
   });
   (g.dots || []).forEach(p => { s += '<circle class="g-dot' + (p[2] ? ' open' : '') + '" cx="' + f(X(p[0])) + '" cy="' + f(Y(p[1])) + '" r="6"/>'; });
