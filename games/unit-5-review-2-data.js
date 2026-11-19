@@ -22,18 +22,18 @@ const M = '−';                                          // real minus sign
 
 /* ---------- graph drawing (SVG, styled by the page) ---------- */
 function curvePath(pts, X, Y) {             // Catmull-Rom through the points, as cubic Beziers
-  let d = 'M' + X(pts[0][0]) + ' ' + Y(pts[0][1]);
+  let d = 'M' + X(pts[0][0]).toFixed(2) + ' ' + Y(pts[0][1]).toFixed(2);
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
     const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
     const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-    d += ' C' + [X(c1[0]), Y(c1[1]), X(c2[0]), Y(c2[1]), X(p2[0]), Y(p2[1])].map(n => n.toFixed(1)).join(' ');
+    d += ' C' + [X(c1[0]), Y(c1[1]), X(c2[0]), Y(c2[1]), X(p2[0]), Y(p2[1])].map(n => n.toFixed(2)).join(' ');
   }
   return d;
 }
 /* g: { x:[min,max], y:[min,max] (default -10..10), gx/gy: units per grid square (default 1),
         ticks: {x:step, y:step} to print numbers on the axes, xTitle/yTitle,
-        curves: [ [[x,y],...] or {p:[[x,y],...], arrow:true} ], dots: [[x,y,open?]] } */
+        curves: [ [[x,y],...] or {p:[[x,y],...], arrow:true|'both'} ], dots: [[x,y,open?]] } */
 function graph(g) {
   const [x0, x1] = g.x || [-10, 10], [y0, y1] = g.y || [-10, 10], gx = g.gx || 1, gy = g.gy || 1;
   const nx = (x1 - x0) / gx, ny = (y1 - y0) / gy, cell = 400 / Math.max(nx, ny);
@@ -63,6 +63,10 @@ function graph(g) {
   (g.curves || []).forEach(c => {
     const P = Array.isArray(c) ? c : c.p;
     s += '<path class="g-curve" d="' + curvePath(P, X, Y) + '"/>';
+    if (c.arrow === 'both') {
+      const [p, q] = [P[1], P[0]], ang = Math.atan2(Y(q[1]) - Y(p[1]), X(q[0]) - X(p[0])) * 180 / Math.PI;
+      s += '<path class="g-arrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';
+    }
     if (c.arrow) {
       const [p, q] = [P[P.length - 2], P[P.length - 1]], ang = Math.atan2(Y(q[1]) - Y(p[1]), X(q[0]) - X(p[0])) * 180 / Math.PI;
       s += '<path class="g-arrow" transform="translate(' + f(X(q[0])) + ' ' + f(Y(q[1])) + ') rotate(' + f(ang) + ')" d="M4 0l-14 -7v14z"/>';

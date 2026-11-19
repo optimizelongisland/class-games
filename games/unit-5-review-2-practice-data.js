@@ -9,25 +9,50 @@ const fx = (name, arg) => nw(v(name || 'f') + '(' + (arg === undefined ? x : arg
 const an = s => v('a') + '<sub>' + s + '</sub>';
 const le = ' ≤ ', lt = ' &lt; ';
 // smooth curve through key points, flat at each one (so a max/min is exactly where it says)
-const sm = keys => { const out = [keys[0]];
-  for (let i = 0; i < keys.length - 1; i++) { const [a, ya] = keys[i], [b, yb] = keys[i + 1];
-    for (let t = 1; t <= 8; t++) { const u = t / 8; out.push([a + (b - a) * u, +(ya + (yb - ya) * (1 - Math.cos(Math.PI * u)) / 2).toFixed(3)]); } }
+// Smooth curve through key points (quintic Hermite). Turning points stay exactly on the keys with a
+// flat top/bottom, the bend is matched on both sides of each turn so it doesn't look lumpy, and the
+// ends leave at a natural slope instead of starting flat.
+const sm = keys => {
+  const n = keys.length, h = [], d = [];
+  for (let i = 0; i < n - 1; i++) { h.push(keys[i + 1][0] - keys[i][0]); d.push((keys[i + 1][1] - keys[i][1]) / h[i]); }
+  const m = keys.map((_, i) => {
+    if (i === 0) return n > 2 && d[0] * d[1] < 0 ? d[0] * 0.9 : d[0];
+    if (i === n - 1) return n > 2 && d[n - 2] * d[n - 3] < 0 ? d[n - 2] * 0.9 : d[n - 2];
+    if (d[i - 1] * d[i] <= 0) return 0;
+    return 2 / (1 / d[i - 1] + 1 / d[i]) * (h[i - 1] + h[i]) / (h[i - 1] + h[i]);
+  });
+  const c = keys.map((_, i) => {
+    if (i === 0 || i === n - 1 || m[i] !== 0 || d[i - 1] === d[i]) return 0;
+    const k = 0.8 * Math.min(6 * Math.abs(d[i - 1]) / h[i - 1], 6 * Math.abs(d[i]) / h[i]);
+    return d[i - 1] > 0 ? -k : k;
+  });
+  const out = [keys[0]], N = 24;
+  for (let i = 0; i < n - 1; i++) {
+    const [x0, y0] = keys[i], y1 = keys[i + 1][1], H = h[i];
+    for (let t = 1; t <= N; t++) {
+      const u = t / N, u3 = u * u * u, u4 = u3 * u, u5 = u4 * u;
+      const y = y0 * (1 - 10 * u3 + 15 * u4 - 6 * u5) + H * m[i] * (u - 6 * u3 + 8 * u4 - 3 * u5) + H * H * c[i] * (u * u - 3 * u3 + 3 * u4 - u5) / 2 +
+        H * H * c[i + 1] * (u3 - 2 * u4 + u5) / 2 + H * m[i + 1] * (-4 * u3 + 7 * u4 - 3 * u5) + y1 * (10 * u3 - 15 * u4 + 6 * u5);
+      out.push([+(x0 + H * u).toFixed(3), +y.toFixed(3)]);
+    }
+  }
   return out; };
 
 U.PRACTICE = {
   1: { topic: 'Is the graph a function?',
     ex: { q: 'Is the graph below a function? Explain.',
-      graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, dots: [[-3, 1], [-1, 3], [1, -2], [1, 2], [3, 0]] },
-      steps: ['Look for an ' + nw(x + '-value') + ' that is used more than once.',
-        nw(x + ' = 1') + ' is paired with two ' + nw(y + '-values') + ': ' + M + '2 and 2.',
-        'A vertical line at ' + nw(x + ' = 1') + ' hits the graph twice, so it fails the vertical line test.'],
-      ans: '<b>Not a function.</b> ' + nw(x + ' = 1') + ' goes to two different ' + nw(y + '-values') + '.' },
+      graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[-4, -3], [1, 2]] }, { p: [[1, -2], [4, 1]] }], dots: [[1, 2], [1, -2]] },
+      steps: ['Slide a vertical line across the graph from left to right.',
+        'At ' + nw(x + ' = 1') + ' both pieces end in a <b>closed</b> dot, so the points (1, 2) and (1, ' + M + '2) are both on the graph.',
+        'The vertical line at ' + nw(x + ' = 1') + ' hits the graph twice, so it fails the vertical line test.',
+        'If one of those dots were open, the graph would pass and be a function.'],
+      ans: '<b>Not a function.</b> ' + nw(x + ' = 1') + ' goes to two different ' + nw(y + '-values') + ', 2 and ' + M + '2.' },
     tries: [
       { q: 'Is this graph a function? Explain.',
-        graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, dots: [[-3, 2], [-1, -1], [0, 2], [2, 3], [4, -2]] },
-        ans: 'Yes. Every ' + nw(x + '-value') + ' is used only once. (Two points sharing ' + nw(y + ' = 2') + ' is fine.)' },
+        graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[-4, 2], [-1, -1]] }, { p: [[-1, -1], [2, 2]] }, { p: [[2, -1], [3, -0.5], [4, 1]] }], dots: [[2, 2], [2, -1, true]] },
+        ans: 'Yes. At ' + nw(x + ' = 2') + ' the dot at (2, ' + M + '1) is <b>open</b>, so only (2, 2) is on the graph. Every vertical line hits the graph once.' },
       { q: 'Is this graph a function? Explain.',
-        graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[2, -2], [-1, -1], [-2, 0], [-1, 1], [2, 2]] }] },
+        graph: { x: [-4, 4], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [{ p: [[2, -2], [-1, -1], [-2, 0], [-1, 1], [2, 2]] }], dots: [[2, 2], [2, -2]] },
         ans: 'No. A vertical line at ' + nw(x + ' = ' + M + '1') + ' hits the graph at ' + nw(y + ' = ' + M + '1') + ' and ' + nw(y + ' = 1') + '.' }] },
 
   2: { topic: 'Which relation is a function?',
@@ -98,7 +123,7 @@ U.PRACTICE = {
       ans: nw(M + '3' + le + x + le + '4') },
     tries: [
       { q: 'What is the domain of this function?',
-        graph: { x: [-4, 6], y: [-4, 5], ticks: { x: 1, y: 1 }, curves: [[[-2, -3], [0, -1.2], [2, 0.6], [3.5, 2.1], [5, 4]]], dots: [[-2, -3], [5, 4]] },
+        graph: { x: [-4, 6], y: [-4, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-2, -3], [1, 2], [3, 0], [5, 4]])], dots: [[-2, -3], [5, 4]] },
         ans: nw(M + '2' + le + x + le + '5') },
       { q: 'What is the domain of this function? Look carefully at the dots.',
         graph: { x: [-2, 7], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [[[0, 1], [6, 3]]], dots: [[0, 1], [6, 3, true]] },
@@ -195,17 +220,17 @@ U.PRACTICE = {
 
   16: { topic: 'Domain and range when the graph keeps going',
     ex: { q: 'State the domain and range of the function.',
-      graph: { x: [-4, 8], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [{ p: [[-2, 1], [-1.75, 1.5], [-1, 2], [0, 2.41], [2, 3], [4, 3.45], [7, 4]], arrow: true }], dots: [[-2, 1]] },
+      graph: { x: [-4, 8], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 31 }, (_, i) => { const t = i / 10; return [-2 + t * t, t + 1]; }), arrow: true }], dots: [[-2, 1]] },
       steps: ['The graph starts at the closed dot (' + M + '2, 1) and the arrow means it keeps going to the right and up forever.',
         'Domain: ' + x + ' starts at ' + M + '2 and never stops, so ' + nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ').',
         'Range: ' + y + ' starts at 1 and keeps rising, so ' + nw(y + ' ≥ 1') + ' (also written ' + nw('1' + le + y + lt + '∞') + ').'],
       ans: 'Domain ' + nw(x + ' ≥ ' + M + '2') + ', range ' + nw(y + ' ≥ 1') },
     tries: [
       { q: 'State the domain and range.',
-        graph: { x: [-2, 10], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [{ p: [[1, -3], [1.25, -2.5], [2, -2], [5, -1], [9, -0.17]], arrow: true }], dots: [[1, -3]] },
+        graph: { x: [-2, 10], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 41 }, (_, i) => { const t = i / 10; return [1 + t * t / 2, t - 3]; }), arrow: true }], dots: [[1, -3]] },
         ans: 'Domain ' + nw(x + ' ≥ 1') + ', range ' + nw(y + ' ≥ ' + M + '3') },
       { q: 'State the domain and range. (Both ends have arrows.)',
-        graph: { x: [-3, 5], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [-1, 1].map(sg => ({ p: Array.from({ length: 11 }, (_, i) => { const xx = 1 + sg * i * 0.25; return [xx, (xx - 1) ** 2 - 2]; }), arrow: true })) },
+        graph: { x: [-3, 5], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 41 }, (_, i) => { const xx = -1.5 + i * 0.125; return [xx, (xx - 1) ** 2 - 2]; }), arrow: 'both' }] },
         ans: 'Domain: all real numbers. Range ' + nw(y + ' ≥ ' + M + '2') }] },
 
   17: { topic: 'Geometric sequence with a negative ratio',
