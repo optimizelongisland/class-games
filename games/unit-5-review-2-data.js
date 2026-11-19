@@ -1,13 +1,9 @@
 /* Unit 5 Review #2 (packet pages 102 to 107): questions, answer checking, hints and shared settings.
-   Used by unit-5-review-2-stations.html (students), unit-5-review-2-teacher.html (teacher board)
+   Used by unit-5-review-2-stations.html (students), unit-5-review-2-practice.html
    and unit-5-review-2-hints.html (the "Need a hint?" QR page).
-
-   LIVE BOARD SETUP: paste your Firebase Realtime Database URL below, e.g.
-   'https://unit5-review-default-rtdb.firebaseio.com'. Leave it empty and the game still works,
-   it just can't report to the teacher board. */
+   There is no live teacher board: nothing is sent anywhere, and everything stays on the device. */
 (function () {
 'use strict';
-const FIREBASE_URL = '';
 const SITE = 'https://optimizelongisland.github.io/class-games/';
 const ROOT = 'u5r2';                       // top-level key in the database
 
@@ -414,13 +410,8 @@ function keyOf(part) {
   return String(part.answer);
 }
 
-/* ---------- live board (Firebase Realtime Database over plain REST) ---------- */
-function dbBase() {
-  let u = '';
-  try { u = new URLSearchParams(location.search).get('db') || localStorage.getItem('u5r2-db') || ''; } catch (e) {}
-  u = (u || FIREBASE_URL || '').trim().replace(/\/+$/, '');
-  return /^https:\/\/[a-z0-9.-]+\.(firebaseio\.com|firebasedatabase\.app)$/i.test(u) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(u) ? u : '';
-}
+/* ---------- live board: removed (these stay so older code paths do nothing) ---------- */
+function dbBase() { return ''; }   // the live teacher board was removed, so nothing is ever sent
 function url(path, method) {
   const b = dbBase(); if (!b) return '';
   return b + '/' + ROOT + '/' + path + '.json' + (method ? '?x-http-method-override=' + method : '');
