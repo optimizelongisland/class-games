@@ -91,7 +91,7 @@ U.PRACTICE = {
       { q: 'If ' + fx('p') + ' = 2' + x + sup(2) + ' ' + M + ' ' + x + ' + 6, find ' + fx('p', M + '4') + '.', ans: nw('32 + 4 + 6 = 42') }] },
 
   5: { topic: 'Read domain, range and values from a graph',
-    ex: { q: 'The graph shows ' + nw(y + ' = ' + fx()) + '. State the domain and range, then find ' + x + ' when ' + nw(fx() + ' = 4') + ', and find ' + fx('f', 3) + '.',
+    ex: { lead: 'The graph shows ' + nw(y + ' = ' + fx()) + '.', q: 'The graph shows ' + nw(y + ' = ' + fx()) + '. State the domain and range, then find ' + x + ' when ' + nw(fx() + ' = 4') + ', and find ' + fx('f', 3) + '.',
       graph: { x: [-5, 7], y: [-4, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-4, 1], [-1, 4], [3, -2], [6, 0]])], dots: [[-4, 1], [6, 0]] },
       steps: ['Domain: read left to right. The graph starts at ' + nw(x + ' = ' + M + '4') + ' and ends at ' + nw(x + ' = 6') + ' (closed dots).',
         'Range: read bottom to top. The lowest point is ' + nw(y + ' = ' + M + '2') + ' and the highest is ' + nw(y + ' = 4') + '.',
@@ -171,7 +171,7 @@ U.PRACTICE = {
       { q: 'Find the first 5 terms of ' + nw(fx('f', n) + ' = 5(' + M + '2)' + sup(n + ' ' + M + ' 1')) + '.', ans: '5, ' + M + '10, 20, ' + M + '40, 80' }] },
 
   11: { topic: 'Geometric sequence: rule and a later term',
-    ex: { q: 'For 3, 9, 27, 81, … : is it arithmetic, geometric, or neither? Write a rule and find the 6th term.',
+    ex: { lead: 'Look at the sequence 3, 9, 27, 81, …', q: 'For 3, 9, 27, 81, … : is it arithmetic, geometric, or neither? Write a rule and find the 6th term.',
       steps: ['Differences: 6, 18, 54 (not the same). Ratios: 9 ÷ 3 = 3, 27 ÷ 9 = 3 (the same). So it is <b>geometric</b> with ' + nw(v('r') + ' = 3') + '.',
         'Rule: ' + nw(an('n') + ' = ' + an('1') + '(' + v('r') + ')' + sup(n + ' ' + M + ' 1')) + ', so ' + nw(an('n') + ' = 3(3)' + sup(n + ' ' + M + ' 1')) + '.',
         nw(an('6') + ' = 3(3)' + sup(5) + ' = 3(243) = 729') + '.'],
@@ -185,7 +185,7 @@ U.PRACTICE = {
       { q: 'Is 1, 4, 9, 16, … arithmetic, geometric, or neither? Explain.', ans: 'Neither. The differences (3, 5, 7) change and the ratios (4, 2.25, …) change.' }] },
 
   12: { topic: 'Arithmetic sequence: rule and a later term',
-    ex: { q: 'For 6, 11, 16, 21, … : write a rule and find the 10th term.',
+    ex: { lead: 'Look at the sequence 6, 11, 16, 21, …', q: 'For 6, 11, 16, 21, … : write a rule and find the 10th term.',
       steps: ['Differences: 5, 5, 5, so it is arithmetic with ' + nw(v('d') + ' = 5') + '.',
         'Rule: ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + ', so ' + nw(an('n') + ' = 6 + 5(' + n + ' ' + M + ' 1)') + ' (or ' + nw('5' + n + ' + 1') + ').',
         nw(an('10') + ' = 6 + 5(9) = 51') + '.'],
@@ -198,7 +198,7 @@ U.PRACTICE = {
       { q: 'For 20, 17, 14, 11, … : write a rule and find the 10th term.', ans: nw(an('n') + ' = 20 ' + M + ' 3(' + n + ' ' + M + ' 1)') + ', ' + nw(an('10') + ' = ' + M + '7') }] },
 
   13: { topic: 'Arithmetic rule from two terms',
-    ex: { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 5') + ' and ' + nw(an('5') + ' = 25') + '. Find the 10th term.',
+    ex: { lead: 'An arithmetic sequence has ' + nw(an('1') + ' = 5') + ' and ' + nw(an('5') + ' = 25') + '.', q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 5') + ' and ' + nw(an('5') + ' = 25') + '. Find the 10th term.',
       steps: ['From ' + an('1') + ' to ' + an('5') + ' is 4 jumps. The total change is ' + nw('25 ' + M + ' 5 = 20') + '.',
         'Each jump: ' + nw('20 ÷ 4 = 5') + ', so ' + nw(v('d') + ' = 5') + ' (the sequence is 5, 10, 15, 20, 25, …).',
         'Rule: ' + nw(an('n') + ' = ' + an('1') + ' + ' + v('d') + '(' + n + ' ' + M + ' 1)') + ', so ' + nw(an('n') + ' = 5 + 5(' + n + ' ' + M + ' 1)') + '.',
@@ -212,7 +212,7 @@ U.PRACTICE = {
       { q: 'Write a rule for the arithmetic sequence with ' + nw(an('1') + ' = 10') + ' and ' + nw(an('3') + ' = 4') + '. Find the 12th term.', ans: nw(an('n') + ' = 10 ' + M + ' 3(' + n + ' ' + M + ' 1)') + ' and ' + nw(an('12') + ' = ' + M + '23') }] },
 
   14: { topic: 'Geometric sequence with a fraction ratio',
-    ex: { q: 'For 1, ' + fr('1', '2') + ', ' + fr('1', '4') + ', ' + fr('1', '8') + ', … : write a rule and find the 6th term.',
+    ex: { lead: 'Look at the sequence 1, ' + fr('1', '2') + ', ' + fr('1', '4') + ', ' + fr('1', '8') + ', …', q: 'For 1, ' + fr('1', '2') + ', ' + fr('1', '4') + ', ' + fr('1', '8') + ', … : write a rule and find the 6th term.',
       steps: ['Ratio: ' + nw(fr('1', '2') + ' ÷ 1 = ' + fr('1', '2')) + '. Check: ' + nw(fr('1', '4') + ' ÷ ' + fr('1', '2') + ' = ' + fr('1', '2')) + '.',
         'Rule: ' + nw(an('n') + ' = 1(' + fr('1', '2') + ')' + sup(n + ' ' + M + ' 1')) + '.',
         nw(an('6') + ' = (' + fr('1', '2') + ')' + sup(5) + ' = ' + fr('1', '32')) + '. Raise the top and the bottom to the 5th power.'],
@@ -225,7 +225,7 @@ U.PRACTICE = {
       { q: 'For 9, 3, 1, ' + fr('1', '3') + ', … : write a rule and find the 6th term.', ans: nw(an('n') + ' = 9(' + fr('1', '3') + ')' + sup(n + ' ' + M + ' 1')) + ', ' + nw(an('6') + ' = ' + fr('1', '27')) }] },
 
   15: { topic: 'Domain and range with an open dot',
-    ex: { q: 'State the domain and range of the function.',
+    ex: { lead: 'Use the graph of the function.', q: 'State the domain and range of the function.',
       graph: { x: [-5, 5], y: [-3, 6], ticks: { x: 1, y: 1 }, curves: [sm([[-4, -1], [-2, 2], [0, 1], [3, 5]])], dots: [[-4, -1], [3, 5, true]] },
       steps: ['Left end: closed dot at ' + nw(x + ' = ' + M + '4') + ' (≤). Right end: open dot at ' + nw(x + ' = 3') + ' (&lt;).',
         'Lowest ' + y + ': ' + M + '1 at the closed dot (≤). Highest ' + y + ': 5 at the open dot (&lt;).',
@@ -243,7 +243,7 @@ U.PRACTICE = {
         ans: 'Domain ' + nw(M + '3' + le + x + lt + '3') + ', range ' + nw(M + '2' + lt + y + le + '4') }] },
 
   16: { topic: 'Domain and range when the graph keeps going',
-    ex: { q: 'State the domain and range of the function.',
+    ex: { lead: 'Use the graph of the function.', q: 'State the domain and range of the function.',
       graph: { x: [-4, 8], y: [-2, 5], ticks: { x: 1, y: 1 }, curves: [{ p: Array.from({ length: 33 }, (_, i) => { const t = Math.sqrt(10) * i / 32; return [-2 + t * t, t + 1]; }), arrow: true }], dots: [[-2, 1]] },
       steps: ['The graph starts at the closed dot (' + M + '2, 1) and the arrow means it keeps going to the right and up forever.',
         'Domain: ' + x + ' starts at ' + M + '2 and never stops, so ' + nw(x + ' ≥ ' + M + '2') + ' (also written ' + nw(M + '2' + le + x + lt + '∞') + ').',

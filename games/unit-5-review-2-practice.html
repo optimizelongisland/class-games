@@ -71,6 +71,8 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .card .st{font:800 1.35rem/1.2 var(--disp);margin:0 0 1rem;display:flex;gap:.6rem;align-items:center}
 .card .st .n{display:inline-grid;place-items:center;min-width:2.3rem;height:2.3rem;border-radius:10px;background:var(--ink);color:#fff;font-size:1.1rem}
 .bigq{font-size:1.2rem;line-height:2;margin:.2rem 0 .6rem}
+.qparts p{margin:0}
+.qparts p+p{padding-left:1em}
 .card .graph{max-width:360px}
 .steps{margin:.6rem 0 .8rem 1.3rem;padding:0;font-size:1.1rem}.steps li{margin:.4rem 0;animation:pop .25s ease}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -123,7 +125,7 @@ function sheet() {
         (t.choices ? '<ol class="ch">' + t.choices.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>' : '') + '<div class="work" aria-label="space for your work"></div></div>';
     }).join('');
     return '<section class="stn"><h2><span class="n">' + n + '</span>' + p.topic + '</h2>' +
-      '<div class="ex"><p class="tag">Worked example</p><p style="margin:0">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+      '<div class="ex"><p class="tag">Worked example</p>' + exQ(e, p) + (e.graph ? U.graph(e.graph) : '') +
       (p.parts ? p.parts.map((pt, i) => '<div class="part"><p class="pq"><b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('')
         : '<ol>' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="a" style="margin:0">Answer: ' + e.ans + '</p>') + '</div>' +
       '<p class="tag" style="color:var(--accent2)">Your turn</p>' + tries + '</section>';
@@ -167,14 +169,14 @@ function online() {
       const e = p.ex, parts = p.parts;
       if (parts) {
         const n = parts.length, all = st.step >= n, lab = i => '(' + 'abcdef'[i] + ')';
-        body = '<p class="tag">Worked example · watch how it’s done</p><p class="bigq">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+        body = '<p class="tag">Worked example · watch how it’s done</p>' + exQ(e, p, 'bigq') + (e.graph ? U.graph(e.graph) : '') +
           parts.slice(0, st.step).map((pt, i) => '<div class="part"><p class="pq"><b>' + lab(i) + '</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('') +
           (all ? '<div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
             : '<div class="acts"><button class="btn" id="stp">Show part ' + lab(st.step) + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
               '<button class="btn ghost" id="allst">Show all parts</button></div>');
       } else {
         const n = e.steps.length, all = st.step >= n;
-        body = '<p class="tag">Worked example · watch how it’s done</p><p class="bigq">' + e.q + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+        body = '<p class="tag">Worked example · watch how it’s done</p>' + exQ(e, p, 'bigq') + (e.graph ? U.graph(e.graph) : '') +
           '<ol class="steps">' + e.steps.slice(0, st.step).map(s => '<li>' + s + '</li>').join('') + '</ol>' +
           (all ? '<p class="a">Answer: ' + e.ans + '</p><div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
             : '<div class="acts"><button class="btn" id="stp">' + (st.step ? 'Next step' : 'Show step 1') + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
@@ -217,6 +219,11 @@ function online() {
   draw();
 }
 
+function exQ(e, p, cls) {
+  const c = cls ? ' class="' + cls + '"' : ' style="margin:0"';
+  if (!(e.lead && p.parts)) return '<p' + c + '>' + e.q + '</p>';
+  return '<div class="qparts' + (cls ? ' ' + cls : '') + '"><p>' + e.lead + '</p>' + p.parts.map((pt, i) => '<p><b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '</p>').join('') + '</div>';
+}
 function form() {
   document.title = 'Make a Practice Sheet: Unit 5 Review #2';
   const on = new Set(list);
