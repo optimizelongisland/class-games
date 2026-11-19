@@ -206,14 +206,14 @@ U.PRACTICE = {
 
   15: { topic: 'Domain and range with an open dot',
     ex: { q: 'State the domain and range of the function.',
-      graph: { x: [-5, 5], y: [-3, 6], ticks: { x: 1, y: 1 }, curves: [[[-4, -1], [3, 5]]], dots: [[-4, -1], [3, 5, true]] },
+      graph: { x: [-5, 5], y: [-3, 6], ticks: { x: 1, y: 1 }, curves: [sm([[-4, -1], [-2, 2], [0, 1], [3, 5]])], dots: [[-4, -1], [3, 5, true]] },
       steps: ['Left end: closed dot at ' + nw(x + ' = ' + M + '4') + ' (≤). Right end: open dot at ' + nw(x + ' = 3') + ' (&lt;).',
         'Lowest ' + y + ': ' + M + '1 at the closed dot (≤). Highest ' + y + ': 5 at the open dot (&lt;).',
         'An open dot means that exact point is <b>not</b> included.'],
       ans: 'Domain ' + nw(M + '4' + le + x + lt + '3') + ', range ' + nw(M + '1' + le + y + lt + '5') },
     tries: [
       { q: 'State the domain and range.',
-        graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [[[-2, 3], [4, -3]]], dots: [[-2, 3, true], [4, -3]] },
+        graph: { x: [-4, 5], y: [-4, 4], ticks: { x: 1, y: 1 }, curves: [sm([[-2, 3], [0, -1], [2, 1], [4, -3]])], dots: [[-2, 3, true], [4, -3]] },
         ans: 'Domain ' + nw(M + '2' + lt + x + le + '4') + ', range ' + nw(M + '3' + le + y + lt + '3') },
       { q: 'State the domain and range.',
         graph: { x: [-4, 4], y: [-3, 5], ticks: { x: 1, y: 1 }, curves: [sm([[-3, 0], [0, 4], [3, -2]])], dots: [[-3, 0], [3, -2, true]] },
