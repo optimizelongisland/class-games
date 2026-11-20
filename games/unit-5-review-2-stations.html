@@ -330,7 +330,7 @@ function exPanel(n) {
     ? P.parts.map((pt, i) => '<b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '<br>' + pt.how + '<div class="exa">' + pt.ans + '</div>')
     : (e.steps || []).concat(['<div class="exa">' + e.ans + '</div>']);
   const k = Math.min(exStep[n] || 1, items.length);
-  return '<div class="panel"><p class="tag">Extra example: ' + P.topic + '</p><p class="ptext" style="margin:0">' + (e.lead && P.parts ? e.lead : e.q) + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+  return '<div class="panel"><p class="tag">Extra example for Station ' + n + '</p><p class="ptext" style="margin:0">' + (e.lead && P.parts ? e.lead : e.q) + '</p>' + (e.graph ? U.graph(e.graph) : '') +
     '<ol class="exs">' + items.slice(0, k).map(t => '<li>' + t + '</li>').join('') + '</ol>' +
     (k < items.length ? '<button class="pill2 ex" id="exnext">Next step (' + (k + 1) + ' of ' + items.length + ')</button>' : '') + '</div>';
 }
