@@ -109,6 +109,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .look b{color:var(--yellow)}
 .endbox{max-width:1180px;margin:1.2rem auto 0}
 .tools{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.toolcard{padding:1rem 1.2rem}.toolcard .tools{margin-top:0}
 .pill2{cursor:pointer;font-size:.85rem;font-weight:700;color:var(--yellow);background:none;border:1.5px solid var(--yellow);border-radius:999px;padding:.3rem .8rem}
 .pill2.ex{color:var(--cyan);border-color:var(--cyan)}
 .pill2.on{background:rgba(255,255,255,.06)}
@@ -427,7 +428,7 @@ function renderStation() {
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 class="stitle">Station ' + q.n + '</h2>' +
     '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
     '</section>' +
-    '<section>' + parts.replace(/<\/div>$/, tools + '</div>') + '</section></div>';
+    '<section>' + parts + '<section class="card toolcard">' + tools + '</section></section></div>';
 
   // roles pop up for a few seconds when a station opens, then fade away
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
