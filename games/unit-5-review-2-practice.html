@@ -114,7 +114,7 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 <body>
 <a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
 <div id="app"></div>
-<script src="unit-5-review-2-data.js?v=31"></script>
+<script src="unit-5-review-2-data.js?v=32"></script>
 <script src="unit-5-review-2-practice-data.js?v=29"></script>
 <script>
 'use strict';
@@ -275,8 +275,8 @@ function typedBox(p, solved, val) {
   if (p.t === 'expr') return '<form class="ans" id="ansf" autocomplete="off">' + pre +
     '<div class="mf" id="ans" contenteditable="' + (solved ? 'false' : 'true') + '" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer" data-v="' + esc(val) + '"></div>' +
     (solved ? '' : '<button class="btn" type="submit">Check</button>') + '</form>' +
-    (solved ? '' : '<div class="keys" id="keys">' + [p.vr || 'n', 'xʸ', '↓', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '"' + (k === 'xʸ' ? ' title="Exponent" aria-label="Exponent"' : k === '↓' ? ' title="Out of the exponent" aria-label="Out of the exponent"' : '') + '>' + esc(k) + '</button>').join('') + '</div>' +
-      '<p class="mfh">Tap <b>xʸ</b> (or type ^) to go up into the exponent. Tap <b>↓</b> to come back down.</p>');
+    (solved ? '' : '<div class="keys" id="keys">' + '<button type="button" data-k="xʸ" title="Exponent" aria-label="Exponent">xʸ</button>' + '</div>' +
+      '<p class="mfh">Tap <b>xʸ</b> to go into the exponent. Tap it again to come back down.</p>');
   return '<form class="ans" id="ansf" autocomplete="off">' + pre +
     '<input id="ans" inputmode="' + (p.t === 'num' ? 'decimal' : 'text') + '" placeholder="' + esc(p.placeholder || 'Type your answer') + '" spellcheck="false" autocapitalize="off" value="' + esc(val) + '"' + (solved ? ' disabled' : '') + '>' +
     (solved ? '' : '<button class="btn" type="submit">Check</button>') + '</form>';
@@ -291,18 +291,18 @@ function wireTyped(submit) {
     if (a.getAttribute('contenteditable') !== 'true') return;
     f.onsubmit = e => { e.preventDefault(); submit(mfText(a)); };
     a.addEventListener('keydown', e => {
-      if (e.key === '^') { e.preventDefault(); mfUp(a); }
+      if (e.key === '^') { e.preventDefault(); mfToggle(a); }
       else if (e.key === 'Enter') { e.preventDefault(); submit(mfText(a)); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); mfDown(a); }
     });
-    a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfUp(a); } });
+    a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfToggle(a); } });
     a.addEventListener('input', () => a.classList.toggle('empty', !mfText(a)));
     const keys = document.getElementById('keys');
     keys.addEventListener('pointerdown', e => e.preventDefault());
     keys.onclick = e => {
       const b = e.target.closest('[data-k]'); if (!b) return;
       const k = b.dataset.k;
-      if (k === 'xʸ') mfUp(a); else if (k === '↓') mfDown(a); else mfInsert(a, k === '−' ? '-' : k);
+      if (k === 'xʸ') mfToggle(a); else mfInsert(a, k === '−' ? '-' : k);
       a.classList.toggle('empty', !mfText(a));
     };
     if (fine) mfFocusEnd(a);
@@ -337,6 +337,11 @@ function mfInsert(el, txt) {
   const t = document.createTextNode(txt); r.insertNode(t);
   r.setStartAfter(t); r.collapse(true); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
   el.dispatchEvent(new Event('input'));
+}
+// xʸ (or ^) goes up into the exponent; pressing it again comes back down
+function mfToggle(el) {
+  const r = mfCaret(el); let n = r.startContainer; n = n.nodeType === 3 ? n.parentNode : n;
+  if (n && n.closest && n.closest('sup') && el.contains(n.closest('sup'))) mfDown(el); else mfUp(el);
 }
 function mfUp(el) {
   const r = mfCaret(el);
