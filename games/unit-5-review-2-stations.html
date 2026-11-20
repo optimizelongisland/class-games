@@ -63,6 +63,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .nums.g4 .num:active:not(:disabled),.nums.g6 .num:active:not(:disabled){transform:translateY(1px)}
 .nums .num.on{background:hsl(var(--h,48) 95% 62%);border-color:#fff;color:#000;box-shadow:0 0 0 4px #fff,0 6px 24px hsl(var(--h,48) 95% 62% / .6)}
 .num.done{border-color:var(--green);color:var(--green)}
+.nums .num.gap{visibility:hidden}
 .nums .num.done{--h:150;background:rgba(53,240,154,.1);box-shadow:none}
 .num.done::after{content:"\2713";position:absolute;top:4px;right:10px;font-size:.9rem}
 .num:disabled{opacity:.3;cursor:default}
@@ -107,13 +108,18 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .look .ic{font-size:2.2rem}
 .look b{color:var(--yellow)}
 .endbox{max-width:1180px;margin:1.2rem auto 0}
-.prob{margin-top:.8rem}
-.prob summary{display:inline-block;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--yellow);border:1.5px solid var(--yellow);border-radius:999px;padding:.3rem .8rem;list-style:none}
-.prob summary::-webkit-details-marker{display:none}
-.prob[open] summary{margin-bottom:.6rem}
-.prob .ptext{font-size:1.1rem}
-.prob .hd2,.prob[open] .sh{display:none} .prob[open] .hd2{display:inline}
-.sthead{display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+.tools{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.pill2{cursor:pointer;font-size:.85rem;font-weight:700;color:var(--yellow);background:none;border:1.5px solid var(--yellow);border-radius:999px;padding:.3rem .8rem}
+.pill2.ex{color:var(--cyan);border-color:var(--cyan)}
+.pill2.on{background:rgba(255,255,255,.06)}
+.panel{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.8rem}
+.panel .ptext{font-size:1.1rem}
+.panel .tag{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin:0 0 .4rem;font-weight:700}
+.exs{margin:.6rem 0 0;padding-left:1.3rem}.exs li{margin:.35rem 0}
+.exa{margin-top:.6rem;color:var(--green)}
+.rolepop{position:fixed;left:50%;top:1.2rem;transform:translateX(-50%);z-index:50;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:.4rem 1.2rem .8rem;box-shadow:0 10px 30px rgba(0,0,0,.6);pointer-events:none;width:max-content;max-width:calc(100vw - 2rem);animation:rolepop 4.6s ease forwards}
+@keyframes rolepop{0%{opacity:0;transform:translate(-50%,-10px)}8%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;visibility:hidden}}
+.sthead{display:flex;align-items:center;justify-content:flex-start;gap:.9rem;flex-wrap:wrap}
 .sthead .btn{font-size:.85rem;padding:.4rem .75rem;min-height:0}
 @media (max-width:560px){.sthead .wl{display:none}.sthead{flex-wrap:nowrap}}
 .stn{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(12px,1.6vw,20px);max-width:1180px;margin:0 auto}
@@ -193,13 +199,14 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
   <div class="foot"><button class="link" id="restart">New team on this device? Start over</button></div>
 </div>
 <div class="toast" id="toast" hidden></div>
-<script src="unit-5-review-2-data.js?v=31"></script>
+<script src="unit-5-review-2-data.js?v=32"></script>
+<script src="unit-5-review-2-practice-data.js?v=29"></script>
 <script>
 'use strict';
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KEY = 'u5r2-state';
-let probOpen = 0, picking = false, S = load(), session = null, online = null, newSession = false;
+let rolesAt = 0, probOpen = 0, exOpen = 0, exStep = {}, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
@@ -294,7 +301,7 @@ function renderSetup() {
 function stationGrid(hideDone) {
   return U.Q.map(q => {
     const d = S.q['q' + q.n] && S.q['q' + q.n].done;
-    if (d && hideDone) return '';
+    if (d && hideDone) return '<span class="num gap" aria-hidden="true"></span>';
     return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '><small>Station</small>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
   }).join('');
 }
@@ -309,11 +316,24 @@ function renderPick() {
 }
 function goStation(n) {
   const st = qs(n);
+  rolesAt = Date.now();
   S.screen = 'station'; S.cur = n; S.at = Date.now(); S.partAt = Date.now(); S.wrongNow = 0; S.hintNow = 0;
   S.part = st.passed || 0;            // resume a half-done station at the first part not yet passed
   render(); sync(true); scrollTo(0, 0);
 }
 
+// worked example from the practice pages, shown one step at a time
+const EX = n => U.PRACTICE && U.PRACTICE[n] && U.PRACTICE[n].ex;
+function exPanel(n) {
+  const P = U.PRACTICE[n], e = P.ex;
+  const items = e.lead && P.parts
+    ? P.parts.map((pt, i) => '<b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '<br>' + pt.how + '<div class="exa">' + pt.ans + '</div>')
+    : (e.steps || []).concat(['<div class="exa">' + e.ans + '</div>']);
+  const k = Math.min(exStep[n] || 1, items.length);
+  return '<div class="panel"><p class="tag">Extra example: ' + P.topic + '</p><p class="ptext" style="margin:0">' + (e.lead && P.parts ? e.lead : e.q) + '</p>' + (e.graph ? U.graph(e.graph) : '') +
+    '<ol class="exs">' + items.slice(0, k).map(t => '<li>' + t + '</li>').join('') + '</ol>' +
+    (k < items.length ? '<button class="pill2 ex" id="exnext">Next step (' + (k + 1) + ' of ' + items.length + ')</button>' : '') + '</div>';
+}
 function renderStation() {
   const q = U.byN(S.cur), st = qs(S.cur), P = q.parts;
   let parts = '';
@@ -334,8 +354,8 @@ function renderStation() {
     inp = '<form class="ans" id="ansf" autocomplete="off">' + (p.prefix ? '<span class="pre">' + p.prefix + '</span>' : '') +
       '<div class="mf" id="ans" contenteditable="true" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer"></div>' +
       '<button class="btn fill cyan" type="submit">Check</button></form>' +
-      '<div class="keys" id="keys">' + [p.vr || 'n', 'xʸ', '↓', '(', ')', '/', '−', '+'].map(k => '<button type="button" data-k="' + esc(k) + '"' + (k === 'xʸ' ? ' title="Exponent" aria-label="Exponent"' : k === '↓' ? ' title="Out of the exponent" aria-label="Out of the exponent"' : '') + '>' + esc(k) + '</button>').join('') + '</div>' +
-      '<p class="mfh">Tap <b>xʸ</b> (or type ^) to go up into the exponent. Tap <b>↓</b> to come back down.</p>';
+      '<div class="keys" id="keys">' + '<button type="button" data-k="xʸ" title="Exponent" aria-label="Exponent">xʸ</button>' + '</div>' +
+      '<p class="mfh">Tap <b>xʸ</b> to go into the exponent. Tap it again to come back down.</p>';
   } else {
     inp = '<form class="ans" id="ansf" autocomplete="off">' + (p.prefix ? '<span class="pre">' + p.prefix + '</span>' : '') +
       '<input id="ans" inputmode="' + (p.t === 'num' ? 'decimal' : 'text') + '" placeholder="' + esc(p.placeholder || 'Type your answer') + '" spellcheck="false" autocapitalize="off">' +
@@ -350,29 +370,37 @@ function renderStation() {
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 style="margin:0">Station ' + q.n + '</h2>' +
-    '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' + jobBar(jobs(doneList().length)) +
-    '<details class="prob" id="prob"' + (probOpen === q.n ? ' open' : '') + '><summary>📄 <span class="sh">Show</span><span class="hd2">Hide</span> station problem</summary><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</details></section>' +
+    '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
+    '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
+    (EX(q.n) ? '<button class="pill2 ex' + (exOpen === q.n ? ' on' : '') + '" id="exb">💡 ' + (exOpen === q.n ? 'Hide example' : 'Need an extra example?') + '</button>' : '') + '</div>' +
+    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</div>' : '') +
+    (exOpen === q.n ? exPanel(q.n) : '') + '</section>' +
     '<section>' + parts + '</section></div>';
 
-  $('#prob').ontoggle = e => { probOpen = e.target.open ? q.n : 0; };
+  // roles pop up for a few seconds when a station opens, then fade away
+  const since = Date.now() - rolesAt, J = jobs(doneList().length);
+  if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
+  $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
+  if ($('#exb')) $('#exb').onclick = () => { exOpen = exOpen === q.n ? 0 : q.n; render(); };
+  if ($('#exnext')) $('#exnext').onclick = () => { exStep[q.n] = (exStep[q.n] || 1) + 1; render(); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
   else if (p.t === 'expr') {
     const a = $('#ans');
     if (st.draft && st.draft[S.part]) mfSet(a, st.draft[S.part]);
     $('#ansf').onsubmit = e => { e.preventDefault(); submit(mfText(a), a); };
     a.addEventListener('keydown', e => {
-      if (e.key === '^') { e.preventDefault(); mfUp(a); }
+      if (e.key === '^') { e.preventDefault(); mfToggle(a); }
       else if (e.key === 'Enter') { e.preventDefault(); submit(mfText(a), a); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); mfDown(a); }
     });
-    a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfUp(a); } });   // phone keyboards
+    a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfToggle(a); } });   // phone keyboards
     a.addEventListener('input', () => { a.classList.toggle('empty', !mfText(a)); st.draft = st.draft || []; st.draft[S.part] = mfText(a); });
     a.classList.toggle('empty', !mfText(a));
     $('#keys').addEventListener('pointerdown', e => e.preventDefault());   // keep the cursor where it is
     $('#keys').onclick = e => {
       const b = e.target.closest('[data-k]'); if (!b) return;
       const k = b.dataset.k;
-      if (k === 'xʸ') mfUp(a); else if (k === '↓') mfDown(a); else mfInsert(a, k === '−' ? '-' : k);
+      if (k === 'xʸ') mfToggle(a); else mfInsert(a, k === '−' ? '-' : k);
       a.classList.toggle('empty', !mfText(a));
     };
     if (matchMedia('(pointer:fine)').matches) mfFocusEnd(a);
@@ -447,6 +475,11 @@ function mfInsert(el, txt) {
   const t = document.createTextNode(txt); r.insertNode(t);
   r.setStartAfter(t); r.collapse(true); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
   el.dispatchEvent(new Event('input'));
+}
+// xʸ (or ^) goes up into the exponent; pressing it again comes back down
+function mfToggle(el) {
+  const r = mfCaret(el); let n = r.startContainer; n = n.nodeType === 3 ? n.parentNode : n;
+  if (n && n.closest && n.closest('sup') && el.contains(n.closest('sup'))) mfDown(el); else mfUp(el);
 }
 function mfUp(el) {
   const r = mfCaret(el);
