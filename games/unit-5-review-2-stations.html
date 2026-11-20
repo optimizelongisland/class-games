@@ -56,11 +56,11 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .nums.g6{grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(.6rem,1.4vw,1rem)}
 @media (max-width:700px){.nums.g6{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .num{min-height:4.2rem;border-radius:14px;border:2px solid var(--line);background:var(--panel2);font:600 1.5rem var(--mono);cursor:pointer;position:relative}
-.nums.g4 .num,.nums.g6 .num{--h:200;min-height:clamp(5rem,9vw,7rem);border-radius:20px;border:3px solid hsl(var(--h) 90% 62%);
-  background:linear-gradient(160deg,hsl(var(--h) 90% 62% / .28),hsl(var(--h) 90% 62% / .08));color:hsl(var(--h) 95% 75%);
-  font:800 clamp(1.8rem,1.2rem + 2vw,3rem) var(--disp);box-shadow:0 6px 0 hsl(var(--h) 70% 35%);transition:transform .08s,box-shadow .08s,filter .15s}
-.nums.g4 .num:hover:not(:disabled),.nums.g6 .num:hover:not(:disabled){filter:brightness(1.2);transform:translateY(-2px);box-shadow:0 8px 0 hsl(var(--h) 70% 35%)}
-.nums.g4 .num:active:not(:disabled),.nums.g6 .num:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 hsl(var(--h) 70% 35%)}
+.nums.g4 .num,.nums.g6 .num{--h:200;min-height:clamp(5rem,9vw,7rem);border-radius:16px;border:2px solid hsl(var(--h) 60% 55% / .7);
+  background:hsl(var(--h) 60% 55% / .1);color:hsl(var(--h) 90% 78%);
+  font:800 clamp(1.8rem,1.2rem + 2vw,3rem) var(--disp);box-shadow:none;transition:transform .08s,box-shadow .08s,filter .15s}
+.nums.g4 .num:hover:not(:disabled),.nums.g6 .num:hover:not(:disabled){background:hsl(var(--h) 60% 55% / .22);border-color:hsl(var(--h) 90% 65%)}
+.nums.g4 .num:active:not(:disabled),.nums.g6 .num:active:not(:disabled){transform:translateY(1px)}
 .nums .num.on{background:hsl(var(--h,48) 95% 62%);border-color:#fff;color:#000;box-shadow:0 0 0 4px #fff,0 6px 24px hsl(var(--h,48) 95% 62% / .6)}
 .num.done{border-color:var(--green);color:var(--green)}
 .nums .num.done{--h:150;background:rgba(53,240,154,.1);box-shadow:none}
@@ -85,13 +85,13 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .btn.pick-good{border-color:var(--green);color:var(--green);background:transparent}
 .btn.pick-more{border-color:var(--violet);color:var(--violet);background:transparent}
 .btn.pick-good.on{background:var(--green);color:#000} .btn.pick-more.on{background:var(--violet);color:#000}
-.sheets{display:grid;gap:.7rem;max-width:640px;margin:1rem auto 0}
+.sheets{display:grid;gap:.7rem;max-width:900px;margin:1rem auto 0}
 .sheets a{display:flex;justify-content:space-between;align-items:center;gap:1rem;text-decoration:none;color:#000;background:var(--violet);border-radius:16px;padding:.9rem 1.2rem;font:800 1.25rem var(--disp)}
-.sheets a span{font:500 .95rem var(--body)}
+.sheets a span{font:500 .95rem var(--body);white-space:nowrap}
 .sheets .sh{border:2px solid var(--violet);border-radius:18px;padding:.8rem}
 .sheets .code{margin:0 0 .6rem;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.3rem 1rem;font-size:1.05rem}
 .sheets .code b{font:800 2rem var(--disp);letter-spacing:.06em;color:var(--violet)}
-.codehelp{max-width:640px;margin:1rem auto 0;color:var(--mute);text-align:left}.codehelp ol{margin:.3rem 0 0 1.2rem;padding:0}
+.codehelp{max-width:900px;margin:1rem auto 0;color:var(--mute);text-align:left}.codehelp ol{margin:.3rem 0 0 1.2rem;padding:0}
 .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
 .field{display:flex;flex-direction:column;gap:.35rem;flex:1 1 14rem}
 .field input{min-height:3.2rem;border-radius:12px;border:2px solid var(--line);background:#000;padding:0 .9rem;font-size:1.1rem}
@@ -141,7 +141,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .steps span{flex:1;height:.5rem;border-radius:9px;background:var(--line)}
 .steps span.ok{background:var(--green)} .steps span.now{background:var(--yellow)}
 .part{border:2px solid var(--line);border-radius:16px;padding:1rem;margin-bottom:.8rem;background:var(--panel)}
-.part.now{border-color:var(--yellow)}
+.part.now{border-color:#3a3a4a}
 .part.ok{border-color:rgba(53,240,154,.5)}
 .part.sk{border-color:rgba(255,138,58,.5)}
 .part .pq{font-size:1.15rem;font-weight:500;margin:0 0 .8rem}
@@ -215,10 +215,14 @@ const jobBar = j => j ? '<div class="jobbar"><span class="jb r1"><b>✏️ ' + e
 const hue = i => Math.round((i - 1) * 360 / 16 + 190) % 360;
 // stations each student asked for extra practice on (plus any part the pair skipped)
 function practiceFor(k) {
-  return U.READY.map(q => q.n).filter(n => {
+  const L = U.READY.map(q => q.n).filter(n => {
     const f = S.feel['q' + n] || {}, st = S.q['q' + n];
     return f[k] === 'more' || (st && (st.sk || []).some(Boolean) && f[k] !== 'good');
   });
+  // nothing flagged: still give a code, covering the stations they did (or all of them)
+  if (L.length) return L;
+  const d = doneList();
+  return d.length ? d : U.READY.map(q => q.n);
 }
 const qs = n => (S.q['q' + n] = S.q['q' + n] || { w: [], sk: [], h: 0, secs: 0, done: false, wa: [] });
 const doneList = () => U.READY.filter(q => S.q['q' + q.n] && S.q['q' + q.n].done).map(q => q.n);
@@ -267,12 +271,12 @@ function renderResume() {
 
 function renderSetup() {
   const nm = [0, 1, 2].map(k => '<label class="field"><span class="lab" style="margin:0">' + (k === 0 ? 'Partner 1' : k === 1 ? 'Partner 2' : 'Partner 3 (optional)') + '</span>' +
-    '<input data-n="' + k + '" maxlength="16" value="' + esc(S.names[k] || '') + '" autocomplete="off" autocapitalize="words" spellcheck="false"' + (k === 0 && !S.names[0] ? ' class="need"' : '') + '></label>').join('');
-  view.innerHTML = '<section class="card"><p class="lab">Step 1</p><h2>Type your first names</h2><p style="color:var(--mute);margin-top:-.4rem">Each of you gets your own practice at the end.</p><div class="names" id="names">' + nm + '</div></section>' +
+    '<input data-n="' + k + '" maxlength="16" value="' + esc(S.names[k] || '') + '" autocomplete="off" autocapitalize="words" spellcheck="false"' + (k === 0 && !S.names[0] ? ' class="need"' : '') + '>' + (k === 0 ? '<span id="need" style="color:var(--yellow);font-size:.95rem"></span>' : '') + '</label>').join('');
+  view.innerHTML = '<section class="card"><h2>Type your first names</h2><div class="names" id="names">' + nm + '</div></section>' +
     '<section class="card"><p class="lab">Your roles</p><p style="color:var(--mute);margin:0 0 .8rem">🔄 The game tells you who does which role at each station, and you switch every time.</p><div class="roles">' +
     '<div class="role r1"><b>✏️ Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div>' +
     '<div class="role r2"><b>🗣️ Explainer</b><span>Talks through each step out loud.</span></div></div></section>' +
-    '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button><span id="need" style="color:var(--yellow)"></span></div>';
+    '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button></div>';
   const check = () => {
     const miss = [!people().length && 'at least one first name'].filter(Boolean);
     $('#go').disabled = !!miss.length;
@@ -291,12 +295,12 @@ function stationGrid(hideDone) {
   return U.Q.map(q => {
     const d = S.q['q' + q.n] && S.q['q' + q.n].done;
     if (d && hideDone) return '';
-    return '<button class="num' + (d ? ' done' : '') + '" style="--h:' + Math.round(((q.n - 1) * 360 / 18 + 190) % 360) + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '><small>Station</small>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
+    return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '><small>Station</small>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
   }).join('');
 }
 function renderPick() {
   const first = !doneList().length;
-  view.innerHTML = '<section class="card"><p class="lab">' + (first ? 'Step 2' : 'Choose a station') + '</p><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
+  view.innerHTML = '<section class="card"><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
     '<div class="nums g6" id="qnums">' + stationGrid(true) + '</div></section>' +
     '<button class="link" id="back">Change names</button>';
   markBusy();
@@ -498,7 +502,7 @@ function sheetLinks() {
   return '<div class="sheets">' + P.map((nm, k) => {
     const L = practiceFor(k), code = U.practiceCode(L);
     return '<div class="sh">' + (code ? '<p class="code"><span>' + esc(nm) + ', write down your code:</span><b>' + code + '</b></p>' : '') +
-      '<a href="' + U.practiceURL(nm, L) + '" target="_blank" rel="noopener">📝 Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
+      '<a href="' + U.practiceURL(nm, L) + '" target="_blank" rel="noopener">Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
   }).join('') + '</div>' +
   '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Additional Practice – Unit 5 Review</b></li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
 }
@@ -553,9 +557,8 @@ async function markBusy() {
 function renderBetween() {
   if (picking) { view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p class="go">Finding your next station\u2026</p></section>'; return; }
   const prev = U.byN(S.cur), st = qs(S.cur), d = doneList().length;
-  view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p><p>Station ' + prev.n + ' complete' + (st.sk.some(Boolean) ? ' (you skipped a part, so your teacher may check in)' : '') + '. That’s ' + d + ' of ' + U.READY.length + '.</p>' +
-    (jobs(d) ? '<p style="font-size:1.15rem">🔄 Switch roles! At your next station:</p>' + jobBar(jobs(d)) : '') +
-    '<p class="go">Pick any open station</p><p style="color:var(--mute);margin-top:-.4rem">Stations you finish leave the board.</p>' +
+  view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p>' +
+    '<p class="go">Pick any open station</p>' +
     '<div class="nums g6" id="qnums" style="max-width:760px;margin:0 auto">' + stationGrid(true) + '</div></section>' +
     '';
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
@@ -563,10 +566,7 @@ function renderBetween() {
 function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
-    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() +
-    '<div class="nums g6" style="max-width:760px;margin:1rem auto 0">' + stationGrid() + '</div>' +
-    '<div class="row" style="justify-content:center;margin-top:1.4rem"><button class="btn line violet" id="again">New team? Start over on this device</button></div></section>';
-  $('#again').onclick = () => { if (confirm('Open your practice sheets first! Start over for a new team?')) startOver(); };
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>';
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
