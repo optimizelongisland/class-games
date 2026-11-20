@@ -113,6 +113,8 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .prob[open] summary{margin-bottom:.6rem}
 .prob .ptext{font-size:1.1rem}
 .prob .hd2,.prob[open] .sh{display:none} .prob[open] .hd2{display:inline}
+.rolepop{position:fixed;left:50%;top:1.2rem;transform:translateX(-50%);z-index:50;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:.4rem 1.2rem .8rem;box-shadow:0 10px 30px rgba(0,0,0,.6);pointer-events:none;width:max-content;max-width:calc(100vw - 2rem);animation:rolepop 4.6s ease forwards}
+@keyframes rolepop{0%{opacity:0;transform:translate(-50%,-10px)}8%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;visibility:hidden}}
 .sthead{display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
 .sthead .btn{font-size:.85rem;padding:.4rem .75rem;min-height:0}
 @media (max-width:560px){.sthead .wl{display:none}.sthead{flex-wrap:nowrap}}
@@ -199,7 +201,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KEY = 'u5r2-state';
-let probOpen = 0, picking = false, S = load(), session = null, online = null, newSession = false;
+let rolesAt = 0, probOpen = 0, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
@@ -309,6 +311,7 @@ function renderPick() {
 }
 function goStation(n) {
   const st = qs(n);
+  rolesAt = Date.now();
   S.screen = 'station'; S.cur = n; S.at = Date.now(); S.partAt = Date.now(); S.wrongNow = 0; S.hintNow = 0;
   S.part = st.passed || 0;            // resume a half-done station at the first part not yet passed
   render(); sync(true); scrollTo(0, 0);
@@ -350,10 +353,13 @@ function renderStation() {
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 style="margin:0">Station ' + q.n + '</h2>' +
-    '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' + jobBar(jobs(doneList().length)) +
+    '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
     '<details class="prob" id="prob"' + (probOpen === q.n ? ' open' : '') + '><summary>📄 <span class="sh">Show</span><span class="hd2">Hide</span> station problem</summary><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</details></section>' +
     '<section>' + parts + '</section></div>';
 
+  // roles pop up for a few seconds when a station opens, then fade away
+  const since = Date.now() - rolesAt, J = jobs(doneList().length);
+  if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
   $('#prob').ontoggle = e => { probOpen = e.target.open ? q.n : 0; };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
   else if (p.t === 'expr') {
