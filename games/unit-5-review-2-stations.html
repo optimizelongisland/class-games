@@ -115,10 +115,12 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .panel{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.8rem}
 .panel .ptext{font-size:1.1rem}
 .panel .tag{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin:0 0 .4rem;font-weight:700}
-.exs{margin:.6rem 0 0;padding-left:1.3rem}.exs li{margin:.35rem 0}
-.exa{margin-top:.6rem;color:var(--green)}
+.panel .part{background:var(--panel2)}
+.ch.good{border-color:var(--green)}
 .rolepop{position:fixed;left:50%;top:1.2rem;transform:translateX(-50%);z-index:50;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:.4rem 1.2rem .8rem;box-shadow:0 10px 30px rgba(0,0,0,.6);pointer-events:none;width:max-content;max-width:calc(100vw - 2rem);animation:rolepop 4.6s ease forwards}
 @keyframes rolepop{0%{opacity:0;transform:translate(-50%,-10px)}8%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;visibility:hidden}}
+.stitle{margin:0;font-size:clamp(2.2rem,1.6rem + 2vw,3rem);line-height:1.05;white-space:nowrap}
+.sthead #leave{white-space:nowrap}
 .sthead{display:flex;align-items:center;justify-content:flex-start;gap:.9rem;flex-wrap:wrap}
 .sthead .btn{font-size:.85rem;padding:.4rem .75rem;min-height:0}
 @media (max-width:560px){.sthead .wl{display:none}.sthead{flex-wrap:nowrap}}
@@ -206,7 +208,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KEY = 'u5r2-state';
-let rolesAt = 0, probOpen = 0, exOpen = 0, exStep = {}, picking = false, S = load(), session = null, online = null, newSession = false;
+let rolesAt = 0, probOpen = 0, exOpen = 0, xs = {}, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
@@ -316,7 +318,7 @@ function renderPick() {
 }
 function goStation(n) {
   const st = qs(n);
-  rolesAt = Date.now();
+  rolesAt = Date.now(); exOpen = 0;
   S.screen = 'station'; S.cur = n; S.at = Date.now(); S.partAt = Date.now(); S.wrongNow = 0; S.hintNow = 0;
   S.part = st.passed || 0;            // resume a half-done station at the first part not yet passed
   render(); sync(true); scrollTo(0, 0);
@@ -325,17 +327,66 @@ function goStation(n) {
 // worked example from the practice pages, shown one step at a time
 const EX = n => U.PRACTICE && U.PRACTICE[n] && U.PRACTICE[n].ex;
 function exPanel(n) {
-  const P = U.PRACTICE[n], e = P.ex;
-  const items = e.lead && P.parts
-    ? P.parts.map((pt, i) => '<b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '<br>' + pt.how + '<div class="exa">' + pt.ans + '</div>')
-    : (e.steps || []).concat(['<div class="exa">' + e.ans + '</div>']);
-  const k = Math.min(exStep[n] || 1, items.length);
-  return '<div class="panel"><p class="tag">Extra example for Station ' + n + '</p><p class="ptext" style="margin:0">' + (e.lead && P.parts ? e.lead : e.q) + '</p>' + (e.graph ? U.graph(e.graph) : '') +
-    '<ol class="exs">' + items.slice(0, k).map(t => '<li>' + t + '</li>').join('') + '</ol>' +
-    (k < items.length ? '<button class="pill2 ex" id="exnext">Next step (' + (k + 1) + ' of ' + items.length + ')</button>' : '') + '</div>';
+  // an extra problem like this station's, answered the same way (pick or type), part by part
+  const P = U.PRACTICE[n], x = xs[n] = xs[n] || { k: 0, j: 0, wrong: [], got: [], typed: '', solved: false, msg: '', miss: false };
+  const t = P.tries[x.k % P.tries.length], Sb = t.sub, one = Sb.length === 1, cur = Sb[x.j], last = x.j === Sb.length - 1;
+  const PLx = i => '(' + 'abcdef'[i] + ')';
+  const shown = (p, i) => p.t === 'mc' ? p.choices[p.right] : (p.prefix ? p.prefix + ' ' : '') + esc(x.got[i] || '');
+  let h = '<div class="panel" id="expanel"><p class="tag">Extra example for Station ' + n + '</p><p class="ptext" style="margin:0 0 .4rem">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+    Sb.slice(0, x.j).map((p, i) => '<div class="part ok"><p class="pq"><b>' + PLx(i) + '</b> ' + p.q + '</p><div class="got">✓ ' + shown(p, i) + '</div></div>').join('') +
+    '<div class="part now"><p class="pq">' + (one ? (cur.q || 'Your answer:') : '<b>' + PLx(x.j) + '</b> ' + cur.q) + '</p>';
+  if (cur.t === 'mc') h += '<div class="chs" id="xchs">' + cur.choices.map((c, i) => { const bad = x.wrong.includes(i), ok = x.solved && i === cur.right;
+      return '<button class="ch' + (bad ? ' bad' : '') + (ok ? ' good' : '') + '" data-i="' + i + '"' + (bad || x.solved ? ' disabled' : '') + '><span class="k">' + 'ABCDEF'[i] + '</span><span>' + c + '</span></button>'; }).join('') + '</div>';
+  else if (cur.t === 'expr') h += '<form class="ans" id="xansf" autocomplete="off">' + (cur.prefix ? '<span class="pre">' + cur.prefix + '</span>' : '') +
+      '<div class="mf" id="xans" contenteditable="' + (x.solved ? 'false' : 'true') + '" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer"></div>' +
+      (x.solved ? '' : '<button class="btn fill cyan" type="submit">Check</button>') + '</form>' +
+      (x.solved ? '' : '<div class="keys"><button type="button" id="xxy" title="Exponent" aria-label="Exponent">xʸ</button></div>');
+  else h += '<form class="ans" id="xansf" autocomplete="off">' + (cur.prefix ? '<span class="pre">' + cur.prefix + '</span>' : '') +
+      '<input id="xans" inputmode="' + (cur.t === 'num' ? 'decimal' : 'text') + '" placeholder="' + esc(cur.placeholder || 'Type your answer') + '" spellcheck="false" autocapitalize="off" value="' + esc(x.typed) + '"' + (x.solved ? ' disabled' : '') + '>' +
+      (x.solved ? '' : '<button class="btn fill cyan" type="submit">Check</button>') + '</form>';
+  if (x.solved) h += '<div class="fb good">✓ Correct!' + (cur.ans ? ' ' + cur.ans : '') + '</div>' +
+      (last ? (P.tries.length > 1 ? '<button class="pill2 ex" id="xmore" style="margin-top:.7rem">Try another example</button>' : '') : '<button class="pill2 ex" id="xnext" style="margin-top:.7rem">Next: part ' + PLx(x.j + 1) + '</button>');
+  else if (x.msg) h += '<div class="fb ' + (x.miss ? 'bad' : 'info') + '">' + esc(x.msg) + '</div>';
+  return h + '</div></div>';
+}
+// the extra example has its own page; Go back returns to the station with the work still there
+function renderExtra(q) {
+  view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 style="margin:0">Extra example for Station ' + q.n + '</h2>' +
+    '<button class="btn line violet" id="exback">&larr; Go back to Station ' + q.n + '</button></div>' + exPanel(q.n).replace('<p class="tag">Extra example for Station ' + q.n + '</p>', '') + '</section></div>';
+  $('#exback').onclick = () => { exOpen = 0; render(); scrollTo(0, 0); };
+  wireEx(q.n);
+}
+function wireEx(n) {
+  const P = U.PRACTICE[n], x = xs[n], t = P.tries[x.k % P.tries.length], cur = t.sub[x.j];
+  const answer = val => {
+    const r = U.check(cur, val);
+    x.typed = cur.t === 'mc' ? '' : String(val);
+    if (r.empty) { x.msg = r.msg; x.miss = false; }
+    else if (r.ok) { x.solved = true; x.msg = ''; x.miss = false; if (cur.t !== 'mc') x.got[x.j] = String(val).trim(); }
+    else { if (cur.t === 'mc') x.wrong.push(+val); x.miss = true; x.msg = r.msg || 'Not quite. Check your work and try again.'; }
+    render(); const pnl = $('#expanel'); if (pnl && !x.solved) { const a = $('#xans'); if (a && a.focus) a.focus(); }
+  };
+  if ($('#xchs')) $('#xchs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) answer(+b.dataset.i); };
+  const a = $('#xans'), f = $('#xansf');
+  if (a && f && !x.solved) {
+    if (a.classList.contains('mf')) {
+      if (x.typed) mfSet(a, x.typed); a.classList.toggle('empty', !mfText(a));
+      f.onsubmit = e => { e.preventDefault(); answer(mfText(a)); };
+      a.addEventListener('keydown', e => { if (e.key === '^') { e.preventDefault(); mfToggle(a); } else if (e.key === 'Enter') { e.preventDefault(); answer(mfText(a)); } else if (e.key === 'ArrowDown') { e.preventDefault(); mfDown(a); } });
+      a.addEventListener('beforeinput', e => { if (e.data === '^') { e.preventDefault(); mfToggle(a); } });
+      a.addEventListener('input', () => { a.classList.toggle('empty', !mfText(a)); x.typed = mfText(a); });
+      if ($('#xxy')) { $('#xxy').onmousedown = e => e.preventDefault(); $('#xxy').onclick = () => { a.focus(); mfToggle(a); }; }
+    } else {
+      f.onsubmit = e => { e.preventDefault(); answer(a.value); };
+      a.addEventListener('input', () => { x.typed = a.value; });
+    }
+  } else if (a && a.classList.contains('mf') && x.got[x.j]) mfSet(a, x.got[x.j]);
+  if ($('#xnext')) $('#xnext').onclick = () => { Object.assign(x, { j: x.j + 1, wrong: [], typed: '', solved: false, msg: '', miss: false }); render(); };
+  if ($('#xmore')) $('#xmore').onclick = () => { Object.assign(x, { k: x.k + 1, j: 0, wrong: [], got: [], typed: '', solved: false, msg: '', miss: false }); render(); };
 }
 function renderStation() {
   const q = U.byN(S.cur), st = qs(S.cur), P = q.parts;
+  if (exOpen === q.n && EX(q.n)) return renderExtra(q);
   let parts = '';
   for (let k = 0; k < S.part; k++) {
     const sk = st.sk[k];
@@ -369,20 +420,20 @@ function renderStation() {
   parts += '<div class="part now pop"><p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
-  view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 style="margin:0">Station ' + q.n + '</h2>' +
+  // under the answer box: show the station problem, or open an extra example
+  const tools = '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
+    (EX(q.n) ? '<button class="pill2 ex" id="exb">💡 Need an extra example?</button>' : '') + '</div>' +
+    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</div>' : '');
+  view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 class="stitle">Station ' + q.n + '</h2>' +
     '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
-    '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
-    (EX(q.n) ? '<button class="pill2 ex' + (exOpen === q.n ? ' on' : '') + '" id="exb">💡 ' + (exOpen === q.n ? 'Hide example' : 'Need an extra example?') + '</button>' : '') + '</div>' +
-    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</div>' : '') +
-    (exOpen === q.n ? exPanel(q.n) : '') + '</section>' +
-    '<section>' + parts + '</section></div>';
+    '</section>' +
+    '<section>' + parts.replace(/<\/div>$/, tools + '</div>') + '</section></div>';
 
   // roles pop up for a few seconds when a station opens, then fade away
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
   if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
   $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
-  if ($('#exb')) $('#exb').onclick = () => { exOpen = exOpen === q.n ? 0 : q.n; render(); };
-  if ($('#exnext')) $('#exnext').onclick = () => { exStep[q.n] = (exStep[q.n] || 1) + 1; render(); };
+  if ($('#exb')) $('#exb').onclick = () => { exOpen = q.n; render(); scrollTo(0, 0); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
   else if (p.t === 'expr') {
     const a = $('#ans');
