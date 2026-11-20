@@ -335,7 +335,7 @@ function renderStation() {
   parts += '<div class="part now pop"><p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
-  view.innerHTML = '<div class="stn"><section class="card"><h2 style="margin:0">Go to Station ' + q.n + '</h2>' + jobBar(jobs(doneList().length)) +
+  view.innerHTML = '<div class="stn"><section class="card"><h2 style="margin:0">Station ' + q.n + '</h2>' + jobBar(jobs(doneList().length)) +
     '<button class="btn line violet" id="leave" style="margin-top:.9rem">&larr; Wrong station? Back to the board</button></section>' +
     '<section>' + parts + '</section></div>';
 
