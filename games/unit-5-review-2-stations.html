@@ -6,7 +6,7 @@
 <title>Stations: Functions and Sequences (Unit 5 Review #2)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Mono:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Lilita+One&family=IBM+Plex+Mono:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
 <style>
 :root{
   --bg:#000; --panel:#0d0d12; --panel2:#15151c; --line:#2a2a35;
@@ -192,6 +192,59 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .toast{position:fixed;left:50%;top:1rem;transform:translateX(-50%);z-index:20;background:var(--green);color:#000;font:800 1.6rem var(--disp);padding:.6rem 1.6rem;border-radius:999px;box-shadow:0 8px 30px rgba(53,240,154,.35)}
 .foot{margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.8rem;justify-content:flex-end;color:var(--mute);font-size:.9rem}
 .foot a{color:var(--mute)}
+/* ---------- carnival theme (matches the bonus games) ---------- */
+:root{--bg:#140b29;--panel:#1d1238;--panel2:#271949;--line:#43306e;--mute:#b6abd6;
+  --disp:'Lilita One','Bricolage Grotesque','Segoe UI',system-ui,sans-serif;--gold:#ffd23d;--tent:#e8455a;--cream:#fff1dc;--royal:#2f6fd6}
+body{background:
+  radial-gradient(1100px 520px at 50% -8%,rgba(255,210,61,.14),transparent 62%),
+  repeating-linear-gradient(90deg,rgba(232,69,90,.09) 0 64px,rgba(255,241,220,.035) 64px 128px),
+  var(--bg);padding-top:0}
+/* tent valance and flag bunting across the top */
+.app::before{content:"";display:block;height:50px;margin-inline:calc(-1 * clamp(16px,2.4vw,44px));
+  background:
+    radial-gradient(circle at 32px 14px,var(--gold) 0 31px,transparent 32px) 0 0/128px 50px repeat-x,
+    radial-gradient(circle at 96px 14px,var(--royal) 0 31px,transparent 32px) 0 0/128px 50px repeat-x,
+    linear-gradient(var(--royal),var(--royal)) 0 0/100% 14px no-repeat}
+.app::after{content:"";position:absolute;left:0;right:0;top:46px;height:34px;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='34'%3E%3Cpath d='M0 4 Q85 14 170 4' stroke='%23fff' stroke-opacity='.6' fill='none'/%3E%3Cpath d='M7 6h20l-10 22z' fill='%23ffd23d'/%3E%3Cpath d='M41 9h20l-10 22z' fill='%233ff09a'/%3E%3Cpath d='M75 10h20l-10 22z' fill='%2333d6ff'/%3E%3Cpath d='M109 9h20l-10 22z' fill='%23ff8a3a'/%3E%3Cpath d='M143 6h20l-10 22z' fill='%23b18cff'/%3E%3C/svg%3E") 0 0/170px 34px repeat-x}
+.app{position:relative}
+.top{padding-top:2.2rem}
+.top h1{font-family:var(--disp);font-weight:400;letter-spacing:.01em;color:var(--cream);text-shadow:0 3px 0 #7a1f9e,0 0 24px rgba(255,210,61,.35)}
+.top h1 .c{color:var(--gold)}
+.pill{border-color:rgba(255,210,61,.45);background:rgba(0,0,0,.25)}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 40%),var(--panel);border:2px solid rgba(255,210,61,.28);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:400;letter-spacing:.01em}
+.btn.fill{box-shadow:0 5px 0 rgba(0,0,0,.4)}
+.btn.fill:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.fill.green{background:var(--gold)}
+.field input{background:#0d0720}
+/* station tiles look like carnival tickets */
+.nums.g4 .num,.nums.g6 .num{--tk:var(--tent);border:0;color:var(--cream);background:
+  radial-gradient(circle at 0 50%,#1f1440 0 11px,transparent 12px),
+  radial-gradient(circle at 100% 50%,#1f1440 0 11px,transparent 12px),
+  linear-gradient(160deg,color-mix(in srgb,var(--tk) 82%,#fff),var(--tk));
+  outline:2px dashed rgba(255,241,220,.55);outline-offset:-9px;font-family:var(--disp);font-weight:400;
+  text-shadow:0 2px 0 rgba(0,0,0,.25);box-shadow:0 6px 0 rgba(0,0,0,.35)}
+.nums .num:nth-child(4n+2){--tk:#2f6fd6} .nums .num:nth-child(4n+3){--tk:#8a2fc0} .nums .num:nth-child(4n+4){--tk:#e0761f}
+.nums.g4 .num:hover:not(:disabled),.nums.g6 .num:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px) rotate(-1deg)}
+.nums .num small{color:var(--cream);opacity:.9}
+/* "Station 9" heading is a marquee sign with lights */
+.stitle{display:inline-block;color:#fff;padding:.25em .7em .3em;border-radius:16px;border:3px solid var(--gold);
+  background:radial-gradient(circle,#fff6b0 0 3px,transparent 4px) 0 4px/22px 12px repeat-x,
+             radial-gradient(circle,#fff6b0 0 3px,transparent 4px) 0 calc(100% - 4px)/22px 12px repeat-x,#7a1f9e;
+  box-shadow:0 0 22px rgba(255,210,61,.35)}
+.part{background:var(--panel2);border-color:var(--line)}
+.part.now{border-color:rgba(255,210,61,.45)}
+.ch{background:#1a1033}
+/* celebration and finish screens */
+.yay{background:radial-gradient(600px 260px at 50% 0,rgba(255,210,61,.18),transparent 70%),var(--panel)}
+.yay .hd{color:var(--gold);text-shadow:0 4px 0 #7a1f9e}
+.win{display:inline-block;color:#2a1500;background:var(--gold);border-radius:999px;padding:.35em 1.1em;box-shadow:0 5px 0 #b8860b}
+.sheets a{background:var(--gold);color:#2a1500}
+.sheets .sh{border-color:rgba(255,210,61,.6)}
+.sheets .code b{color:var(--gold)}
+.rolepop{background:#271949;border-color:rgba(255,210,61,.45)}
+@media (max-width:520px){.stitle{font-size:1.7rem;padding:.5em .6em .55em}}
 </style>
 </head>
 <body>
