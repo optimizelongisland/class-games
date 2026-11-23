@@ -124,6 +124,12 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .sthead #leave{white-space:nowrap}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
 .turn.steal{color:var(--yellow)}
+.tsum{max-width:1180px;margin-inline:auto}
+.tstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.7rem;margin-bottom:.8rem}
+.tstats div{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:.7rem .9rem;text-align:center}
+.tstats b{display:block;font:400 1.8rem var(--disp);color:var(--gold,#ffd23d)}
+.tstats span{font-size:.9rem;color:var(--mute)}
+.tflags{margin:0;padding-left:1.2rem;line-height:1.6}
 .win{font:800 clamp(1.3rem,1rem + 1.2vw,1.8rem) var(--disp);color:var(--yellow);margin:.2rem 0 .8rem}
 .sthead{display:flex;align-items:center;justify-content:flex-start;gap:.9rem;flex-wrap:wrap}
 .sthead .btn{font-size:.85rem;padding:.4rem .75rem;min-height:0}
@@ -534,6 +540,12 @@ function renderStation() {
 // after a wrong answer the next partner can steal. Whoever gets it right plays the carnival game and gets the points.
 // The game for one station is the same game at the next station, so each partner gets the same game; then a new one.
 // All 6 games play before any repeats. The winner shows on the finish screen.
+// the station's game goes to whoever got the most parts right there (the station owner wins ties)
+function stationWinner(st, d) {
+  const n = Math.max(1, people().length), own = d % n, won = st.won || {};
+  let best = own; for (let k = 0; k < n; k++) if ((won[k] || 0) > (won[best] || 0)) best = k;
+  return best;
+}
 const owner = () => doneList().length % Math.max(1, people().length);
 const answerer = () => (owner() + (S.wrongNow || 0)) % Math.max(1, people().length);
 function turnLine() {
@@ -564,8 +576,10 @@ function submit(val, el) {
   if (r.ok) {
     st.got = st.got || []; st.got[S.part] = p.t === 'mc' ? U.keyOf(p) : String(val).trim();
     const d = doneList().length, k = answerer();   // d = this team's station count so far (0 = first)
+    st.won = st.won || {}; st.won[k] = (st.won[k] || 0) + 1;   // who answered this part right
+    const msg = PRAISE[Math.floor(Math.random() * PRAISE.length)];
     advance();
-    reward(PRAISE[Math.floor(Math.random() * PRAISE.length)], d, k);
+    if (st.done) reward(msg, d, stationWinner(st, d)); else toast(msg);   // one game per station, after the last part
     return;
   }
   st.w[S.part] = (st.w[S.part] || 0) + 1; S.wrongNow++;
@@ -734,11 +748,30 @@ function renderBetween() {
     '';
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
 }
+// "Show your teacher": a quick summary that stays on this device
+function teacherCard() {
+  let parts = 0, first = 0, fixed = 0, hints = 0, skips = 0;
+  for (const q of U.READY) {
+    const st = S.q['q' + q.n]; if (!st || !st.done) continue;
+    q.parts.forEach((_, i) => { parts++; if ((st.sk || [])[i]) skips++; else if (!((st.w || [])[i])) first++; else fixed++; });
+    hints += st.h || 0;
+  }
+  const P = people();
+  const flags = P.map((nm, k) => { const L = U.READY.filter(q => (S.feel['q' + q.n] || {})[k] === 'more').map(q => q.n);
+    return '<li><b>' + esc(nm) + '</b>: ' + (L.length ? 'wants more practice on Station' + (L.length > 1 ? 's ' : ' ') + L.join(', ') : 'felt good about every station') + '</li>'; }).join('');
+  return '<section class="card tsum"><p class="lab">Show your teacher</p>' +
+    '<div class="tstats"><div><b>' + doneList().length + '</b><span>stations done</span></div>' +
+    '<div><b>' + first + ' / ' + parts + '</b><span>right on the first try</span></div>' +
+    '<div><b>' + fixed + '</b><span>fixed after a mistake</span></div>' +
+    '<div><b>' + hints + '</b><span>hints used</span></div>' +
+    '<div><b>' + skips + '</b><span>parts skipped</span></div></div>' +
+    '<ul class="tflags">' + flags + '</ul></section>';
+}
 function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
     (winnerLine() ? '<p class="win">' + winnerLine() + '</p>' : '') +
-    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>';
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>' + teacherCard();
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
