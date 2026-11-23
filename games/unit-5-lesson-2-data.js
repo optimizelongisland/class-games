@@ -280,5 +280,33 @@ function keyOf(part) {
   return String(part.answer);
 }
 
-window.U5L2 = { Q, H: { v, fr, sup, nw, rt, M }, READY: Q, byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean, SITE, dbBase: () => '' };
+// Practice codes: partners share one computer, so each student gets a short code like "Fox7K"
+// to open their own sheet later on any device. The letters after the animal are the stations as a
+// bitmask, written without look-alike characters (no 0, O, 1, I, L). The animal is a check: it is
+// worked out from the stations, so a typo almost always gives the wrong animal. Not case-sensitive.
+const ANIMALS = ['Bear', 'Fox', 'Owl', 'Wolf', 'Hawk', 'Otter', 'Tiger', 'Panda', 'Koala', 'Moose', 'Lynx', 'Eagle', 'Shark', 'Zebra', 'Llama', 'Gecko', 'Bison', 'Raven'];
+const ABC = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+const animalOf = m => ANIMALS[(Math.imul(m, 2654435761) >>> 0) % ANIMALS.length];
+function practiceCode(list) {
+  let m = list.reduce((a, n) => a | (1 << (n - 1)), 0), t = '';
+  if (!m) return '';
+  const m0 = m;
+  while (m) { t = ABC[m % ABC.length] + t; m = Math.floor(m / ABC.length); }
+  return animalOf(m0) + t;
+}
+function readCode(code) {
+  const c = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const an = ANIMALS.find(a => c.startsWith(a.toUpperCase()));
+  if (!an) return null;
+  let m = 0;
+  for (const ch of c.slice(an.length)) { const d = ABC.indexOf(ch); if (d < 0) return null; m = m * ABC.length + d; }
+  if (!m || m >= (1 << 18) || animalOf(m) !== an) return null;
+  const out = [];
+  for (let n = 1; n <= 18; n++) if (m & (1 << (n - 1))) out.push(n);
+  return out;
+}
+
+
+window.U5L2 = { Q, H: { v, fr, sup, nw, rt, M }, READY: Q, byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean, SITE, dbBase: () => '',
+  practiceCode, readCode, practiceURL: (name, list, period) => 'unit-5-lesson-2-practice.html?name=' + encodeURIComponent(name) + '&q=' + list.join(',') + (period ? '&p=' + period : '') };
 })();

@@ -240,13 +240,15 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
 .yay .hd{color:var(--gold)}
 .win{display:inline-block;color:#1a1200;background:var(--gold);border-radius:8px;padding:.35em 1.1em;box-shadow:0 5px 0 #a8820f}
 .rolepop{background:var(--panel2);border-color:rgba(255,204,51,.45)}
+.sheets a{background:var(--gold);color:#1a1200;font-family:var(--disp);text-transform:uppercase;letter-spacing:.02em}
+.sheets .sh{border-color:rgba(255,204,51,.6)}
+.sheets .code b{color:var(--gold);font-family:var(--disp)}
 .turn{font-family:var(--disp);text-transform:uppercase;letter-spacing:.03em;font-weight:600}
 /* picture and table choices: 2 x 2 like the packet (1 and 2 on the left, 3 and 4 on the right) */
 .chs.grid2{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;grid-auto-flow:column}
 .chs.grid2 .ch{align-items:flex-start;padding:.6rem}
 .cimg{display:block;width:100%;max-width:260px;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:10px;padding:4px}
 .ch.bad .cimg{opacity:.5}
-.ch .nw{white-space:normal!important}
 .tb{border-collapse:collapse;text-align:center;font:600 1.05rem var(--mono)}
 .tb th,.tb td{border:2px solid #5a6f96;padding:.15rem .9rem}
 .tb th{background:rgba(255,255,255,.08);font-family:var(--body)}
@@ -258,7 +260,10 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
 .rels .r2 .nw{white-space:normal!important}
 @media (max-width:640px){.rels{grid-template-columns:1fr}.chs.grid2 .ch .k{width:1.8rem;height:1.8rem}}
 @media (max-width:520px){.stitle{font-size:1.9rem}}
+.ch .nw{white-space:normal!important}
 @media (max-width:560px){.sthead{flex-wrap:wrap}.chs.grid2{gap:.5rem}.chs.grid2 .ch{flex-direction:column;align-items:stretch;gap:.4rem;padding:.45rem}.chs.grid2 .cimg{max-width:none}.chs.grid2 .tb{font-size:.95rem}.chs.grid2 .tb th,.chs.grid2 .tb td{padding:.1rem .45rem}}
+.graph.mini{max-width:220px;margin:0}
+.panel .chs.grid2 .ch{align-items:flex-start}
 </style>
 </head>
 <body>
@@ -273,6 +278,7 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
 </div>
 <div class="toast" id="toast" hidden></div>
 <script src="unit-5-lesson-2-data.js?v=1"></script>
+<script src="unit-5-lesson-2-practice-data.js?v=1"></script>
 <script src="unit-5-lesson-2-arena.js?v=1"></script>
 <script>
 'use strict';
@@ -339,7 +345,7 @@ function render() {
   // "Class is ending?" on every screen once the team has names, so they can grab their codes mid-problem
   if (['pick', 'station', 'feel', 'between'].includes(S.screen) && people().length && !picking) view.insertAdjacentHTML('beforeend', endBox());
 }
-const endBox = () => '<details class="card endbox"><summary style="cursor:pointer;color:var(--mute)">Class is ending? Show your teacher your summary</summary>' + teacherCard() + '</details>';
+const endBox = () => '<details class="card endbox"><summary style="cursor:pointer;color:var(--mute)">Class is ending? Open your practice sheets now</summary>' + sheetLinks() + '</details>';
 
 function renderResume() {
   view.innerHTML = '<section class="card"><p class="lab">New class?</p><h2>Is this a new team?</h2>' +
@@ -406,7 +412,7 @@ function exPanel(n) {
   let h = '<div class="panel" id="expanel"><p class="tag">Extra example for Station ' + n + '</p><p class="ptext" style="margin:0 0 .4rem">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
     Sb.slice(0, x.j).map((p, i) => '<div class="part ok"><p class="pq"><b>' + PLx(i) + '</b> ' + p.q + '</p><div class="got">✓ ' + shown(p, i) + '</div></div>').join('') +
     '<div class="part now"><p class="pq">' + (one ? (cur.q || 'Your answer:') : '<b>' + PLx(x.j) + '</b> ' + cur.q) + '</p>';
-  if (cur.t === 'mc') h += '<div class="chs" id="xchs">' + cur.choices.map((c, i) => { const bad = x.wrong.includes(i), ok = x.solved && i === cur.right;
+  if (cur.t === 'mc') h += '<div class="chs' + (cur.choices.some(c => /<svg|<table/.test(c)) ? ' grid2' : '') + '" id="xchs">' + cur.choices.map((c, i) => { const bad = x.wrong.includes(i), ok = x.solved && i === cur.right;
       return '<button class="ch' + (bad ? ' bad' : '') + (ok ? ' good' : '') + '" data-i="' + i + '"' + (bad || x.solved ? ' disabled' : '') + '><span class="k">' + 'ABCDEF'[i] + '</span><span>' + c + '</span></button>'; }).join('') + '</div>';
   else if (cur.t === 'expr') h += '<form class="ans" id="xansf" autocomplete="off">' + (cur.prefix ? '<span class="pre">' + cur.prefix + '</span>' : '') +
       '<div class="mf" id="xans" contenteditable="' + (x.solved ? 'false' : 'true') + '" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer"></div>' +
@@ -492,15 +498,18 @@ function renderStation() {
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   // under the answer box: show the station problem, or open an extra example
-  const tools = EX(q.n) ? '<div class="tools"><button class="pill2 ex" id="exb">💡 Need an extra example?</button></div>' : '';
+  const tools = '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
+    (EX(q.n) ? '<button class="pill2 ex" id="exb">💡 Need an extra example?</button>' : '') + '</div>' +
+    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</div>' : '');
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 class="stitle">Station ' + q.n + '</h2>' +
     '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
-    '<div class="qtext">' + q.text + '</div></section>' +
-    '<section>' + parts + (tools ? '<section class="card toolcard">' + tools + '</section>' : '') + '</section></div>';
+    '</section>' +
+    '<section>' + parts + '<section class="card toolcard">' + tools + '</section></section></div>';
 
   // roles pop up for a few seconds when a station opens, then fade away
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
   if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
+  $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
   if ($('#exb')) $('#exb').onclick = () => { exOpen = q.n; render(); scrollTo(0, 0); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
   else if (p.t === 'expr') {
@@ -675,7 +684,7 @@ function renderFeel() {
     '<div class="feel" id="feel">' +
     P.map((nm, k) => '<div class="fp"><p class="who">' + esc(nm) + '</p><div class="row">' +
       '<button class="btn pick-good' + (f[k] === 'good' ? ' on' : '') + '" data-k="' + k + '" data-v="good">👍 I’ve got it</button>' +
-      '<button class="btn pick-more' + (f[k] === 'more' ? ' on' : '') + '" data-k="' + k + '" data-v="more">📝 I need more practice on this</button></div></div>').join('') +
+      '<button class="btn pick-more' + (f[k] === 'more' ? ' on' : '') + '" data-k="' + k + '" data-v="more">📝 Give me extra problems to practice later</button></div></div>').join('') +
     '</div><div class="row" style="justify-content:center;margin-top:1.2rem"><button class="btn fill green big" id="nextst"' + (all ? '' : ' disabled') + '>' + (all ? 'Next station &rarr;' : 'Everyone pick one first') + '</button></div></section>';
   $('#feel').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; f[b.dataset.k] = b.dataset.v; render(); sync(); };
   $('#nextst').onclick = leaveStation;
@@ -693,7 +702,7 @@ function sheetLinks() {
     return '<div class="sh">' + (code ? '<p class="code"><span>' + esc(nm) + ', write down your code:</span><b>' + code + '</b></p>' : '') +
       '<a href="' + U.practiceURL(nm, L) + '" target="_blank" rel="noopener">Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
   }).join('') + '</div>' +
-  '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Additional Practice – Unit 5 Review</b></li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
+  '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Additional Practice – Lesson 2</b></li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
 }
 
 // Without the live board: go to the next unfinished station in number order (5 -> 6 -> 7 ...).
@@ -775,7 +784,7 @@ function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
     (winnerLine() ? '<p class="win">' + winnerLine() + '</p>' : '') +
-    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Show your teacher the summary below.</p></section>' + teacherCard();
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>' + teacherCard();
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
