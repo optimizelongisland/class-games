@@ -581,7 +581,7 @@ function renderFeel() {
     '<div class="feel" id="feel">' +
     P.map((nm, k) => '<div class="fp"><p class="who">' + esc(nm) + '</p><div class="row">' +
       '<button class="btn pick-good' + (f[k] === 'good' ? ' on' : '') + '" data-k="' + k + '" data-v="good">👍 I’ve got it</button>' +
-      '<button class="btn pick-more' + (f[k] === 'more' ? ' on' : '') + '" data-k="' + k + '" data-v="more">📝 Add extra practice to my sheet</button></div></div>').join('') +
+      '<button class="btn pick-more' + (f[k] === 'more' ? ' on' : '') + '" data-k="' + k + '" data-v="more">📝 Give me extra problems to practice later</button></div></div>').join('') +
     '</div><div class="row" style="justify-content:center;margin-top:1.2rem"><button class="btn fill green big" id="nextst"' + (all ? '' : ' disabled') + '>' + (all ? 'Next station &rarr;' : 'Everyone pick one first') + '</button></div></section>';
   $('#feel').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; f[b.dataset.k] = b.dataset.v; render(); sync(); };
   $('#nextst').onclick = leaveStation;
