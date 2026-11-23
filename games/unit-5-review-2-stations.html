@@ -125,6 +125,17 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
 .turn.steal{color:var(--yellow)}
 .tsum{max-width:1180px;margin-inline:auto}
+.pcount{max-width:1180px;margin-inline:auto;text-align:center}
+.prizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.8rem;margin-top:.8rem}
+.prize{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:1rem .8rem;border-radius:16px;border:2px solid var(--gold,#ffd23d);background:var(--panel2);color:var(--ink,#fff);font:inherit;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.35)}
+.prize:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.12)}
+.prize .ri{font-size:2.4rem}.prize b{font-size:1.05rem}
+.prize .tk{font:400 1.25rem var(--disp);color:var(--gold,#ffd23d)}
+.prize.locked{opacity:.45;border-style:dashed;cursor:not-allowed}
+.prize small{color:var(--mute)}
+.receipt{display:inline-flex;align-items:center;gap:1rem;text-align:left;padding:1rem 1.4rem;border-radius:16px;border:2px dashed var(--gold,#ffd23d);background:var(--panel2);margin:.6rem 0}
+.receipt .ri{font-size:3rem}.receipt b{display:block;font:400 1.6rem var(--disp);color:var(--gold,#ffd23d)}.receipt span{color:var(--mute)}
+.ptip{margin:.4rem 0}.tprize{margin:.6rem 0 0;color:var(--mute)}.tprize b{color:var(--ink,#fff)}
 .tstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.7rem;margin-bottom:.8rem}
 .tstats div{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:.7rem .9rem;text-align:center}
 .tstats b{display:block;font:400 1.8rem var(--disp);color:var(--gold,#ffd23d)}
@@ -266,7 +277,7 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 <div class="toast" id="toast" hidden></div>
 <script src="unit-5-review-2-data.js?v=32"></script>
 <script src="unit-5-review-2-practice-data.js?v=29"></script>
-<script src="unit-5-review-2-carnival.js?v=3"></script>
+<script src="unit-5-review-2-carnival.js?v=4"></script>
 <script>
 'use strict';
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
@@ -320,7 +331,7 @@ setInterval(() => { if (!document.hidden) sync(true); }, 20000);
 
 function meta() {
   const live = U.dbBase() ? '<span class="pill"><span class="dot ' + (online === false ? 'off' : online ? 'on' : '') + '"></span>' + (online === false ? 'Board offline' : 'Board') + '</span>' : '';
-  $('#meta').innerHTML = (S.started ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' + (hasPts() ? '<span class="pill">⭐ ' + scoreList().map(x => esc(x.name) + ' ' + x.pts).join(' · ') + '</span>' : '') : '') + live;
+  $('#meta').innerHTML = (S.started ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' + (hasPts() ? '<span class="pill">🎟️ ' + tix() + ' team tickets</span>' : '') : '') + live;
 }
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1600); }
 
@@ -536,8 +547,9 @@ function renderStation() {
   $('#leave').onclick = () => { S.screen = 'pick'; render(); sync(true); };
 }
 
-// Head-to-head: partners take turns owning a station (they switch every station). The owner answers first;
-// after a wrong answer the next partner can steal. Whoever gets it right plays the carnival game and gets the points.
+// Team tickets: partners take turns owning a station (they switch every station). The owner answers first;
+// after a wrong answer the next partner can assist. Every right answer and every carnival game point goes into
+// ONE shared ticket total, and the team cashes in at the Prize Counter on the finish screen.
 // The game for one station is the same game at the next station, so each partner gets the same game; then a new one.
 // All 6 games play before any repeats. The winner shows on the finish screen.
 // the station's game goes to whoever got the most parts right there (the station owner wins ties)
@@ -551,7 +563,7 @@ const answerer = () => (owner() + (S.wrongNow || 0)) % Math.max(1, people().leng
 function turnLine() {
   const P = people(); if (P.length < 2) return '';
   const a = answerer();
-  return S.wrongNow ? '<p class="turn steal">🔁 Steal! <b>' + esc(P[a]) + '</b>, your turn to answer</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
+  return S.wrongNow ? '<p class="turn steal">🤝 Assist! <b>' + esc(P[a]) + '</b>, help your team out</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
 }
 // Add ?nofun to the address to turn the games off.
 const NOFUN = new URLSearchParams(location.search).has('nofun');
@@ -559,16 +571,21 @@ function reward(msg, d, k) {
   if (NOFUN || !window.Carnival) { toast(msg); return; }
   const P = people(), n = P.length || 1, who = P[k] || '', round = Math.floor(d / n);
   if (S.rgRound !== round || !S.rg) { S.rg = Carnival.pick(); S.rgRound = round; }
-  S.ppts = S.ppts || {}; save();
-  Carnival.play({ msg, who, game: S.rg, scores: scoreList(), onDone: p => { S.ppts[k] = (S.ppts[k] || 0) + p; save(); meta(); return scoreList(); } });
+  save();
+  Carnival.play({ msg, who, game: S.rg, unit: 'tickets', team: 'Your team', scores: scoreList(),
+    onDone: p => { S.tix = tix() + p; save(); meta(); return scoreList(); } });
 }
-const scoreList = () => people().map((name, k) => ({ name, pts: (S.ppts || {})[k] || 0 }));
-const hasPts = () => scoreList().some(x => x.pts > 0);
-function winnerLine() {
-  const L = scoreList(); if (!hasPts() || L.length < 2) return L.length === 1 && hasPts() ? '⭐ ' + esc(L[0].name) + ' won ' + L[0].pts + ' carnival points!' : '';
-  const top = Math.max(...L.map(x => x.pts)), w = L.filter(x => x.pts === top);
-  return (w.length > 1 ? '🏆 It’s a tie! ' : '🏆 ' + esc(w[0].name) + ' wins the carnival! ') + L.map(x => esc(x.name) + ' ' + x.pts).join(' · ');
-}
+// shared team tickets: 3 for a right answer on the first try, 1 for a fix or an assist, plus every game point
+const tix = () => S.tix || 0;
+const scoreList = () => [{ name: '🎟️ Team tickets', pts: tix() }];
+const hasPts = () => tix() > 0;
+// Prize Counter: edit names and prices here. The team picks one prize; each partner gets one.
+const PRIZES = [
+  { t: 50, icon: '⭐', name: 'Sticker or fun pencil' },
+  { t: 100, icon: '🍬', name: 'Candy' },
+  { t: 150, icon: '💺', name: 'Pick your seat tomorrow' },
+  { t: 200, icon: '🎫', name: 'Homework pass' }
+];
 const PRAISE = ['Good job!', 'Good job!', 'Nice work!', 'You got it!'];
 function submit(val, el) {
   const q = U.byN(S.cur), st = qs(S.cur), p = q.parts[S.part], r = U.check(p, val), fb = $('#fb');
@@ -577,9 +594,10 @@ function submit(val, el) {
     st.got = st.got || []; st.got[S.part] = p.t === 'mc' ? U.keyOf(p) : String(val).trim();
     const d = doneList().length, k = answerer();   // d = this team's station count so far (0 = first)
     st.won = st.won || {}; st.won[k] = (st.won[k] || 0) + 1;   // who answered this part right
-    const msg = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+    const earn = (st.w || [])[S.part] ? 1 : 3; S.tix = tix() + earn;   // answer tickets
+    const msg = PRAISE[Math.floor(Math.random() * PRAISE.length)] + ' +' + earn + ' 🎟️';
     advance();
-    if (st.done) reward(msg, d, stationWinner(st, d)); else toast(msg);   // one game per station, after the last part
+    if (st.done) reward(msg, d, stationWinner(st, d)); else { toast(msg); meta(); }   // one game per station, after the last part
     return;
   }
   st.w[S.part] = (st.w[S.part] || 0) + 1; S.wrongNow++;
@@ -592,9 +610,9 @@ function submit(val, el) {
   const f = $('#fb');
   f.className = 'fb bad';
   const jj = jobs(doneList().length);
-  f.innerHTML = (r.msg ? esc(r.msg) : people().length > 1 ? 'Not quite. ' + esc(people()[answerer()]) + ', you can steal it!' : 'Not quite. Talk it through again and check your work.') +
+  f.innerHTML = (r.msg ? esc(r.msg) : people().length > 1 ? 'Not quite. ' + esc(people()[answerer()]) + ', you can assist!' : 'Not quite. Talk it through again and check your work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
-  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner can steal
+  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner can assist
   if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
   else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
 }
@@ -765,13 +783,28 @@ function teacherCard() {
     '<div><b>' + fixed + '</b><span>fixed after a mistake</span></div>' +
     '<div><b>' + hints + '</b><span>hints used</span></div>' +
     '<div><b>' + skips + '</b><span>parts skipped</span></div></div>' +
-    '<ul class="tflags">' + flags + '</ul></section>';
+    '<ul class="tflags">' + flags + '</ul>' +
+    (hasPts() ? '<p class="tprize">🎟️ ' + tix() + ' team tickets' + (PRIZES[S.prize] ? ' · Prize: <b>' + esc(PRIZES[S.prize].name) + '</b>' : ' · no prize picked yet') + '</p>' : '') + '</section>';
 }
 function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
-    (winnerLine() ? '<p class="win">' + winnerLine() + '</p>' : '') +
-    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>' + teacherCard();
+    (hasPts() ? '<p class="win">🎟️ Your team earned ' + tix() + ' tickets!</p>' : '') +
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>' +
+    (NOFUN ? '' : prizeCounter()) + teacherCard();
+  const pc = $('#prizes'); if (pc) pc.onclick = e => { const b = e.target.closest('[data-p]'); if (!b || b.disabled) return;
+    S.prize = +b.dataset.p; save(); renderFinished(); $('#pcounter').scrollIntoView({ block: 'center' }); };
+  const ch = $('#pchange'); if (ch) ch.onclick = () => { S.prize = null; save(); renderFinished(); $('#pcounter').scrollIntoView({ block: 'center' }); };
+}
+function prizeCounter() {
+  const T = tix(), got = PRIZES[S.prize];
+  if (got) return '<section class="card pcount" id="pcounter"><p class="lab">Prize Counter</p>' +
+    '<div class="receipt"><span class="ri">' + got.icon + '</span><div><b>' + esc(got.name) + '</b><span>' + got.t + ' tickets · one for each of ' + people().map(esc).join(' and ') + '</span></div></div>' +
+    '<p class="ptip">Show this to your teacher to get your prize.</p><button class="btn" id="pchange">Change prize</button></section>';
+  return '<section class="card pcount" id="pcounter"><p class="lab">Prize Counter</p><p class="ptip">You have <b>' + T + ' 🎟️</b>. Pick one prize for your team.</p>' +
+    '<div class="prizes" id="prizes">' + PRIZES.map((p, i) => '<button class="prize' + (T >= p.t ? '' : ' locked') + '" data-p="' + i + '"' + (T >= p.t ? '' : ' disabled') + '>' +
+      '<span class="ri">' + p.icon + '</span><b>' + esc(p.name) + '</b><span class="tk">' + p.t + ' 🎟️</span>' +
+      (T >= p.t ? '' : '<small>' + (p.t - T) + ' more needed</small>') + '</button>').join('') + '</div></section>';
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
