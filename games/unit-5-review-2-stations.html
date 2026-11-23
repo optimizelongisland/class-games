@@ -122,6 +122,9 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 @keyframes rolepop{0%{opacity:0;transform:translate(-50%,-10px)}8%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;visibility:hidden}}
 .stitle{margin:0;font-size:clamp(2.2rem,1.6rem + 2vw,3rem);line-height:1.05;white-space:nowrap}
 .sthead #leave{white-space:nowrap}
+.turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
+.turn.steal{color:var(--yellow)}
+.win{font:800 clamp(1.3rem,1rem + 1.2vw,1.8rem) var(--disp);color:var(--yellow);margin:.2rem 0 .8rem}
 .sthead{display:flex;align-items:center;justify-content:flex-start;gap:.9rem;flex-wrap:wrap}
 .sthead .btn{font-size:.85rem;padding:.4rem .75rem;min-height:0}
 @media (max-width:560px){.sthead .wl{display:none}.sthead{flex-wrap:nowrap}}
@@ -204,7 +207,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 <div class="toast" id="toast" hidden></div>
 <script src="unit-5-review-2-data.js?v=32"></script>
 <script src="unit-5-review-2-practice-data.js?v=29"></script>
-<script src="unit-5-review-2-carnival.js?v=2"></script>
+<script src="unit-5-review-2-carnival.js?v=3"></script>
 <script>
 'use strict';
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
@@ -258,7 +261,7 @@ setInterval(() => { if (!document.hidden) sync(true); }, 20000);
 
 function meta() {
   const live = U.dbBase() ? '<span class="pill"><span class="dot ' + (online === false ? 'off' : online ? 'on' : '') + '"></span>' + (online === false ? 'Board offline' : 'Board') + '</span>' : '';
-  $('#meta').innerHTML = (S.started ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' + (S.pts ? '<span class="pill">⭐ ' + S.pts + ' points</span>' : '') : '') + live;
+  $('#meta').innerHTML = (S.started ? '<span class="pill">' + esc(label()) + '</span><span class="pill">' + doneList().length + ' / ' + U.READY.length + ' done</span>' + (hasPts() ? '<span class="pill">⭐ ' + scoreList().map(x => esc(x.name) + ' ' + x.pts).join(' · ') + '</span>' : '') : '') + live;
 }
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1600); }
 
@@ -419,7 +422,7 @@ function renderStation() {
   const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
   const help = '<div class="helpbar">' + (S.hintNow < hints.length ? '<button class="btn line violet" id="hintb">Need a hint?' + (S.hintNow ? ' (' + (hints.length - S.hintNow) + ' more)' : '') + '</button>' : '') +
     (S.wrongNow >= 3 ? '<button class="link" id="skip">Skip this part for now (tell your teacher)</button>' : '') + '</div>';
-  parts += '<div class="part now pop"><p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
+  parts += '<div class="part now pop">' + turnLine() + '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   // under the answer box: show the station problem, or open an extra example
@@ -474,14 +477,32 @@ function renderStation() {
   $('#leave').onclick = () => { S.screen = 'pick'; render(); sync(true); };
 }
 
-// After each correct answer a random carnival game pops up. Partners take turns; points go to one team score.
+// Head-to-head: partners take turns owning a station (they switch every station). The owner answers first;
+// after a wrong answer the next partner can steal. Whoever gets it right plays the carnival game and gets the points.
+// The game for one station is the same game at the next station, so each partner gets the same game; then a new one.
+// All 6 games play before any repeats. The winner shows on the finish screen.
+const owner = () => doneList().length % Math.max(1, people().length);
+const answerer = () => (owner() + (S.wrongNow || 0)) % Math.max(1, people().length);
+function turnLine() {
+  const P = people(); if (P.length < 2) return '';
+  const a = answerer();
+  return S.wrongNow ? '<p class="turn steal">🔁 Steal! <b>' + esc(P[a]) + '</b>, your turn to answer</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
+}
 // Add ?nofun to the address to turn the games off.
 const NOFUN = new URLSearchParams(location.search).has('nofun');
-function reward(msg) {
+function reward(msg, d, k) {
   if (NOFUN || !window.Carnival) { toast(msg); return; }
-  const P = people(), who = P.length ? P[(S.turn || 0) % P.length] : '';
-  S.turn = (S.turn || 0) + 1; save();
-  Carnival.play({ msg, who, total: S.pts || 0, onDone: p => { S.pts = (S.pts || 0) + p; save(); meta(); return S.pts; } });
+  const P = people(), n = P.length || 1, who = P[k] || '', round = Math.floor(d / n);
+  if (S.rgRound !== round || !S.rg) { S.rg = Carnival.pick(); S.rgRound = round; }
+  S.ppts = S.ppts || {}; save();
+  Carnival.play({ msg, who, game: S.rg, scores: scoreList(), onDone: p => { S.ppts[k] = (S.ppts[k] || 0) + p; save(); meta(); return scoreList(); } });
+}
+const scoreList = () => people().map((name, k) => ({ name, pts: (S.ppts || {})[k] || 0 }));
+const hasPts = () => scoreList().some(x => x.pts > 0);
+function winnerLine() {
+  const L = scoreList(); if (!hasPts() || L.length < 2) return L.length === 1 && hasPts() ? '⭐ ' + esc(L[0].name) + ' won ' + L[0].pts + ' carnival points!' : '';
+  const top = Math.max(...L.map(x => x.pts)), w = L.filter(x => x.pts === top);
+  return (w.length > 1 ? '🏆 It’s a tie! ' : '🏆 ' + esc(w[0].name) + ' wins the carnival! ') + L.map(x => esc(x.name) + ' ' + x.pts).join(' · ');
 }
 const PRAISE = ['Good job!', 'Good job!', 'Nice work!', 'You got it!'];
 function submit(val, el) {
@@ -489,8 +510,9 @@ function submit(val, el) {
   if (r.empty) { fb.className = 'fb info'; fb.textContent = r.msg; return; }
   if (r.ok) {
     st.got = st.got || []; st.got[S.part] = p.t === 'mc' ? U.keyOf(p) : String(val).trim();
+    const d = doneList().length, k = answerer();   // d = this team's station count so far (0 = first)
     advance();
-    reward(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+    reward(PRAISE[Math.floor(Math.random() * PRAISE.length)], d, k);
     return;
   }
   st.w[S.part] = (st.w[S.part] || 0) + 1; S.wrongNow++;
@@ -503,8 +525,9 @@ function submit(val, el) {
   const f = $('#fb');
   f.className = 'fb bad';
   const jj = jobs(doneList().length);
-  f.innerHTML = (r.msg ? esc(r.msg) : jj ? 'Not quite. ' + esc(jj.exp) + ', talk it through again and check ' + esc(jj.rec) + '’s work.' : 'Not quite. Talk it through again and check your work.') +
+  f.innerHTML = (r.msg ? esc(r.msg) : people().length > 1 ? 'Not quite. ' + esc(people()[answerer()]) + ', you can steal it!' : 'Not quite. Talk it through again and check your work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
+  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner can steal
   if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
   else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
 }
@@ -661,7 +684,8 @@ function renderBetween() {
 function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
-    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes' + (S.pts ? ' and won ⭐ ' + S.pts + ' carnival points' : '') + '. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>';
+    (winnerLine() ? '<p class="win">' + winnerLine() + '</p>' : '') +
+    '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>';
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)

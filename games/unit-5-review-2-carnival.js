@@ -2,6 +2,9 @@
    After a correct answer the page calls Carnival.play({ msg, who, total, onDone }).
    A random game (never the same twice in a row) runs in an overlay; onDone(points) returns the new team total. */
 (function () {
+if (window.CanvasRenderingContext2D && !CanvasRenderingContext2D.prototype.roundRect) {   // older browsers
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this; };
+}
 const CSS = `
 .cvn{position:fixed;inset:0;z-index:1000;background:rgba(5,6,15,.82);display:flex;align-items:center;justify-content:center;padding:12px;animation:cvnin .2s}
 @keyframes cvnin{from{opacity:0}}
@@ -50,7 +53,7 @@ function build() {
   const fl = document.createElement('link'); fl.rel = 'stylesheet'; fl.href = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap'; document.head.appendChild(fl);
   const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
   root = document.createElement('div'); root.className = 'cvn'; root.hidden = true;
-  root.innerHTML = '<div class="cvn-box" role="dialog" aria-label="Bonus game"><div class="cvn-top"><span id="cvn-title"></span><span>Team points <b id="cvn-team">0</b></span></div>' +
+  root.innerHTML = '<div class="cvn-box" role="dialog" aria-label="Bonus game"><div class="cvn-top"><span id="cvn-title"></span><span id="cvn-team"></span></div>' +
     '<div id="cvn-stage"><canvas id="cvn-cv"></canvas><div id="cvn-layer"></div><div id="cvn-hud"><span id="cvn-st"></span><span id="cvn-pts">+0</span></div><div id="cvn-bar"></div>' +
     '<div id="cvn-over"><p id="cvn-big"></p><p id="cvn-sub"></p><p id="cvn-how"></p><button id="cvn-go" type="button">Play</button></div></div>' +
     '<div style="text-align:right"><button class="cvn-skip" id="cvn-skip" type="button">Skip game</button></div></div>';
@@ -60,6 +63,23 @@ function build() {
   q('cvn-skip').onclick = close;
   wire();
   window.addEventListener('resize', () => { if (!root.hidden) { fit(); if (!running && phase === 'intro') drawIdle(); } });
+}
+// Shuffle-bag: every game comes up once before any game repeats (kept across page reloads).
+function pick() {
+  const keys = Object.keys(GAMES); let bag = [];
+  try { bag = JSON.parse(localStorage.getItem('cvn-bag') || '[]').filter(g => keys.includes(g)); } catch (e) {}
+  if (!bag.length) {
+    bag = keys.slice(); for (let i = bag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
+    if (bag[0] === lastG) bag.push(bag.shift());
+  }
+  const g = bag.shift(); lastG = g;
+  try { localStorage.setItem('cvn-bag', JSON.stringify(bag)); } catch (e) {}
+  return g;
+}
+// scores: [{ name, pts }] shown at the top, highest first
+function board(scores) {
+  const el = q('cvn-team'); if (!scores || !scores.length) { el.textContent = ''; return; }
+  el.innerHTML = scores.map(x => '<span style="margin-left:.9rem">' + x.name.replace(/[<>&"]/g, '') + ' <b>' + x.pts + '</b></span>').join('');
 }
 function fit() {
   const r = stage.getBoundingClientRect(); W = r.width; H = r.height;
@@ -93,10 +113,10 @@ function drawIdle() {
 }
 function play(o) {
   build(); opts = o || {};
-  const all = Object.keys(GAMES).filter(g => g !== lastG); game = all[Math.floor(Math.random() * all.length)]; lastG = game;
+  game = GAMES[opts.game] ? opts.game : pick();
   running = false; tick = null; cancelAnimationFrame(raf); layer.innerHTML = ''; pts = 0; bar(0); phase = 'intro';
   q('cvn-title').textContent = opts.who ? opts.who + '’s turn' : 'Bonus game';
-  q('cvn-team').textContent = opts.total || 0;
+  board(opts.scores);
   q('cvn-big').textContent = opts.msg || 'Correct!';
   q('cvn-sub').textContent = (opts.who ? opts.who + ', your bonus game: ' : 'Bonus game: ') + GAMES[game].name + '!';
   q('cvn-how').textContent = GAMES[game].how;
@@ -113,11 +133,11 @@ function start() {
 }
 function finish(msg) {
   running = false; tick = null; bar(0); phase = 'done';
-  const got = pts, total = opts.onDone ? opts.onDone(got) : got;
-  q('cvn-team').textContent = total; q('cvn-skip').hidden = true;
+  const got = pts, scores = opts.onDone ? opts.onDone(got) : null;
+  board(scores); q('cvn-skip').hidden = true;
   setTimeout(() => {
     q('cvn-big').textContent = '+' + got + (got === 1 ? ' point' : ' points');
-    q('cvn-sub').textContent = msg + ' Your team has ' + total + ' points.';
+    q('cvn-sub').textContent = msg + (opts.who ? ' ' + opts.who + ' now has ' + ((scores || []).find(x => x.name === opts.who) || { pts: got }).pts + ' points.' : '');
     q('cvn-how').textContent = '';
     q('cvn-go').textContent = 'Back to the station';
     q('cvn-over').hidden = false; q('cvn-go').focus();
@@ -693,5 +713,5 @@ cv.addEventListener('pointerup', e => {
 cv.addEventListener('pointercancel', () => { toss.drag = null; rt.drag = null; });
 }
 
-window.Carnival = { play, close, isOpen: () => !!root && !root.hidden };
+window.Carnival = { play, close, pick, isOpen: () => !!root && !root.hidden };
 })();
