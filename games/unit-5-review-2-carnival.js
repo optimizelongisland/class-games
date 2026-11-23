@@ -190,7 +190,7 @@ function balloonTick(now, dt) {
 /* ---------------- 2. Paper Toss ---------------- */
 let toss = {};
 function tossSetup() {
-  toss = { left: 5, ball: { x: W / 2, y: H - 64, r: Math.max(18, Math.min(26, W * 0.03)) }, fly: null, drag: null, speed: 1.1, t0: performance.now(), trail: [], streak: 0, face: 'idle', faceAt: 0, wob: 0, look: null };
+  toss = { left: 5, ball: { x: W / 2, y: H - 64, r: Math.max(18, Math.min(26, W * 0.03)) }, fly: null, drag: null, speed: 0.7, t0: performance.now(), trail: [], streak: 0, face: 'idle', faceAt: 0, wob: 0, look: null };
 }
 function binX(now) { return W / 2 + Math.sin((now - toss.t0) / 1000 * toss.speed) * W * 0.3; }
 function binGeo() { const w = Math.max(76, Math.min(120, W * 0.14)); return { w, h: w * 1.05, y: H * 0.26 }; }
@@ -217,7 +217,7 @@ function tossTick(now) {
       toss.faceAt = now; toss.trail = [];
       f.phase = 'after'; f.t = now; f.dur = 650; f.binAt = bx;
     } else if (f.phase === 'after' && e >= 1) {
-      toss.fly = null; toss.left--; toss.speed += 0.35;
+      toss.fly = null; toss.left--; toss.speed += 0.15;
       if (toss.left <= 0) { tossDraw(now); return finish(pts >= 5 ? 'Great shooting!' : pts ? 'Nice toss!' : 'Better luck next time!'); }
     }
   }
