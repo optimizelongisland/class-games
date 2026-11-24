@@ -405,10 +405,10 @@ function hrTick(now) {
 
 /* ---------------- 4. Field Goal ---------------- */
 let fg = {};
-const FG_W = [0.36, 0.31, 0.26, 0.22, 0.18], FG_P = [2, 2, 2, 3, 3], FG_YD = [20, 30, 40, 45, 50];
+const FG_W = [0.23, 0.2, 0.17, 0.14, 0.12], FG_P = [2, 2, 2, 3, 3], FG_YD = [20, 30, 40, 45, 50];
 function fgSetup() { fg = { i: 0, fly: null, wait: 0, t0: performance.now(), wind: rnd(-1, 1) }; }
-function fgGeo() { return { cy: H * 0.42, top: H * 0.12, bx: W / 2, by: H - 70, maxA: 0.5 }; }
-function fgAngle(now) { const sp = 1 + fg.i * 0.25; return Math.sin((now - fg.t0) / 600 * sp) * fgGeo().maxA; }
+function fgGeo() { return { cy: H * 0.42, top: H * 0.12, bx: W / 2, by: H - 70, maxA: 0.6 }; }
+function fgAngle(now) { const sp = 1 + fg.i * 0.3; return Math.sin((now - fg.t0) / 430 * sp) * fgGeo().maxA; }
 function fgDraw(now) {
   ctx.clearRect(0, 0, W, H); const g = fgGeo(), i = Math.min(fg.i, 4), uw = W * FG_W[i];
   stadium(now, { crowdBot: H * 0.26 }); grass(H * 0.26, H, 10);
@@ -441,7 +441,7 @@ function fgDraw(now) {
 function fgKick() {
   if (fg.fly || fg.i >= 5 || !running) return;
   const g = fgGeo(), a = fgAngle(performance.now());
-  fg.fly = { t: performance.now(), lx: g.bx + Math.tan(a) * (g.by - g.cy) + fg.wind * W * 0.06 * (1 + fg.i * 0.2) };
+  fg.fly = { t: performance.now(), lx: g.bx + Math.tan(a) * (g.by - g.cy) + fg.wind * W * 0.08 * (1 + fg.i * 0.2) };
 }
 function fgTick(now) {
   const f = fg.fly;
