@@ -293,13 +293,13 @@ function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), n
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
 function save() { S.last = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const people = () => (S.names || []).map(x => x.trim()).filter(Boolean);
-// who does which role: the Recorder rotates through the partners, one station at a time
+// whose turn it is: the first answer rotates through the partners, one station at a time; the others can steal
 function jobs(k) {
   const P = people(); if (P.length < 2) return null;
   const r = P[k % P.length];
   return { rec: r, exp: P.filter(x => x !== r).join(' & ') };
 }
-const jobBar = j => j ? '<div class="jobbar"><span class="jb r1"><b>✏️ ' + esc(j.rec) + '</b> Recorder: writes the work &amp; types</span><span class="jb r2"><b>🗣️ ' + esc(j.exp) + '</b> Explainer: talks it through</span></div>' : '';
+const jobBar = j => j ? '<div class="jobbar"><span class="jb r2"><b>✍️ Both of you</b> solve it on paper</span><span class="jb r1"><b>🎯 ' + esc(j.rec) + '</b> answers first. Wrong? ' + esc(j.exp) + ' can steal!</span></div>' : '';
 const hue = i => Math.round((i - 1) * 360 / 16 + 190) % 360;
 // stations each student asked for extra practice on (plus any part the pair skipped)
 function practiceFor(k) {
@@ -365,9 +365,10 @@ function renderSetup() {
   const nm = [0, 1, 2].map(k => '<label class="field"><span class="lab" style="margin:0">' + (k === 0 ? 'Partner 1' : k === 1 ? 'Partner 2' : 'Partner 3 (optional)') + '</span>' +
     '<input data-n="' + k + '" maxlength="16" value="' + esc(S.names[k] || '') + '" autocomplete="off" autocapitalize="words" spellcheck="false"' + (k === 0 && !S.names[0] ? ' class="need"' : '') + '>' + (k === 0 ? '<span id="need" style="color:var(--yellow);font-size:.95rem"></span>' : '') + '</label>').join('');
   view.innerHTML = '<section class="card"><h2>Type your first names</h2><div class="names" id="names">' + nm + '</div></section>' +
-    '<section class="card"><p class="lab">Your roles</p><p style="color:var(--mute);margin:0 0 .8rem">🔄 The game tells you who does which role at each station, and you switch every time.</p><div class="roles">' +
-    '<div class="role r1"><b>✏️ Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div>' +
-    '<div class="role r2"><b>🗣️ Explainer</b><span>Talks through each step out loud.</span></div></div></section>' +
+    '<section class="card"><p class="lab">How to play</p><div class="roles">' +
+    '<div class="role r1"><b>✍️ Both solve</b><span>Each of you works out every station on your own paper at the same time.</span></div>' +
+    '<div class="role r2"><b>🎯 Take turns</b><span>The game says whose turn it is. That partner enters their answer, and you switch every station.</span></div>' +
+    '<div class="role r1"><b>🔁 Steal</b><span>If they get it wrong, the other partner can steal the turn and answer.</span></div></div></section>' +
     '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button></div>';
   const check = () => {
     const miss = [!people().length && 'at least one first name'].filter(Boolean);
@@ -610,7 +611,6 @@ function submit(val, el) {
   else if (S.wrongNow === 3) { render(); }
   const f = $('#fb');
   f.className = 'fb bad';
-  const jj = jobs(doneList().length);
   f.innerHTML = (r.msg ? esc(r.msg) : people().length > 1 ? 'Not quite. ' + esc(people()[answerer()]) + ', you can steal it!' : 'Not quite. Talk it through again and check your work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
   const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner can steal
