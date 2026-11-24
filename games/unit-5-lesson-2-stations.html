@@ -243,6 +243,7 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
 .sheets a{background:var(--gold);color:#1a1200;font-family:var(--disp);text-transform:uppercase;letter-spacing:.02em}
 .sheets .sh{border-color:rgba(255,204,51,.6)}
 .sheets .code b{color:var(--gold);font-family:var(--disp)}
+.sheets .allnote{margin:-.2rem 0 .6rem;font-size:.9rem;opacity:.8}
 .turn{font-family:var(--disp);text-transform:uppercase;letter-spacing:.03em;font-weight:600}
 /* picture and table choices: 2 x 2 like the packet (1 and 2 on the left, 3 and 4 on the right) */
 .chs.grid2{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;grid-auto-flow:column}
@@ -280,7 +281,7 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
 <div class="toast" id="toast" hidden></div>
 <script src="unit-5-lesson-2-data.js?v=3"></script>
 <script src="unit-5-lesson-2-practice-data.js?v=4"></script>
-<script src="unit-5-lesson-2-arena.js?v=5"></script>
+<script src="unit-5-lesson-2-arena.js?v=7"></script>
 <script>
 'use strict';
 const U = window.U5L2, $ = s => document.querySelector(s), view = $('#view');
@@ -310,6 +311,10 @@ function practiceFor(k) {
   if (L.length) return L;
   const d = doneList();
   return d.length ? d : U.READY.map(q => q.n);
+}
+function flagged(k) {
+  return U.READY.some(q => { const n = q.n, f = S.feel['q' + n] || {}, st = S.q['q' + n];
+    return f[k] === 'more' || (st && (st.sk || []).some(Boolean) && f[k] !== 'good'); });
 }
 const qs = n => (S.q['q' + n] = S.q['q' + n] || { w: [], sk: [], h: 0, secs: 0, done: false, wa: [] });
 const doneList = () => U.READY.filter(q => S.q['q' + q.n] && S.q['q' + q.n].done).map(q => q.n);
@@ -699,11 +704,12 @@ function leaveStation() {
 function sheetLinks() {
   const P = people();
   return '<div class="sheets">' + P.map((nm, k) => {
-    const L = practiceFor(k), code = U.practiceCode(L);
+    const L = practiceFor(k), code = U.practiceCode(L), all = !flagged(k);
     return '<div class="sh">' + (code ? '<p class="code"><span>' + esc(nm) + ', write down your code:</span><b>' + code + '</b></p>' : '') +
+      (all ? '<p class="allnote">' + esc(nm) + ' did not pick any station for extra practice, so this code has every station you did. (Partners who both pick nothing get the same code. That is normal.)</p>' : '') +
       '<a href="' + U.practiceURL(nm, L) + '" target="_blank" rel="noopener">Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
   }).join('') + '</div>' +
-  '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Additional Practice – Lesson 2</b></li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
+  '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>Mrs. Kalinowski\'s website</b>.</li><li>Find this activity (Function Arena, Lesson 2) and tap <b>Additional Practice</b> under it.</li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
 }
 
 // Without the live board: go to the next unfinished station in number order (5 -> 6 -> 7 ...).
