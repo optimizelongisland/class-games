@@ -1,6 +1,7 @@
 /* Unit 5 Lesson 2: extra practice for each station, used by unit-5-lesson-2-practice.html
    and by the "Need an extra example?" button in the station game.
-   Each station has one worked example (with steps) and two multiple-choice "try it" problems.
+   Each station has one worked example (with steps) and five multiple-choice "try it" problems.
+   The printable sheet uses the first two; online, students can ask for up to five.
    These are new problems written for practice, in the same style as packet pages 15-18. */
 (function () {
 'use strict';
@@ -205,6 +206,74 @@ U.PRACTICE = {
       { q: 'Which relation is a function?', choices: [set([3, 1], [3, 2], [4, 5]), mapping([2, 4, 6], [1, 3], [[0, 0], [1, 1], [1, 0], [2, 1]]), GR.oval(), set([5, 2], [6, 3], [7, 2])], right: 3,
         ans: 'The inputs 5, 6, 7 do not repeat.' }] }
 };
+
+// three more problems per station, so a student can ask for up to 5 (only if they want them)
+const notF = 'Which relation is <b>not</b> a function?', isF = 'Which relation is a function?', tbF = 'Which table represents a function?', grF = 'Which graph represents a function?', grN = 'Which graph does <b>not</b> represent a function?';
+const fx = f => [x, v(f) + '(' + x + ')'];
+const io = ['Input', 'Output'];
+const miss3 = (q, nums, right, ans) => ({ q, choices: nums.map(N), right, ans });
+const rel = (I, II, III, IV) => 'Which relation(s) is a function?<br><b>I</b> ' + I + '<br><b>II</b> ' + II + '<br><b>III</b> ' + III + '<br><b>IV</b> ' + IV;
+const MORE = {
+  1: [
+    { q: notF, choices: [set([2, 3], [4, 5], [6, 7]), set([1, 2], [3, 2], [5, 2]), set([0, 4], [1, 5], [2, 6]), set([7, 1], [8, 2], [7, 3])], right: 3, ans: nw(x + ' = 7') + ' goes to both 1 and 3.' },
+    { q: notF, choices: [set([-2, 0], [-1, 1], [-2, 2]), set([3, 3], [4, 4], [5, 5]), set([0, 9], [1, 9], [2, 9]), set([6, -1], [7, -2], [8, -3])], right: 0, ans: nw(x + ' = ' + M + '2') + ' goes to both 0 and 2.' },
+    { q: notF, choices: [set([1, 1], [2, 4], [3, 9]), set([5, 0], [6, 1], [6, 2]), set([-4, 2], [-3, 2], [-2, 2]), set([9, 8], [8, 9], [7, 10])], right: 1, ans: nw(x + ' = 6') + ' goes to both 1 and 2.' }],
+  2: [
+    { q: isF, choices: [set([3, 1], [4, 1], [5, 6]), set([2, 2], [2, 3], [4, 4]), set([1, 0], [1, 5], [2, 6]), set([8, 1], [9, 2], [8, 3])], right: 0, ans: 'The ' + nw(x + '-values') + ' 3, 4, 5 do not repeat.' },
+    { q: isF, choices: [set([0, 0], [0, 1], [1, 2]), set([5, 5], [6, 6], [5, 7]), set([-3, 4], [0, 4], [3, 4]), set([2, -1], [2, 1], [3, 0])], right: 2, ans: 'The ' + nw(x + '-values') + ' ' + M + '3, 0, 3 do not repeat. Repeating the output 4 is allowed.' },
+    { q: isF, choices: [set([4, 9], [4, 8], [5, 7]), set([10, 2], [20, 4], [30, 6]), set([-1, -1], [-1, 1], [0, 0]), set([6, 3], [7, 3], [6, 4])], right: 1, ans: 'The ' + nw(x + '-values') + ' 10, 20, 30 do not repeat.' }],
+  3: [
+    miss3('Given ' + set([2, 6], [4, 1], [7, 3], [x, 8]) + ', which value of ' + x + ' will make this relation a function?', [2, 4, 5, 7], 2, '2, 4 and 7 are already used, so ' + nw(x + ' = 5') + '.'),
+    miss3('Given ' + set([-1, 4], [1, 0], [3, 2], [x, 6]) + ', which value of ' + x + ' will make this relation a function?', [-1, 0, 1, 3], 1, M + '1, 1 and 3 are already used, so ' + nw(x + ' = 0') + '.'),
+    miss3('Given ' + set([5, 5], [10, 3], [15, 1], [x, 7]) + ', which value of ' + x + ' will make this relation a function?', [20, 5, 10, 15], 0, '5, 10 and 15 are already used, so ' + nw(x + ' = 20') + '.')],
+  4: [
+    { q: tbF, choices: [tb(xy, [[1, 6], [2, 6], [3, 6]]), tb(xy, [[0, 2], [1, 3], [0, 4]]), tb(xy, [[7, 1], [7, 2], [8, 3]]), tb(xy, [[3, 5], [4, 6], [3, 7]])], right: 0, ans: 'The inputs 1, 2, 3 do not repeat. The output 6 repeating is fine.' },
+    { q: tbF, choices: [tb(xy, [[2, 1], [2, 2], [2, 3]]), tb(xy, [[5, 0], [6, 1], [5, 2]]), tb(xy, [[-1, 4], [-2, 5], [-1, 6]]), tb(xy, [[0, 0], [1, -1], [2, -2]])], right: 3, ans: 'The inputs 0, 1, 2 do not repeat.' },
+    { q: tbF, choices: [tb(xy, [[4, 3], [5, 3], [4, 8]]), tb(xy, [[-2, 5], [0, 5], [2, 1]]), tb(xy, [[9, 2], [9, 3], [10, 4]]), tb(xy, [[3, -3], [6, 0], [3, 3]])], right: 1, ans: 'The inputs ' + M + '2, 0, 2 do not repeat.' }],
+  5: [
+    { q: grF, choices: [GR.circle(), GR.sidewaysLeft(), GR.wave(), GR.vertical()], right: 2, ans: 'The wave always moves to the right, so every vertical line hits it once.' },
+    { q: grF, choices: [GR.vSide(), GR.segment(), GR.oval(), GR.cubic()], right: 3, ans: 'The rising S curve passes the vertical line test.' },
+    { q: grF, choices: [GR.parabolaDown(), GR.sideways(), GR.circle(), GR.sStand()], right: 0, ans: 'The upside-down U passes the vertical line test.' }],
+  6: [
+    { q: grN, choices: [GR.slant(), GR.circle(), GR.parabolaUp(), GR.vUp()], right: 1, ans: 'The circle: a vertical line through the middle hits it twice.' },
+    { q: grN, choices: [GR.wave(), GR.steps(), GR.vSide(), GR.parabolaDown()], right: 2, ans: 'The sideways V: a vertical line to the left of the corner hits it twice.' },
+    { q: grN, choices: [GR.horizontal(), GR.cubic(), GR.vUp(), GR.sStand()], right: 3, ans: 'The standing wavy curve: a vertical line near the middle hits it more than once.' }],
+  7: [
+    { q: grF, choices: [GR.sideways(), GR.cubic(), GR.oval(), GR.sStand()], right: 1, ans: 'The rising S curve never turns back, so it passes.' },
+    { q: grF, choices: [GR.circle(), GR.sidewaysLeft(), GR.wave(), GR.segment()], right: 2, ans: 'The wave passes the vertical line test.' },
+    { q: grF, choices: [GR.parabolaUp(), GR.sStand(), GR.sideways(), GR.oval()], right: 0, ans: 'The U opening up passes the vertical line test.' }],
+  8: [
+    { q: grF, choices: [GR.circle(), GR.segment(), GR.parabolaDown(), GR.vSide()], right: 2, ans: 'The upside-down U passes. The circle, vertical segment and sideways V fail.' },
+    { q: grF, choices: [GR.oval(), GR.slant(), GR.vertical(), GR.sidewaysLeft()], right: 1, ans: 'The slanted line passes. The oval, vertical line and sideways U fail.' },
+    { q: grF, choices: [GR.segment(), GR.circle(), GR.sideways(), GR.horizontal()], right: 3, ans: 'The horizontal line passes. The others are hit twice by a vertical line.' }],
+  9: [
+    { q: grF, choices: [GR.vUp(), GR.vSide(), GR.sideways(), GR.circle()], right: 0, ans: 'The V opening up passes. The V on its side does not.' },
+    { q: grF, choices: [GR.sidewaysLeft(), GR.segment(), GR.parabolaUp(), GR.oval()], right: 2, ans: 'The U opening up passes. The U opening left does not.' },
+    { q: grF, choices: [GR.vSide(), GR.vertical(), GR.sStand(), GR.wave()], right: 3, ans: 'The wave passes the vertical line test.' }],
+  10: [
+    { q: grF, choices: [GR.sideways(), GR.slant(), GR.circle(), GR.segment()], right: 1, ans: 'A slanted straight line passes the vertical line test.' },
+    { q: grF, choices: [GR.vertical(), GR.oval(), GR.sStand(), GR.steps()], right: 3, ans: 'The stair-step line never has two points on the same vertical line.' },
+    { q: grF, choices: [GR.cubic(), GR.vSide(), GR.sidewaysLeft(), GR.circle()], right: 0, ans: 'The rising S curve passes the vertical line test.' }],
+  11: [
+    { q: 'Which table could represent a function?', choices: [tb(fx('f'), [[1, 2], [2, 2], [3, 5]]), tb(fx('g'), [[4, 1], [4, 3], [5, 6]]), tb(fx('h'), [[0, 7], [1, 8], [0, 9]]), tb(fx('k'), [[2, 2], [3, 3], [3, 4]])], right: 0, ans: 'Table ' + v('f') + ': the inputs 1, 2, 3 do not repeat.' },
+    { q: 'Which table could represent a function?', choices: [tb(fx('p'), [[6, 1], [6, 2], [7, 3]]), tb(fx('q'), [[-1, 0], [0, 1], [-1, 2]]), tb(fx('r'), [[3, 4], [5, 6], [3, 8]]), tb(fx('s'), [[-2, 4], [2, 4], [0, 0]])], right: 3, ans: 'Table ' + v('s') + ': the inputs ' + M + '2, 2, 0 do not repeat. Sharing the output 4 is fine.' },
+    { q: 'Which table could represent a function?', choices: [tb(fx('f'), [[0, 3], [0, 4], [1, 5]]), tb(fx('g'), [[8, 2], [9, 2], [8, 1]]), tb(fx('h'), [[10, 0], [11, 1], [12, 0]]), tb(fx('k'), [[1, 6], [2, 7], [2, 8]])], right: 2, ans: 'Table ' + v('h') + ': the inputs 10, 11, 12 do not repeat.' }],
+  12: [
+    { q: rel(set([1, 3], [1, 4], [2, 5]), nw(y + ' = 2' + x + ' + 1'), 'a circle', set([0, 2], [1, 2], [2, 2])), choices: ['I and III', 'II and IV', 'II, only', 'I, only'], right: 1,
+      ans: 'II is a slanted line, and IV has no repeated input. I repeats the input 1, and the circle fails the vertical line test.' },
+    { q: rel('a horizontal line', set([4, 1], [4, 2], [5, 3]), 'a U shape opening up', 'an oval'), choices: ['I and III', 'II and IV', 'III, only', 'I and II'], right: 0,
+      ans: 'The horizontal line and the U opening up pass the vertical line test. II repeats the input 4, and the oval fails.' },
+    { q: rel('a vertical line', set([-1, 0], [0, 1], [1, 2]), nw(y + ' = ' + M + '2' + x), 'a V shape on its side'), choices: ['I and IV', 'II, only', 'II and III', 'III, only'], right: 2,
+      ans: 'II has no repeated input, and III is a slanted line. The vertical line and the sideways V fail the vertical line test.' }],
+  13: [
+    { q: isF, choices: [mapping([1, 2, 3], [4, 5], [[0, 0], [1, 0], [1, 1], [2, 1]]), mapping([4, 5, 6], [0, 1, 2], [[0, 0], [1, 1], [2, 2]]), tb(io, [[2, 3], [2, 4], [3, 5]]), GR.sideways()], right: 1,
+      ans: 'In that mapping each input has exactly one arrow.' },
+    { q: isF, choices: [set([1, 9], [2, 9], [3, 9]), mapping([0, 1], [2, 3, 4], [[0, 0], [0, 1], [1, 2]]), GR.vertical(), tb(io, [[6, 1], [7, 2], [6, 3]])], right: 0,
+      ans: 'The inputs 1, 2, 3 do not repeat. Every output being 9 is fine.' },
+    { q: isF, choices: [GR.oval(), set([2, 2], [2, 3], [4, 4]), mapping([-2, 0, 2], [1, 5], [[0, 0], [0, 1], [1, 1], [2, 1]]), tb(io, [[1, 4], [2, 4], [3, 4]])], right: 3,
+      ans: 'In the table the inputs 1, 2, 3 do not repeat. The output 4 repeating is fine.' }]
+};
+Object.keys(MORE).forEach(n => U.PRACTICE[n].tries.push(...MORE[n]));
 
 // every try becomes a list of parts (one part each here), the way the station game reads them
 Object.keys(U.PRACTICE).forEach(s_ => U.PRACTICE[s_].tries.forEach(t => {

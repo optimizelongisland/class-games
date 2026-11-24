@@ -119,8 +119,8 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 <body>
 <a href="../index.html" class="cg-back" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;background:rgba(20,20,28,.85);color:#f5f5f7;border:1px solid #3a3a48;border-radius:999px;padding:6px 14px;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(4px)">&larr; All games</a>
 <div id="app"></div>
-<script src="unit-5-lesson-2-data.js?v=1"></script>
-<script src="unit-5-lesson-2-practice-data.js?v=1"></script>
+<script src="unit-5-lesson-2-data.js?v=2"></script>
+<script src="unit-5-lesson-2-practice-data.js?v=2"></script>
 <script>
 'use strict';
 const U = window.U5L2, P = U.PRACTICE, app = document.getElementById('app');
@@ -142,7 +142,7 @@ function sheet() {
   const key = [];
   const body = list.map(n => {
     const p = P[n], e = p.ex;
-    const tries = p.tries.map(t => {
+    const tries = p.tries.slice(0, 2).map(t => {
       k++;
       const chs = cs => '<ol class="ch">' + cs.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>';
       const one = t.sub.length === 1, kv = s => s.t === 'mc' ? (one && /^[A-D][.)]/.test(s.ans) ? s.ans : '<b>' + 'ABCD'[s.right] + ')</b> ' + (one ? s.ans : s.choices[s.right])) : (one ? s.ans : s.ans.replace(/\.$/, ''));
@@ -165,24 +165,25 @@ function sheet() {
   document.getElementById('pdf').onclick = () => window.print();
 }
 
-// Online practice: one card at a time. Worked example steps reveal one by one, then the student
-// tries each problem. Multiple choice checks itself; other problems show the answer and the student
-// marks whether they got it. A print/PDF version is always one tap away.
+// Online practice, one station at a time: the worked example with every step showing, then
+// "I'm ready to practice". After each correct answer the student picks "I feel good now" (next
+// station) or "Give me another" (up to 5 problems per station). A print/PDF version is one tap away.
 function online() {
   document.title = (name ? name + '’s ' : '') + 'Practice: Unit 5 Lesson 2';
   const cards = [];
   let k = 0;
-  list.forEach(n => {
-    cards.push({ kind: 'ex', n });
-    P[n].tries.forEach(t => { k++; cards.push({ kind: 'try', n, t, k }); });
+  list.forEach((n, s) => {
+    cards.push({ kind: 'ex', n, s });
+    P[n].tries.forEach((t, j) => { k++; cards.push({ kind: 'try', n, t, k, j: j + 1, s }); });
   });
-  const total = k, store = 'u5l2-online2:' + location.search;
+  const stations = list.length, store = 'u5l2-online3:' + location.search;
   let st = { i: 0, step: 0, res: {} };
   try { const s = JSON.parse(localStorage.getItem(store) || 'null'); if (s && s.i < cards.length + 1) st = s; } catch (e) { }
   const save = () => { try { localStorage.setItem(store, JSON.stringify(st)); } catch (e) { } };
   const sep = location.search ? '&' : '?';
   const printURL = location.search + sep + 'print=1';
   const go = i => { st.i = i; st.step = 0; st.solved = false; st.wrong = []; st.miss = false; st.msg = ''; st.typed = ''; st.got = []; save(); draw(); window.scrollTo(0, 0); };
+  const nextStation = i => { for (let j = i + 1; j < cards.length; j++) if (cards[j].kind === 'ex') return j; return cards.length; };
 
   // never leave a blank page: if saved progress or an old cached file breaks drawing, start fresh and say so
   function draw() {
@@ -196,40 +197,34 @@ function online() {
     }
   }
   function drawCard() {
-    const done = Object.keys(st.res).length;
-    const top = '<div class="bar"><span class="prog"><b>' + (name ? esc(name) + '’s practice' : 'My practice') + '</b> · ' + done + ' of ' + total + ' problems done</span>' +
+    const fin = st.i >= cards.length, c = cards[st.i], at = fin ? stations : c.s;
+    const top = '<div class="bar"><span class="prog"><b>' + (name ? esc(name) + '’s practice' : 'My practice') + '</b> · ' +
+      (fin ? 'all ' + stations + (stations === 1 ? ' station' : ' stations') + ' done' : 'Station ' + (at + 1) + ' of ' + stations) + '</span>' +
       '<a class="btn ghost" href="' + printURL + '">🖨️ Print or save as PDF</a></div>' +
-      '<div class="pbar"><span style="width:' + Math.round(100 * done / total) + '%"></span></div>';
-    if (st.i >= cards.length) return finish(top);
-    const c = cards[st.i], p = P[c.n];
+      '<div class="pbar"><span style="width:' + Math.round(100 * at / stations) + '%"></span></div>';
+    if (fin) return finish(top);
+    const p = P[c.n];
     let body = '';
     if (c.kind === 'ex') {
       const e = p.ex, parts = p.parts;
-      if (parts) {
-        const n = parts.length, all = st.step >= n, lab = i => '(' + 'abcdef'[i] + ')';
-        body = '<p class="tag">Worked example · watch how it’s done</p>' + exQ(e, p, 'bigq') + (e.graph ? U.graph(e.graph) : '') +
-          parts.slice(0, st.step).map((pt, i) => '<div class="part"><p class="pq"><b>' + lab(i) + '</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('') +
-          (all ? '<div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
-            : '<div class="acts"><button class="btn" id="stp">Show part ' + lab(st.step) + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
-              '<button class="btn ghost" id="allst">Show all parts</button></div>');
-      } else {
-        const n = e.steps.length, all = st.step >= n;
-        body = '<p class="tag">Worked example · watch how it’s done</p>' + exQ(e, p, 'bigq') + (e.graph ? U.graph(e.graph) : '') +
-          '<ol class="steps">' + e.steps.slice(0, st.step).map(s => '<li>' + s + '</li>').join('') + '</ol>' +
-          (all ? '<p class="a">Answer: ' + e.ans + '</p><div class="acts"><button class="btn" id="nx">Got it, let me try one ➜</button></div>'
-            : '<div class="acts"><button class="btn" id="stp">' + (st.step ? 'Next step' : 'Show step 1') + ' (' + (st.step + 1) + ' of ' + n + ')</button>' +
-              '<button class="btn ghost" id="allst">Show all steps</button></div>');
-      }
+      body = '<p class="tag">Worked example · read each step</p>' + exQ(e, p, 'bigq') + (e.graph ? U.graph(e.graph) : '') +
+        (parts ? parts.map((pt, i) => '<div class="part"><p class="pq"><b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('')
+          : '<ol class="steps">' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="a">Answer: ' + e.ans + '</p>') +
+        '<div class="acts"><button class="btn" id="nx">I’m ready to practice ➜</button></div>';
     } else {
       const t = c.t, S = t.sub, one = S.length === 1, j = Math.min(st.step, S.length - 1), cur = S[j], last = j === S.length - 1;
-      const wrong = st.wrong || [], solved = !!st.solved, got = st.got || [];
+      const wrong = st.wrong || [], solved = !!st.solved, got = st.got || [], max = p.tries.length, more = c.j < max;
       const shown = (s, i) => s.t === 'mc' ? s.choices[s.right] : (s.prefix ? s.prefix + ' ' : '') + esc(got[i] || '');
-      body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + (one ? '' : ' · part ' + PL(j) + ' of ' + S.length) + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
+      body = '<p class="tag" style="color:var(--accent2)">Your turn · practice problem ' + c.j + (c.j > 1 ? ' of up to ' + max : '') + (one ? '' : ' · part ' + PL(j) + ' of ' + S.length) + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
         (one ? '' : S.slice(0, j).map((s, i) => '<div class="part"><p class="pq"><b>' + PL(i) + '</b> ' + s.q + '</p><p class="pa">✅ ' + shown(s, i) + '</p></div>').join('') +
           '<p class="bigq sq"><b>' + PL(j) + '</b> ' + cur.q + '</p>');
       if (cur.t === 'mc') body += '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === cur.right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
       else body += typedBox(cur, solved, st.typed || '');
-      if (solved) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div><div class="acts">' + (last ? '<button class="btn" id="nx">Next ➜</button>' : '<button class="btn" id="sbn">Next: part ' + PL(j + 1) + ' ➜</button>') + '</div>';
+      const lastSt = c.s === stations - 1;
+      if (solved && !last) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div><div class="acts"><button class="btn" id="sbn">Next: part ' + PL(j + 1) + ' ➜</button></div>';
+      else if (solved) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div>' +
+        (more ? '<p class="hint">How do you feel about this one?</p><div class="acts"><button class="btn" id="good">😀 I feel good now' + (lastSt ? '' : ' (next station)') + ' ➜</button><button class="btn ghost" id="another">🔁 Give me another</button></div>'
+          : '<p class="hint">That was the last extra problem for this station.</p><div class="acts"><button class="btn" id="good">' + (lastSt ? 'Finish ➜' : 'Next station ➜') + '</button></div>');
       else if (st.miss) body += '<div class="fbk bad">❌ ' + esc(st.msg || 'Not quite. Check your work and try again.') + '</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
       else if (st.msg) body += '<div class="fbk info">' + esc(st.msg) + '</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
       else body += '<div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';
@@ -238,10 +233,10 @@ function online() {
       (st.i > 0 ? '<button class="back" id="bk">← Back</button>' : '') + '</main>';
     const $ = id => document.getElementById(id);
     if ($('sbn')) $('sbn').onclick = () => { st.step++; st.solved = false; st.wrong = []; st.miss = false; st.msg = ''; st.typed = ''; save(); draw(); };
-    if ($('stp')) $('stp').onclick = () => { st.step++; save(); draw(); };
-    if ($('allst')) $('allst').onclick = () => { st.step = 99; save(); draw(); };
     if ($('nx')) $('nx').onclick = () => go(st.i + 1);
-    if ($('bk')) $('bk').onclick = () => go(st.i - 1);
+    if ($('another')) $('another').onclick = () => go(st.i + 1);
+    if ($('good')) $('good').onclick = () => go(nextStation(st.i));
+    if ($('bk')) $('bk').onclick = () => go(c.kind === 'ex' ? Math.max(0, st.i - 1) : st.i - 1);
     if ($('peek')) $('peek').onclick = () => { const j = cards.findIndex(x => x.kind === 'ex' && x.n === c.n); go(j); };
     const answer = val => {
       const t = c.t, j = Math.min(st.step, t.sub.length - 1), cur = t.sub[j], last = j === t.sub.length - 1, r = U.check(cur, val);
@@ -262,10 +257,14 @@ function online() {
   }
 
   function finish(top) {
-    const miss = cards.filter(c => c.kind === 'try' && st.res[c.k] === 'miss');
-    const good = cards.filter(c => c.kind === 'try' && st.res[c.k] === 'good').length;
-    app.innerHTML = top + '<main class="paper card done"><h1>🎉 All done!</h1><p class="bigq">You got <b>' + good + ' of ' + total + '</b> on your own.</p>' +
-      (miss.length ? '<p>Look these over again:</p><ul class="miss">' + miss.map(c => '<li><b>Problem ' + c.k + '</b> · Station ' + c.n + ': ' + P[c.n].topic + ' <button class="btn ghost sm" data-j="' + cards.indexOf(c) + '">Try again</button></li>').join('') + '</ul>' : '<p>Nice work. You’re ready for the test on these stations.</p>') +
+    const tried = cards.filter(c => c.kind === 'try' && st.res[c.k]);
+    const miss = tried.filter(c => st.res[c.k] === 'miss');
+    const good = tried.length - miss.length;
+    const rows = list.map(n => { const d = tried.filter(c => c.n === n), g = d.filter(c => st.res[c.k] === 'good').length;
+      return '<li><b>Station ' + n + '</b> · ' + P[n].topic + ': ' + d.length + (d.length === 1 ? ' problem' : ' problems') + ', ' + g + ' right on the first try</li>'; }).join('');
+    app.innerHTML = top + '<main class="paper card done"><h1>🎉 All done!</h1><p class="bigq">You did <b>' + tried.length + '</b> practice ' + (tried.length === 1 ? 'problem' : 'problems') + ' and got <b>' + good + '</b> right on the first try.</p>' +
+      '<ul class="miss">' + rows + '</ul>' +
+      (miss.length ? '<p>Look these over again:</p><ul class="miss">' + miss.map(c => '<li><b>Station ' + c.n + '</b>, practice problem ' + c.j + ' <button class="btn ghost sm" data-j="' + cards.indexOf(c) + '">Try again</button></li>').join('') + '</ul>' : '<p>Nice work. You’re ready for the test on these stations.</p>') +
       '<div class="acts"><a class="btn" href="' + printURL + '">🖨️ Print or save as PDF</a><button class="btn ghost" id="again">Start over</button></div></main>';
     document.getElementById('again').onclick = () => { st = { i: 0, step: 0, res: {} }; save(); draw(); };
     document.querySelectorAll('[data-j]').forEach(b => b.onclick = () => { const j = +b.dataset.j; delete st.res[cards[j].k]; go(j); });
