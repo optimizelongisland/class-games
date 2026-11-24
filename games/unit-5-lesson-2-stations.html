@@ -118,8 +118,15 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .panel .tag{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin:0 0 .4rem;font-weight:700}
 .panel .part{background:var(--panel2)}
 .ch.good{border-color:var(--green)}
-.rolepop{position:fixed;left:50%;top:1.2rem;transform:translateX(-50%);z-index:50;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:.4rem 1.2rem .8rem;box-shadow:0 10px 30px rgba(0,0,0,.6);pointer-events:none;width:max-content;max-width:calc(100vw - 2rem);animation:rolepop 4.6s ease forwards}
-@keyframes rolepop{0%{opacity:0;transform:translate(-50%,-10px)}8%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;visibility:hidden}}
+.rolepop{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:1rem;background:rgba(3,6,14,.72);cursor:pointer;animation:rolepop 6.5s ease forwards}
+.rolepop .rp{background:var(--panel2);border:3px solid var(--gold,#ffcc33);border-radius:22px;padding:1.4rem 1.6rem 1.6rem;max-width:640px;width:100%;text-align:center;box-shadow:0 0 0 6px rgba(255,204,51,.15),0 20px 60px rgba(0,0,0,.7);animation:rpbump .5s ease}
+.rolepop .rps{font:700 1.1rem var(--disp);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:0}
+.rolepop .rpa{font:800 clamp(2.2rem,1.4rem + 4vw,3.6rem) var(--disp);text-transform:uppercase;color:var(--yellow,#ffcc33);margin:.2rem 0 .6rem;line-height:1.05}
+.rolepop .rpl{font:600 clamp(1.15rem,1rem + 1vw,1.5rem) var(--body,system-ui);color:var(--fg);margin:.35rem 0 0}
+.rolepop .rpl b{color:var(--cyan)}
+.rolepop .rpt{font-size:.9rem;color:var(--mute);margin:1rem 0 0}
+@keyframes rpbump{0%{transform:scale(.7)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes rolepop{0%{opacity:0}5%{opacity:1}88%{opacity:1}100%{opacity:0;visibility:hidden}}
 .stitle{margin:0;font-size:clamp(2.2rem,1.6rem + 2vw,3rem);line-height:1.05;white-space:nowrap}
 .sthead #leave{white-space:nowrap}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
@@ -243,7 +250,6 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
 .yay{background:radial-gradient(600px 260px at 50% 0,rgba(255,204,51,.16),transparent 70%),var(--panel)}
 .yay .hd{color:var(--gold)}
 .win{display:inline-block;color:#1a1200;background:var(--gold);border-radius:8px;padding:.35em 1.1em;box-shadow:0 5px 0 #a8820f}
-.rolepop{background:var(--panel2);border-color:rgba(255,204,51,.45)}
 .sheets a{background:var(--gold);color:#1a1200;font-family:var(--disp);text-transform:uppercase;letter-spacing:.02em}
 .sheets .sh{border-color:rgba(255,204,51,.6)}
 .sheets .code b{color:var(--gold);font-family:var(--disp)}
@@ -523,7 +529,13 @@ function renderStation() {
 
   // roles pop up for a few seconds when a station opens, then fade away
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
-  if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
+  if (J && since < 6400) {
+    view.insertAdjacentHTML('beforeend', '<div class="rolepop" id="rolepop" style="animation-delay:-' + since + 'ms"><div class="rp"><p class="rps">Station ' + q.n + '</p>' +
+      '<p class="rpa">🎯 ' + esc(J.rec) + ' answers first</p>' +
+      '<p class="rpl">✍️ <b>Both of you</b> solve it on paper</p>' +
+      '<p class="rpl">🔁 Wrong? <b>' + esc(J.exp) + '</b> can steal!</p><p class="rpt">Tap anywhere to start</p></div></div>');
+    $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
+  }
   if ($('#probb')) $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
   if ($('#exb')) $('#exb').onclick = () => { exOpen = q.n; render(); scrollTo(0, 0); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
