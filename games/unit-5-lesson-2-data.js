@@ -84,6 +84,22 @@ const set = (...P) => nw('{' + P.map(p => '(' + p.map(N).join(', ') + ')').join(
 const tb = (h, rows) => '<table class="tb"><tr><th>' + h[0] + '</th><th>' + h[1] + '</th></tr>' + rows.map(r => '<tr><td>' + N(r[0]) + '</td><td>' + N(r[1]) + '</td></tr>').join('') + '</table>';
 const im = (name, alt) => '<img class="cimg" src="' + IMG + name + '.png" alt="' + alt + '">';
 const xy = [v('x'), v('y')];
+/* a mapping diagram: two ovals, arrows from inputs to outputs */
+function mapping(ins, outs, arrows, cls) {
+  const H = 40 + Math.max(ins.length, outs.length) * 34, row = (n, i) => 30 + (i + 0.5) * (H - 40) / n;
+  let s = '<svg class="' + (cls || 'graph map') + '" viewBox="0 0 240 ' + (H + 20) + '" role="img" aria-label="Mapping: ' + arrows.map(([a, b]) => ins[a] + ' to ' + outs[b]).join(', ') + '">' +
+    '<text x="45" y="16" text-anchor="middle" class="g-title">Input</text><text x="195" y="16" text-anchor="middle" class="g-title">Output</text>' +
+    '<ellipse cx="45" cy="' + (H / 2 + 12) + '" rx="32" ry="' + (H / 2 - 8) + '" class="g-axis"/><ellipse cx="195" cy="' + (H / 2 + 12) + '" rx="32" ry="' + (H / 2 - 8) + '" class="g-axis"/>';
+  ins.forEach((t, i) => { s += '<text x="45" y="' + (row(ins.length, i) + 6) + '" text-anchor="middle" class="g-num" style="font-size:17px">' + N(t) + '</text>'; });
+  outs.forEach((t, i) => { s += '<text x="195" y="' + (row(outs.length, i) + 6) + '" text-anchor="middle" class="g-num" style="font-size:17px">' + N(t) + '</text>'; });
+  arrows.forEach(([a, b]) => {
+    const x1 = 62, y1 = row(ins.length, a), x2 = 176, y2 = row(outs.length, b), ang = Math.atan2(y2 - y1, x2 - x1);
+    s += '<line x1="' + x1 + '" y1="' + y1.toFixed(1) + '" x2="' + x2 + '" y2="' + y2.toFixed(1) + '" class="g-axis" style="stroke-width:1.8"/>' +
+      '<path class="g-arrow" transform="translate(' + x2 + ' ' + y2.toFixed(1) + ') rotate(' + (ang * 180 / Math.PI).toFixed(1) + ')" d="M2 0l-11 -5v10z"/>';
+  });
+  return s + '</svg>';
+}
+
 const H_SET = ['In a function, every <b>x-value</b> (the first number in each pair) goes to only ONE y-value.',
   'Look at the first number of every ordered pair. Does any first number show up twice?',
   'Repeating <b>y-values</b> is OK! Only an x-value that repeats with a different y-value breaks a function.'];
@@ -167,11 +183,33 @@ const Q = [
                 im('ip7-3', 'A circle centered at the origin'), im('ip7-4', 'A mapping: 3 to 4, 6 to 5, 6 to 7, 11 to 7, and 8 with no arrow')],
       hints: ['Each choice shows a relation a different way: ordered pairs, a table, a graph and a mapping.',
               'In a mapping, a function has only ONE arrow leaving each input. In a table, an input can’t repeat with a different output.',
-              'Choice 1: look at the x-values 1, 2, 3, 4. Do any of them repeat?'] }] }
+              'Choice 1: look at the x-values 1, 2, 3, 4. Do any of them repeat?'] }] },
+  { n: 14, src: 'New problem', title: 'Mapping diagrams',
+    text: 'Which mapping represents a function?',
+    parts: [{ t: 'mc', q: 'Choose the mapping that is a function.', pq: '', labels: '1234', answer: 2, wide: true,
+      choices: [mapping([1, 2, 3], [4, 5], [[0, 0], [1, 0], [1, 1], [2, 1]]), mapping([0, 1, 2], [3, 6, 9], [[0, 0], [1, 1], [1, 2], [2, 2]]),
+                mapping([-1, 0, 1], [2, 4], [[0, 0], [1, 1], [2, 0]]), mapping([5, 6], [1, 2, 3], [[0, 0], [0, 1], [1, 2]])],
+      hints: ['In a mapping, look at the arrows leaving each <b>input</b> (the left oval).',
+              'A function has exactly ONE arrow leaving every input. Does any input have two arrows?',
+              'Two arrows landing on the same output is fine. Two arrows leaving the same input is NOT.'] }] },
+  { n: 15, src: 'New problem', title: 'Equations',
+    text: 'Which equation does <b>not</b> represent a function?',
+    parts: [{ t: 'mc', q: 'Choose the equation that is <b>not</b> a function.', pq: '', labels: '1234', answer: 2,
+      choices: [nw(v('y') + ' = 3' + v('x') + ' ' + M + ' 1'), nw(v('y') + ' = ' + v('x') + sup('2')), nw(v('x') + ' = 4'), nw(v('y') + ' = ' + M + '2')],
+      hints: ['Picture the graph of each equation, then use the vertical line test.',
+              v('y') + ' = (a number) is a horizontal line. ' + v('x') + ' = (a number) is a vertical line.',
+              'A vertical line has the same ' + v('x') + '-value for every point, so one input has many outputs.'] }] },
+  { n: 16, src: 'New problem', title: 'Missing value in a table',
+    text: 'This table should represent a function.' + tb(xy, [[1, 5], [2, 7], [3, 9], ['?', 11]]) + 'Which value can <b>not</b> replace the <b>?</b>',
+    parts: [{ t: 'mc', q: 'Choose the value that can <b>not</b> go in the table.', pq: '', labels: '1234', answer: 2, choices: ['4', '0', '2', '6'],
+      hints: ['In a function, an ' + v('x') + '-value can’t repeat with a different ' + v('y') + '-value.',
+              'Which ' + v('x') + '-values are already in the table?',
+              '1, 2 and 3 already have outputs (5, 7 and 9). If the ? were one of them, that input would have two outputs.'] }] }
 ];
 Q.forEach(q => { q.ready = true; q.est = 2;
   q.parts.forEach(p => { const c = p.choices[p.answer], L = p.labels[p.answer] + ') ', alt = /alt="([^"]*)"/.exec(c);
-    if (alt) p.key = L + alt[1]; else if (/<table/.test(c)) p.key = L + 'the table in choice ' + p.labels[p.answer]; }); });
+    if (alt) p.key = L + alt[1]; else if (/<table/.test(c)) p.key = L + 'the table in choice ' + p.labels[p.answer]
+    else if (/<svg/.test(c)) p.key = L + 'the mapping in choice ' + p.labels[p.answer]; }); });
 
 /* ---------- answer checking ---------- */
 function clean(s) {
@@ -307,6 +345,6 @@ function readCode(code) {
 }
 
 
-window.U5L2 = { Q, H: { v, fr, sup, nw, rt, M }, READY: Q, byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean, SITE, dbBase: () => '',
+window.U5L2 = { mapping, Q, H: { v, fr, sup, nw, rt, M }, READY: Q, byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean, SITE, dbBase: () => '',
   practiceCode, readCode, practiceURL: (name, list, period) => 'unit-5-lesson-2-practice.html?name=' + encodeURIComponent(name) + '&q=' + list.join(',') + (period ? '&p=' + period : '') };
 })();

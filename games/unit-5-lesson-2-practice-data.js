@@ -36,22 +36,11 @@ const GR = {
   steps: () => G([{ p: [[-4.5, -3], [-2, -1]] }, { p: [[-2, -1], [1, -1]] }, { p: [[1, -1], [2, 2]] }, ray([2, 2], [4.5, 2])], 'A line that rises, goes flat, rises again, then stays flat'),
   segment: () => G([{ p: [[3, -3], [3, 3]] }], 'A vertical segment', [[3, -3], [3, 3]])
 };
-/* a mapping diagram: two ovals, arrows from inputs to outputs */
-function mapping(ins, outs, arrows) {
-  const H = 40 + Math.max(ins.length, outs.length) * 34, row = (n, i) => 30 + (i + 0.5) * (H - 40) / n;
-  let s = '<svg class="graph mini map" viewBox="0 0 240 ' + (H + 20) + '" role="img" aria-label="Mapping: ' + arrows.map(([a, b]) => ins[a] + ' to ' + outs[b]).join(', ') + '">' +
-    '<text x="45" y="16" text-anchor="middle" class="g-title">Input</text><text x="195" y="16" text-anchor="middle" class="g-title">Output</text>' +
-    '<ellipse cx="45" cy="' + (H / 2 + 12) + '" rx="32" ry="' + (H / 2 - 8) + '" class="g-axis"/><ellipse cx="195" cy="' + (H / 2 + 12) + '" rx="32" ry="' + (H / 2 - 8) + '" class="g-axis"/>';
-  ins.forEach((t, i) => { s += '<text x="45" y="' + (row(ins.length, i) + 6) + '" text-anchor="middle" class="g-num" style="font-size:17px">' + N(t) + '</text>'; });
-  outs.forEach((t, i) => { s += '<text x="195" y="' + (row(outs.length, i) + 6) + '" text-anchor="middle" class="g-num" style="font-size:17px">' + N(t) + '</text>'; });
-  arrows.forEach(([a, b]) => {
-    const x1 = 62, y1 = row(ins.length, a), x2 = 176, y2 = row(outs.length, b), ang = Math.atan2(y2 - y1, x2 - x1);
-    s += '<line x1="' + x1 + '" y1="' + y1.toFixed(1) + '" x2="' + x2 + '" y2="' + y2.toFixed(1) + '" class="g-axis" style="stroke-width:1.8"/>' +
-      '<path class="g-arrow" transform="translate(' + x2 + ' ' + y2.toFixed(1) + ') rotate(' + (ang * 180 / Math.PI).toFixed(1) + ')" d="M2 0l-11 -5v10z"/>';
-  });
-  return s + '</svg>';
-}
+const mapping = (i, o, a) => U.mapping(i, o, a, 'graph mini map');
 
+/* station 12 style: each relation in its own box, graphs drawn as small pictures */
+const relBox = items => '<div class="relg">' + items.map((h, i) => '<div><b>' + ['I', 'II', 'III', 'IV'][i] + '</b><span>' + h + '</span></div>').join('') + '</div>';
+const RELQ = 'Which relation(s) is a function?';
 const VLT = 'Use the vertical line test: slide a vertical line (a pencil held straight up and down) across the graph from left to right.';
 U.PRACTICE = {
   1: { topic: 'Which ordered pairs are not a function?',
@@ -181,16 +170,16 @@ U.PRACTICE = {
         ans: 'Table ' + v('q') + ': the inputs 3, ' + M + '3, 0 do not repeat. Two inputs sharing the output 9 is fine.' }] },
 
   12: { topic: 'Which relation(s) is a function?',
-    ex: { q: 'Which of these are functions? <b>I</b> ' + set([1, 2], [2, 3], [1, 4]) + ' &nbsp; <b>II</b> ' + nw(y + ' = 3' + x + ' ' + M + ' 2') + ' &nbsp; <b>III</b> a circle',
+    ex: { q: 'Which of these are functions?' + relBox([set([1, 2], [2, 3], [1, 4]), nw(y + ' = 3' + x + ' ' + M + ' 2'), GR.circle()]),
       steps: ['I: the input 1 goes to 2 and to 4. <b>Not</b> a function.',
         'II: ' + nw(y + ' = 3' + x + ' ' + M + ' 2') + ' is a slanted line. Every ' + x + ' gives one ' + y + '. It <b>is</b> a function.',
-        'III: a circle fails the vertical line test. <b>Not</b> a function.'],
+        'III: the circle fails the vertical line test. <b>Not</b> a function.'],
       ans: '<b>II only.</b>' },
     tries: [
-      { q: 'Which relation(s) is a function?<br><b>I</b> ' + set([2, 1], [3, 1], [4, 1]) + '<br><b>II</b> a vertical line<br><b>III</b> ' + nw(y + ' = ' + M + x + ' + 4') + '<br><b>IV</b> ' + set([0, 5], [0, 6], [1, 7]),
+      { q: RELQ + relBox([set([2, 1], [3, 1], [4, 1]), GR.vertical(), nw(y + ' = ' + M + x + ' + 4'), set([0, 5], [0, 6], [1, 7])]),
         choices: ['I and III', 'II and IV', 'I, only', 'III, only'], right: 0,
         ans: 'I has no repeated input, and III is a slanted line. II fails the vertical line test, and IV repeats the input 0.' },
-      { q: 'Which relation(s) is a function?<br><b>I</b> a U shape opening to the right<br><b>II</b> ' + set([1, 5], [2, 6], [3, 7]) + '<br><b>III</b> an oval<br><b>IV</b> ' + nw(y + ' = 5'),
+      { q: RELQ + relBox([GR.sideways(), set([1, 5], [2, 6], [3, 7]), GR.oval(), nw(y + ' = 5')]),
         choices: ['I and III', 'II, only', 'II and IV', 'IV, only'], right: 2,
         ans: 'II has no repeated input, and ' + nw(y + ' = 5') + ' is a horizontal line. The sideways U and the oval fail the vertical line test.' }] },
 
@@ -204,7 +193,61 @@ U.PRACTICE = {
       { q: 'Which relation is a function?', choices: [mapping([1, 2, 3], [5, 6], [[0, 0], [0, 1], [1, 1], [2, 1]]), tb(['Input', 'Output'], [[4, 1], [4, 2], [5, 3]]), mapping([-1, 0, 1], [2, 3], [[0, 0], [1, 1], [2, 0]]), GR.circle()], right: 2,
         ans: 'In that mapping each input has exactly one arrow. Two inputs landing on 2 is fine.' },
       { q: 'Which relation is a function?', choices: [set([3, 1], [3, 2], [4, 5]), mapping([2, 4, 6], [1, 3], [[0, 0], [1, 1], [1, 0], [2, 1]]), GR.oval(), set([5, 2], [6, 3], [7, 2])], right: 3,
-        ans: 'The inputs 5, 6, 7 do not repeat.' }] }
+        ans: 'The inputs 5, 6, 7 do not repeat.' }] },
+
+  14: { topic: 'Mapping diagrams',
+    ex: { q: 'Is this mapping a function?' + mapping([2, 4, 6], [1, 3], [[0, 0], [1, 0], [2, 1]]),
+      steps: ['In a mapping, look at the arrows leaving each <b>input</b> (the left oval).',
+        'The inputs 2, 4 and 6 each have exactly one arrow.',
+        'Two arrows land on the output 1, and that is fine. Only an input with two arrows breaks a function.'],
+      ans: '<b>It is a function.</b>' },
+    tries: [
+      { q: 'Which mapping represents a function?', choices: [mapping([1, 2], [3, 4, 5], [[0, 0], [0, 1], [1, 2]]), mapping([1, 2, 3], [7], [[0, 0], [1, 0], [2, 0]]), mapping([4, 5, 6], [1, 2], [[0, 0], [1, 0], [1, 1], [2, 1]]), mapping([0, 1], [2, 3], [[0, 0], [0, 1], [1, 1]])], right: 1,
+        ans: 'Every input has one arrow, all going to 7. Sharing an output is fine.' },
+      { q: 'Which mapping represents a function?', choices: [mapping([3, 4], [5, 6], [[0, 0], [0, 1], [1, 1]]), mapping([1, 2, 3], [4, 5], [[0, 0], [1, 0], [2, 0], [2, 1]]), mapping([-2, 0], [1, 2, 3], [[0, 0], [1, 1], [1, 2]]), mapping([-1, 0, 1], [0, 1], [[0, 1], [1, 0], [2, 1]])], right: 3,
+        ans: 'The inputs ' + M + '1, 0 and 1 each have exactly one arrow.' },
+      { q: 'Which mapping is <b>not</b> a function?', choices: [mapping([6, 7, 8], [1, 2], [[0, 0], [1, 1], [2, 0], [2, 1]]), mapping([1, 2], [5, 6], [[0, 0], [1, 1]]), mapping([3, 4, 5], [9], [[0, 0], [1, 0], [2, 0]]), mapping([0, 2, 4], [1, 3, 5], [[0, 2], [1, 1], [2, 0]])], right: 0,
+        ans: 'The input 8 has two arrows, one to 1 and one to 2.' },
+      { q: 'Which mapping represents a function?', choices: [mapping([1, 2, 3], [4, 5, 6], [[0, 0], [0, 1], [1, 2], [2, 2]]), mapping([5, 6], [0, 1], [[0, 0], [0, 1], [1, 1]]), mapping([2, 4, 6], [3, 5], [[0, 0], [1, 1], [2, 1]]), mapping([-3, 3], [9, -9], [[0, 0], [0, 1], [1, 0]])], right: 2,
+        ans: 'The inputs 2, 4 and 6 each have exactly one arrow.' },
+      { q: 'Which mapping is <b>not</b> a function?', choices: [mapping([1, 2, 3], [0], [[0, 0], [1, 0], [2, 0]]), mapping([4, 5], [8, 9], [[0, 1], [1, 0]]), mapping([-1, 0, 1], [2, 3], [[0, 0], [1, 0], [1, 1], [2, 1]]), mapping([7, 8, 9], [1, 2, 3], [[0, 0], [1, 1], [2, 2]])], right: 2,
+        ans: 'The input 0 has two arrows, one to 2 and one to 3.' }] },
+
+  15: { topic: 'Equations: function or not?',
+    ex: { q: 'Is ' + nw(x + ' = ' + M + '3') + ' a function?',
+      steps: ['Picture the graph. Every point on it has ' + nw(x + ' = ' + M + '3') + ', so it is a vertical line.',
+        'The one input ' + M + '3 goes to every ' + y + '-value: (' + M + '3, 0), (' + M + '3, 1), (' + M + '3, 2) and so on.',
+        'One input with many outputs, so it fails the vertical line test.'],
+      ans: '<b>Not a function.</b> (' + nw(y + ' = ' + M + '3') + ', a horizontal line, would be a function.)' },
+    tries: [
+      { q: 'Which equation does <b>not</b> represent a function?', choices: [nw(y + ' = 2' + x + ' + 3'), nw(y + ' = 7'), nw(x + ' = 1'), nw(y + ' = ' + x + '<sup>2</sup> + 1')], right: 2,
+        ans: nw(x + ' = 1') + ' is a vertical line.' },
+      { q: 'Which equation represents a function?', choices: [nw(x + ' = ' + M + '5'), nw(x + ' = 0'), nw(y + ' = ' + M + '4' + x + ' + 1'), nw(x + ' = 8')], right: 2,
+        ans: nw(y + ' = ' + M + '4' + x + ' + 1') + ' is a slanted line. The others are vertical lines.' },
+      { q: 'Which equation does <b>not</b> represent a function?', choices: [nw(y + ' = ' + M + x), nw(x + ' = 6'), nw(y + ' = 4'), nw(y + ' = ' + x + ' ' + M + ' 9')], right: 1,
+        ans: nw(x + ' = 6') + ' is a vertical line.' },
+      { q: 'Which equation represents a function?', choices: [nw(x + ' = 2'), nw(y + ' = 3'), nw(x + ' = ' + M + '1'), nw(x + ' = 10')], right: 1,
+        ans: nw(y + ' = 3') + ' is a horizontal line, so every ' + x + ' goes to 3.' },
+      { q: 'Which equation does <b>not</b> represent a function?', choices: [nw(y + ' = 5' + x), nw(y + ' = ' + x + '<sup>2</sup>'), nw(y + ' = 0'), nw(x + ' = ' + M + '7')], right: 3,
+        ans: nw(x + ' = ' + M + '7') + ' is a vertical line.' }] },
+
+  16: { topic: 'Missing value in a table',
+    ex: { q: 'This table should be a function. Can the <b>?</b> be 4?' + tb(xy, [[2, 1], [4, 3], [6, 5], ['?', 7]]),
+      steps: ['The ' + nw(x + '-values') + ' already used are 2, 4 and 6.',
+        'If the ? were 4, the input 4 would go to 3 and to 7. That is two outputs.',
+        'So the ? has to be a new number, like 8.'],
+      ans: '<b>No.</b> The ? can not be 4.' },
+    tries: [
+      { q: 'This table represents a function. Which value can <b>not</b> replace the <b>?</b>' + tb(xy, [[1, 2], [3, 4], [5, 6], ['?', 8]]), choices: ['2', '3', '4', '7'], right: 1,
+        ans: '3 is already used (it goes to 4), so it can’t also go to 8.' },
+      { q: 'This table represents a function. Which value can <b>not</b> replace the <b>?</b>' + tb(xy, [[0, 5], [-1, 5], [-2, 5], ['?', 9]]), choices: [N(-2), '1', '2', '3'], right: 0,
+        ans: M + '2 is already used (it goes to 5), so it can’t also go to 9.' },
+      { q: 'This table represents a function. Which value can <b>not</b> replace the <b>?</b>' + tb(xy, [[10, 1], [20, 2], [30, 3], ['?', 4]]), choices: ['40', '20', '15', '0'], right: 1,
+        ans: '20 is already used (it goes to 2), so it can’t also go to 4.' },
+      { q: 'Which value of <b>?</b> will make this table a function?' + tb(xy, [[2, 6], [3, 9], [4, 12], ['?', 15]]), choices: ['2', '3', '4', '5'], right: 3,
+        ans: '2, 3 and 4 are already used, so the ? must be 5.' },
+      { q: 'Which value of <b>?</b> will make this table a function?' + tb(xy, [[-3, 1], [0, 1], [3, 1], ['?', 2]]), choices: [N(-3), '0', '3', '6'], right: 3,
+        ans: M + '3, 0 and 3 are already used, so the ? must be 6.' }] }
 };
 
 // three more problems per station, so a student can ask for up to 5 (only if they want them)
@@ -212,7 +255,7 @@ const notF = 'Which relation is <b>not</b> a function?', isF = 'Which relation i
 const fx = f => [x, v(f) + '(' + x + ')'];
 const io = ['Input', 'Output'];
 const miss3 = (q, nums, right, ans) => ({ q, choices: nums.map(N), right, ans });
-const rel = (I, II, III, IV) => 'Which relation(s) is a function?<br><b>I</b> ' + I + '<br><b>II</b> ' + II + '<br><b>III</b> ' + III + '<br><b>IV</b> ' + IV;
+const rel = (...R) => RELQ + relBox(R);
 const MORE = {
   1: [
     { q: notF, choices: [set([2, 3], [4, 5], [6, 7]), set([1, 2], [3, 2], [5, 2]), set([0, 4], [1, 5], [2, 6]), set([7, 1], [8, 2], [7, 3])], right: 3, ans: nw(x + ' = 7') + ' goes to both 1 and 3.' },
@@ -259,11 +302,11 @@ const MORE = {
     { q: 'Which table could represent a function?', choices: [tb(fx('p'), [[6, 1], [6, 2], [7, 3]]), tb(fx('q'), [[-1, 0], [0, 1], [-1, 2]]), tb(fx('r'), [[3, 4], [5, 6], [3, 8]]), tb(fx('s'), [[-2, 4], [2, 4], [0, 0]])], right: 3, ans: 'Table ' + v('s') + ': the inputs ' + M + '2, 2, 0 do not repeat. Sharing the output 4 is fine.' },
     { q: 'Which table could represent a function?', choices: [tb(fx('f'), [[0, 3], [0, 4], [1, 5]]), tb(fx('g'), [[8, 2], [9, 2], [8, 1]]), tb(fx('h'), [[10, 0], [11, 1], [12, 0]]), tb(fx('k'), [[1, 6], [2, 7], [2, 8]])], right: 2, ans: 'Table ' + v('h') + ': the inputs 10, 11, 12 do not repeat.' }],
   12: [
-    { q: rel(set([1, 3], [1, 4], [2, 5]), nw(y + ' = 2' + x + ' + 1'), 'a circle', set([0, 2], [1, 2], [2, 2])), choices: ['I and III', 'II and IV', 'II, only', 'I, only'], right: 1,
+    { q: rel(set([1, 3], [1, 4], [2, 5]), nw(y + ' = 2' + x + ' + 1'), GR.circle(), set([0, 2], [1, 2], [2, 2])), choices: ['I and III', 'II and IV', 'II, only', 'I, only'], right: 1,
       ans: 'II is a slanted line, and IV has no repeated input. I repeats the input 1, and the circle fails the vertical line test.' },
-    { q: rel('a horizontal line', set([4, 1], [4, 2], [5, 3]), 'a U shape opening up', 'an oval'), choices: ['I and III', 'II and IV', 'III, only', 'I and II'], right: 0,
+    { q: rel(GR.horizontal(), set([4, 1], [4, 2], [5, 3]), GR.parabolaUp(), GR.oval()), choices: ['I and III', 'II and IV', 'III, only', 'I and II'], right: 0,
       ans: 'The horizontal line and the U opening up pass the vertical line test. II repeats the input 4, and the oval fails.' },
-    { q: rel('a vertical line', set([-1, 0], [0, 1], [1, 2]), nw(y + ' = ' + M + '2' + x), 'a V shape on its side'), choices: ['I and IV', 'II, only', 'II and III', 'III, only'], right: 2,
+    { q: rel(GR.vertical(), set([-1, 0], [0, 1], [1, 2]), nw(y + ' = ' + M + '2' + x), GR.vSide()), choices: ['I and IV', 'II, only', 'II and III', 'III, only'], right: 2,
       ans: 'II has no repeated input, and III is a slanted line. The vertical line and the sideways V fail the vertical line test.' }],
   13: [
     { q: isF, choices: [mapping([1, 2, 3], [4, 5], [[0, 0], [1, 0], [1, 1], [2, 1]]), mapping([4, 5, 6], [0, 1, 2], [[0, 0], [1, 1], [2, 2]]), tb(io, [[2, 3], [2, 4], [3, 5]]), GR.sideways()], right: 1,
