@@ -94,7 +94,7 @@ h1{font:800 clamp(1.7rem,1.2rem + 2vw,2.6rem)/1.05 var(--disp);margin:0}
 .xsteps li{counter-increment:s;position:relative;padding-left:2.4rem;margin:0 0 1rem}
 .xsteps li::before{content:counter(s);position:absolute;left:0;top:.1rem;width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid var(--accent);color:var(--accent);font:700 .9rem/1.6rem var(--body);text-align:center;box-sizing:border-box;line-height:1.4rem}
 .xans{font-size:1.1rem;margin:0 0 .4rem;padding-left:2.4rem;color:var(--ink)}
-.xans span{color:var(--mute);font-weight:600}
+.xans .al{color:var(--mute);font-weight:600}
 .card .a{font-weight:600;font-size:1.1rem;background:var(--soft);border-radius:12px;padding:.7rem 1rem}
 .acts{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
 .btn.good{background:#15803d;border-color:#15803d}.btn.bad{background:#b45309;border-color:#b45309}.btn.sm{min-height:2.2rem;padding:.2rem .8rem;font-size:.9rem;margin-left:.4rem}
@@ -215,7 +215,7 @@ function online() {
       const e = p.ex, parts = p.parts;
       body = '<p class="tag">Example</p>' + exQ(e, p, 'bigq') + (e.graph ? U.graph(e.graph) : '') +
         (parts ? parts.map((pt, i) => '<div class="part"><p class="pq"><b>(' + 'abcdef'[i] + ')</b> ' + pt.q + '</p><p class="how">' + pt.how + '</p><p class="pa">Answer: ' + pt.ans + '</p></div>').join('')
-          : '<h3 class="sth">Steps</h3><ol class="xsteps">' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="xans"><span>Answer:</span> ' + e.ans + '</p>') +
+          : '<h3 class="sth">Steps</h3><ol class="xsteps">' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="xans"><span class="al">Answer:</span> ' + e.ans + '</p>') +
         '<div class="acts"><button class="btn" id="nx">I’m ready to practice ➜</button></div>';
     } else {
       const t = c.t, S = t.sub, one = S.length === 1, j = Math.min(st.step, S.length - 1), cur = S[j], last = j === S.length - 1;
