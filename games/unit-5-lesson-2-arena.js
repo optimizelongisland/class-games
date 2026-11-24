@@ -37,7 +37,7 @@ const CSS = `
 const COL = ['#ff4d3d', '#ffcc33', '#2fd4ff', '#3be37a', '#ffffff', '#ff8a2a'];
 const GAMES = {
   hoops: { name: 'Free Throw', how: 'Drag up and let go to shoot (on a computer, click and drag up). The hoop slides, so aim where it will be. Swish = 3, in = 2. 5 shots.' },
-  penalty: { name: 'Penalty Kick', how: 'Tap a spot in the goal to shoot. Top corners = 3, bottom corners = 2, middle = 1. Beat the goalie! 5 kicks.' },
+  penalty: { name: 'Penalty Kick', how: 'Tap one of the 6 boxes in the goal to kick the ball there. Each box shows its points: top corners 3, bottom corners 2, middle 1. When you kick, the goalie dives left, right or stays in the middle. Pick a different side than the goalie to score! 5 kicks.' },
   homerun: { name: 'Home Run Derby', how: 'Tap SWING (or anywhere) when the pitch reaches the glowing zone. Perfect timing = home run (3). Close = base hit (1). 6 pitches.' },
   fieldgoal: { name: 'Field Goal', how: 'The arrow swings back and forth. Tap to kick when it points between the posts. Watch the wind! Each kick is farther and worth more. 5 kicks.' },
   bowling: { name: 'Bowling', how: 'The ball slides across the lane. Tap to roll it. Hit the front pin dead on for a strike (4). 7 or more pins = 2, 3 or more = 1. 3 rolls.' },
@@ -264,36 +264,47 @@ function hpTick(now) {
 }
 
 /* ---------------- 2. Penalty Kick ---------------- */
+// The goal is split into 6 boxes with their points written in them. Tap a box to kick there.
+// The goalie dives to one side (or stays in the middle) when you kick: pick a different box than the goalie to score.
 let pk = {};
-function pkSetup() { pk = { left: 5, fly: null, wait: 0, gx: 0.5, dive: null }; }
-function pkGeo() { const x0 = W * 0.14, x1 = W * 0.86, y0 = H * 0.3, y1 = H * 0.66; return { x0, x1, y0, y1, w: x1 - x0, h: y1 - y0 }; }
+const PK_P = [[3, 1, 3], [2, 1, 2]];   // [row][col]: top corners 3, bottom corners 2, middle 1
+function pkSetup() { pk = { left: 5, fly: null, wait: 0, dive: null, hover: null, msg: null }; }
+function pkGeo() { const x0 = W * 0.12, x1 = W * 0.88, y0 = H * 0.3, y1 = H * 0.7; return { x0, x1, y0, y1, w: x1 - x0, h: y1 - y0 }; }
 function pkZone(x, y) {
   const g = pkGeo(); if (x < g.x0 || x > g.x1 || y < g.y0 || y > g.y1) return null;
   const col = Math.min(2, Math.floor((x - g.x0) / (g.w / 3))), row = y < g.y0 + g.h / 2 ? 0 : 1;
-  return { col, row, p: col === 1 ? 1 : row === 0 ? 3 : 2 };
+  return { col, row, p: PK_P[row][col] };
 }
+const pkBox = (g, c, r) => ({ x: g.x0 + g.w * c / 3, y: g.y0 + g.h * r / 2, w: g.w / 3, h: g.h / 2 });
 function pkDraw(now) {
   ctx.clearRect(0, 0, W, H); const g = pkGeo();
   stadium(now, { crowdBot: H * 0.24 }); grass(H * 0.24, H, 9);
   // net
   ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(g.x0, g.y0, g.w, g.h);
-  ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1;
   for (let x = g.x0; x <= g.x1; x += 14) { ctx.beginPath(); ctx.moveTo(x, g.y0); ctx.lineTo(x, g.y1); ctx.stroke(); }
   for (let y = g.y0; y <= g.y1; y += 14) { ctx.beginPath(); ctx.moveTo(g.x0, y); ctx.lineTo(g.x1, y); ctx.stroke(); }
-  // zone points (faint)
-  ctx.font = '700 ' + Math.round(g.h * 0.2) + 'px ' + F; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = 'rgba(255,204,51,.35)';
-  [[0, 0, 3], [2, 0, 3], [0, 1, 2], [2, 1, 2], [1, 0, 1], [1, 1, 1]].forEach(([c, r, p]) => ctx.fillText(p, g.x0 + g.w * (c + 0.5) / 3, g.y0 + g.h * (r + 0.5) / 2));
-  ctx.textBaseline = 'alphabetic';
-  // goalie
-  let gx = g.x0 + g.w * (0.5 + Math.sin(now / 520) * 0.12), tilt = 0;
-  if (pk.dive) { const t = clamp((now - pk.dive.t) / 260, 0, 1); gx = pk.dive.from + (pk.dive.to - pk.dive.from) * t; tilt = pk.dive.tilt * t; }
-  pk.gxNow = gx;
+  // the 6 target boxes, each with its points
+  const ready = running && !pk.fly && pk.left > 0, pulse = 0.5 + 0.5 * Math.sin(now / 250);
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) {
+    const b = pkBox(g, c, r), p = PK_P[r][c], hov = pk.hover && pk.hover.row === r && pk.hover.col === c;
+    const hit = pk.fly && pk.fly.z && pk.fly.z.row === r && pk.fly.z.col === c;
+    ctx.fillStyle = hit || hov ? 'rgba(255,204,51,.35)' : p === 3 ? 'rgba(255,204,51,.14)' : p === 2 ? 'rgba(47,212,255,.12)' : 'rgba(255,255,255,.05)';
+    ctx.fillRect(b.x + 5, b.y + 5, b.w - 10, b.h - 10);
+    ctx.setLineDash([8, 6]); ctx.lineWidth = hov || hit ? 3 : 2;
+    ctx.strokeStyle = hov || hit ? '#ffcc33' : 'rgba(255,255,255,' + (ready ? 0.45 + 0.35 * pulse : 0.4) + ')';
+    ctx.strokeRect(b.x + 5, b.y + 5, b.w - 10, b.h - 10); ctx.setLineDash([]);
+    label(p + (p === 1 ? ' PT' : ' PTS'), b.x + b.w / 2, b.y + b.h / 2, Math.round(clamp(b.h * 0.26, 16, 30)), p === 3 ? '#ffcc33' : p === 2 ? '#2fd4ff' : '#fff');
+  }
+  // goalie: stands in the middle and bounces until you kick, then dives
+  let gx = g.x0 + g.w / 2, tilt = 0, lift = Math.abs(Math.sin(now / 300)) * 6;
+  if (pk.dive) { const t = clamp((now - pk.dive.t) / 300, 0, 1); gx = pk.dive.from + (pk.dive.to - pk.dive.from) * t; tilt = pk.dive.tilt * t; lift = 0; }
   const gh = g.h * 0.78, gw = g.w * 0.08;
-  ctx.save(); ctx.translate(gx, g.y1); ctx.rotate(tilt);
-  ctx.fillStyle = '#ffcc33'; ctx.fillRect(-gw / 2, -gh * 0.75, gw, gh * 0.45);
+  ctx.save(); ctx.translate(gx, g.y1 - lift); ctx.rotate(tilt);
+  ctx.fillStyle = '#ff8a2a'; ctx.fillRect(-gw / 2, -gh * 0.75, gw, gh * 0.45);
   ctx.fillStyle = '#1b2a4a'; ctx.fillRect(-gw / 2, -gh * 0.3, gw * 0.42, gh * 0.3); ctx.fillRect(gw * 0.08, -gh * 0.3, gw * 0.42, gh * 0.3);
   ctx.fillStyle = '#f1c9a5'; ctx.beginPath(); ctx.arc(0, -gh * 0.86, gw * 0.42, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#ffcc33'; ctx.lineWidth = gw * 0.3; ctx.lineCap = 'round';
+  ctx.strokeStyle = '#ff8a2a'; ctx.lineWidth = gw * 0.3; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(-gw / 2, -gh * 0.7); ctx.lineTo(-gw * 1.6, -gh * 0.98); ctx.moveTo(gw / 2, -gh * 0.7); ctx.lineTo(gw * 1.6, -gh * 0.98); ctx.stroke();
   ctx.fillStyle = '#3be37a'; ctx.beginPath(); ctx.arc(-gw * 1.6, -gh * 0.98, gw * 0.3, 0, 7); ctx.arc(gw * 1.6, -gh * 0.98, gw * 0.3, 0, 7); ctx.fill();
   ctx.restore(); ctx.lineCap = 'butt';
@@ -302,29 +313,35 @@ function pkDraw(now) {
   // penalty spot + ball
   ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(W / 2, H - 50, 10, 4, 0, 0, 7); ctx.fill();
   const br = clamp(W * 0.028, 15, 24);
-  if (pk.fly) { const f = pk.fly, t = clamp((now - f.t) / 420, 0, 1); ballSoccer(W / 2 + (f.x - W / 2) * t, H - 62 + (f.y - (H - 62)) * t - Math.sin(Math.PI * t) * 20, br * (1 - 0.45 * t)); }
+  if (pk.fly) { const f = pk.fly, t = clamp((now - f.t) / 450, 0, 1); ballSoccer(W / 2 + (f.x - W / 2) * t, H - 62 + (f.y - (H - 62)) * t - Math.sin(Math.PI * t) * 20, br * (1 - 0.45 * t)); }
   else if (pk.left > 0) ballSoccer(W / 2, H - 62, br);
+  // what to do / what happened
+  if (pk.msg) label(pk.msg.big, W / 2, g.y1 + 48, 34, pk.msg.c);
+  if (pk.msg && pk.msg.small) label(pk.msg.small, W / 2, g.y1 + 84, 18, '#fff');
+  else if (ready) label('TAP A BOX IN THE GOAL TO SHOOT', W / 2, H - 100, Math.round(clamp(W * 0.03, 15, 22)), 'rgba(255,255,255,' + (0.6 + 0.4 * pulse) + ')');
   label('KICKS ' + pk.left, W - 60, H - 24, 18, '#fff');
 }
 function pkTap(p) {
   if (pk.fly || pk.left <= 0) return;
   const g = pkGeo(), z = pkZone(p.x, p.y), now = performance.now();
-  pk.left--; pk.fly = { x: p.x, y: p.y, z, t: now };
-  // goalie guesses a column: right column 40% of the time, otherwise a random one
-  const guess = z && Math.random() < 0.4 ? z.col : Math.floor(Math.random() * 3);
-  const to = g.x0 + g.w * (guess + 0.5) / 3;
-  pk.dive = { from: pk.gxNow || W / 2, to, t: now, tilt: guess === 0 ? -0.9 : guess === 2 ? 0.9 : 0, col: guess };
+  if (!z) { float(p.x, p.y, 'Tap inside the goal', '#fff'); return; }   // a miss-tap doesn't use up a kick
+  // aim at the middle of the box you picked
+  const b = pkBox(g, z.col, z.row);
+  pk.left--; pk.msg = null; pk.fly = { x: b.x + b.w / 2, y: b.y + b.h / 2, z, t: now };
+  // the goalie guesses a side: left, middle or right (it guesses yours 1 time in 3)
+  const guess = Math.floor(Math.random() * 3);
+  pk.dive = { from: g.x0 + g.w / 2, to: g.x0 + g.w * (guess + 0.5) / 3, t: now, tilt: guess === 0 ? -1.1 : guess === 2 ? 1.1 : 0, col: guess };
 }
+const PK_SIDE = ['left', 'middle', 'right'];
 function pkTick(now) {
   const f = pk.fly;
-  if (f && now - f.t >= 420 && !f.done) {
+  if (f && now - f.t >= 450 && !f.done) {
     f.done = true;
-    if (!f.z) float(f.x, f.y, 'Wide!', '#fff');
-    else if (pk.dive.col === f.z.col && !(f.z.col === 1 && Math.random() < 0.25)) float(f.x, f.y - 30, 'Saved!', '#2fd4ff');
-    else { pts += f.z.p; float(f.x, f.y - 30, 'GOAL! +' + f.z.p, '#ffcc33'); confetti(f.x, f.y, 16); }
-    pk.wait = now + 800;
+    if (pk.dive.col === f.z.col) pk.msg = { big: 'SAVED!', c: '#2fd4ff', small: 'The goalie guessed ' + PK_SIDE[pk.dive.col] + ' too. Pick a different side!' };
+    else { pts += f.z.p; pk.msg = { big: 'GOAL! +' + f.z.p, c: '#ffcc33', small: 'The goalie went ' + PK_SIDE[pk.dive.col] + '.' }; confetti(f.x, f.y, 18); }
+    pk.wait = now + 1500;
   }
-  if (f && f.done && now >= pk.wait) { pk.fly = null; pk.dive = null; if (pk.left <= 0) { pkDraw(now); return finish(pts >= 9 ? 'Hat trick hero!' : pts ? 'Nice finishing!' : 'The goalie was on fire!'); } }
+  if (f && f.done && now >= pk.wait) { pk.fly = null; pk.dive = null; pk.msg = null; if (pk.left <= 0) { pkDraw(now); return finish(pts >= 9 ? 'Hat trick hero!' : pts ? 'Nice finishing!' : 'The goalie was on fire!'); } }
   hud(pk.left + ' kicks left'); bar(1 - pk.left / 5); pkDraw(now);
 }
 
@@ -574,6 +591,7 @@ function wire() {
     const p = pos(e);
     if (hp.drag) { hp.drag.x = p.x; hp.drag.y = p.y; }
     if (game === 'goalie' && running) { gl.x = p.x; gl.y = clamp(p.y, H * 0.3, H * 0.9); }
+    if (game === 'penalty' && running) pk.hover = pkZone(p.x, p.y);
   });
   cv.addEventListener('pointerup', e => {
     if (game !== 'hoops' || !hp.drag || !running) return;
