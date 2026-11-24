@@ -72,6 +72,9 @@ function graph(g) {
 }
 
 
+// small graph on a -5..5 grid (station 15)
+const G15 = (curves, dots, label) => graph({ x: [-5, 5], y: [-5, 5], ticks: { x: 1, y: 1 }, curves, dots, label });
+
 /* ---------- the questions ----------
    Stations 1-13 are the packet problems from pages 15-18 (Lesson 2: Identifying Functions Continued),
    in packet order. `src` says where each one is in the packet.
@@ -192,13 +195,16 @@ const Q = [
       hints: ['In a mapping, look at the arrows leaving each <b>input</b> (the left oval).',
               'A function has exactly ONE arrow leaving every input. Does any input have two arrows?',
               'Two arrows landing on the same output is fine. Two arrows leaving the same input is NOT.'] }] },
-  { n: 15, src: 'New problem', title: 'Equations',
-    text: 'Which equation does <b>not</b> represent a function?',
-    parts: [{ t: 'mc', q: 'Choose the equation that is <b>not</b> a function.', pq: '', labels: '1234', answer: 2,
-      choices: [nw(v('y') + ' = 3' + v('x') + ' ' + M + ' 1'), nw(v('y') + ' = ' + v('x') + sup('2')), nw(v('x') + ' = 4'), nw(v('y') + ' = ' + M + '2')],
-      hints: ['Picture the graph of each equation, then use the vertical line test.',
-              v('y') + ' = (a number) is a horizontal line. ' + v('x') + ' = (a number) is a vertical line.',
-              'A vertical line has the same ' + v('x') + '-value for every point, so one input has many outputs.'] }] },
+  { n: 15, src: 'New problem', title: 'Vertical line test',
+    text: 'Use the vertical line test. Which graph does <b>not</b> represent a function?',
+    parts: [{ t: 'mc', q: 'Choose the graph that is <b>not</b> a function.', pq: '', labels: '1234', answer: 2, pics: true,
+      choices: [G15([{ p: Array.from({ length: 31 }, (_, i) => { const t = -4.5 + 9 * i / 30; return [t, 2 * Math.sin(t)]; }), arrow: 'both' }], [], 'A wave going left to right'),
+                G15([], [[-4, -1], [-2, 3], [0, 1], [1, -3], [3, 2]], 'Five dots, no two in the same column'),
+                G15([], [[-3, -2], [-1, 1], [2, 4], [2, -1], [4, 2]], 'Five dots, two of them stacked at x = 2'),
+                G15([{ p: [[0, -1], [-4.5, 3.5]], arrow: true }, { p: [[0, -1], [4.5, 3.5]], arrow: true }], [], 'A V shape opening up')],
+      hints: ['Slide a pencil, held straight up and down, across each graph from left to right.',
+              'If the pencil ever touches the graph in <b>two places at once</b>, that graph is NOT a function.',
+              'Dots count too: two dots in the same column (same ' + v('x') + ') means one input has two outputs.'] }] },
   { n: 16, src: 'New problem', title: 'Missing value in a table',
     text: 'This table should represent a function.' + tb(xy, [[1, 5], [2, 7], [3, 9], ['?', 11]]) + 'Which value can <b>not</b> replace the <b>?</b>',
     parts: [{ t: 'mc', q: 'Choose the value that can <b>not</b> go in the table.', pq: '', labels: '1234', answer: 2, choices: ['4', '0', '2', '6'],
@@ -209,7 +215,7 @@ const Q = [
 Q.forEach(q => { q.ready = true; q.est = 2;
   q.parts.forEach(p => { const c = p.choices[p.answer], L = p.labels[p.answer] + ') ', alt = /alt="([^"]*)"/.exec(c);
     if (alt) p.key = L + alt[1]; else if (/<table/.test(c)) p.key = L + 'the table in choice ' + p.labels[p.answer]
-    else if (/<svg/.test(c)) p.key = L + 'the mapping in choice ' + p.labels[p.answer]; }); });
+    else if (/<svg/.test(c)) p.key = L + (/aria-label="Mapping/.test(c) ? 'the mapping in choice ' + p.labels[p.answer] : /aria-label="([^"]*)"/.exec(c)[1]); }); });
 
 /* ---------- answer checking ---------- */
 function clean(s) {

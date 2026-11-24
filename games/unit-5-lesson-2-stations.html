@@ -124,6 +124,10 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .sthead #leave{white-space:nowrap}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
 .turn.steal{color:var(--yellow)}
+.chs.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+.chs.nums .ch{justify-content:center;padding:1.1rem .4rem}
+.pchs{margin-top:.8rem}.pchs .ch{cursor:default}
+.chs.nums .ch .k{font-size:1.6rem;width:3.2rem;height:3.2rem;margin:0}
 .tsum{max-width:1180px;margin-inline:auto}
 .tstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.7rem;margin-bottom:.8rem}
 .tstats div{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:.7rem .9rem;text-align:center}
@@ -279,14 +283,17 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:7
   <div class="foot"><button class="link" id="restart">New team on this device? Start over</button></div>
 </div>
 <div class="toast" id="toast" hidden></div>
-<script src="unit-5-lesson-2-data.js?v=3"></script>
-<script src="unit-5-lesson-2-practice-data.js?v=4"></script>
+<script src="unit-5-lesson-2-data.js?v=4"></script>
+<script src="unit-5-lesson-2-practice-data.js?v=5"></script>
 <script src="unit-5-lesson-2-arena.js?v=7"></script>
 <script>
 'use strict';
 const U = window.U5L2, $ = s => document.querySelector(s), view = $('#view');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KEY = 'u5l2-state';
+// The question is only on the printed station card: the game shows just the choice numbers.
+// Add ?show to the address to see the full problems on screen (for the teacher).
+const HIDE = !/[?&]show\b/.test(location.search);
 let rolesAt = 0, probOpen = 0, exOpen = 0, xs = {}, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
@@ -480,9 +487,9 @@ function renderStation() {
   let inp = '';
   if (p.t === 'mc') {
     const tried = (st.wa[S.part] || []).map(Number);
-    inp = '<div class="chs' + (p.pics || p.wide ? ' grid2' : '') + '" id="chs">' + p.choices.map((c, i) => {
+    inp = '<div class="chs' + (HIDE ? ' nums' : p.pics || p.wide ? ' grid2' : '') + '" id="chs">' + p.choices.map((c, i) => {
       const L = (p.labels || 'ABCDEF')[i], bad = tried.includes(i);
-      return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + '><span class="k">' + L + '</span><span>' + c + '</span></button>';
+      return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + ' aria-label="Choice ' + L + '"><span class="k">' + L + '</span>' + (HIDE ? '' : '<span>' + c + '</span>') + '</button>';
     }).join('') + '</div>';
   } else if (p.t === 'expr') {
     // math field: ^ raises the cursor into an exponent box, ↓ brings it back down
@@ -501,13 +508,14 @@ function renderStation() {
   const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
   const help = '<div class="helpbar">' + (S.hintNow < hints.length ? '<button class="btn line violet" id="hintb">Need a hint?' + (S.hintNow ? ' (' + (hints.length - S.hintNow) + ' more)' : '') + '</button>' : '') +
     (S.wrongNow >= 3 ? '<button class="link" id="skip">Skip this part for now (tell your teacher)</button>' : '') + '</div>';
-  parts += '<div class="part now pop">' + turnLine() + '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
+  parts += '<div class="part now pop">' + turnLine() + (HIDE ? '<p class="pq">📄 Read the <b>Station ' + q.n + '</b> card. Solve it on paper, then tap the number of your answer.</p>' : '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>') + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   // under the answer box: show the station problem, or open an extra example
   const tools = '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
     (EX(q.n) ? '<button class="pill2 ex" id="exb">💡 Need an extra example?</button>' : '') + '</div>' +
-    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</div>' : '');
+    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') +
+      (HIDE && p.t === 'mc' ? '<div class="chs pchs' + (p.pics || p.wide ? ' grid2' : '') + '">' + p.choices.map((c, i) => '<div class="ch"><span class="k">' + (p.labels || 'ABCDEF')[i] + '</span><span>' + c + '</span></div>').join('') + '</div>' : '') + '</div>' : '');
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 class="stitle">Station ' + q.n + '</h2>' +
     '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
     '</section>' +
@@ -516,7 +524,7 @@ function renderStation() {
   // roles pop up for a few seconds when a station opens, then fade away
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
   if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
-  $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
+  if ($('#probb')) $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
   if ($('#exb')) $('#exb').onclick = () => { exOpen = q.n; render(); scrollTo(0, 0); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
   else if (p.t === 'expr') {
