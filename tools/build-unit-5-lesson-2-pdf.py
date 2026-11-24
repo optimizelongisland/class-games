@@ -1,5 +1,5 @@
 """Builds resources/algebra/unit-5-lesson-2-stations.pdf for Unit 5 Lesson 2 (Identifying Functions Continued):
-  - one station card per page (13 stations = packet pages 15-18), to post around the room
+  - one station card per page (16 stations: packet pages 15-18 plus 3 new ones), to post around the room
   - a student recording sheet
   - an answer key
 Questions come from games/unit-5-lesson-2-data.js, so edit them there.
@@ -33,6 +33,9 @@ WHY = {
   11: 'Table g has x-values 1, 2, 3, 4 with no repeats. The others each repeat an x-value.',
   12: 'I repeats x = 2 (6 and −6); III fails the vertical line test. II has no repeated x, and IV is a non-vertical line.',
   13: 'The x-values 1, 2, 3, 4 never repeat. The table repeats 7, the circle fails the vertical line test, and 6 maps to 5 and 7.',
+  14: 'Each input (−1, 0, 1) has one arrow. In the others, 2, 1 or 5 has two arrows.',
+  15: 'x = 4 is a vertical line, so the input 4 has every y-value. The others pass the vertical line test.',
+  16: '2 is already used (2 goes to 7), so it can’t also go to 11. 4, 0 and 6 are new x-values.',
 }
 
 def choices(p, big):
@@ -46,7 +49,7 @@ for q in qs:
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 · Lesson 2 · Identifying Functions</small><b>{q['title']}</b></div></header>
   <div class="q">{q['text']}</div>
   {choices(p, True)}
-  <footer><span>Write your answer and your reason on your recording sheet.</span><span>Packet {q['src']}</span></footer>
+  <footer><span>Write your answer and your reason on your recording sheet.</span><span>{('Packet ' + q['src']) if q['src'].startswith('Page') else q['src']}</span></footer>
 </section>''')
 
 rows = ''.join(f'<tr><td class="sn">{q["n"]}</td><td class="ab"></td><td></td></tr>' for q in qs)
@@ -60,7 +63,7 @@ pages.append(f'''<section class="page sheet">
 krows = ''.join(f'<tr><td class="sn">{q["n"]}</td><td class="src">{q["src"]}</td><td class="ka"><b>{q["parts"][0]["labels"][q["parts"][0]["answer"]]}</b></td><td>{WHY[q["n"]]}</td></tr>' for q in qs)
 pages.append(f'''<section class="page sheet key">
   <h1>Answer Key: Lesson 2 Stations</h1>
-  <p class="dir">Station numbers match packet pages 15 to 18 in order.</p>
+  <p class="dir">Stations 1 to 13 match packet pages 15 to 18 in order. Stations 14 to 16 are new problems.</p>
   <table class="rec"><tr><th>Station</th><th>Packet</th><th>Answer</th><th>Why</th></tr>{krows}</table>
 </section>''')
 
@@ -92,6 +95,10 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 .rels>div>b{font:700 18pt 'Times New Roman',serif;min-width:.4in}
 .rels .r2{font-size:14pt}
 .rels .cimg{width:2.2in;height:2in}
+svg.graph{width:3.1in;height:auto;display:block}
+.chs li>div{flex:1;min-width:0}
+.g-axis{stroke:#111;stroke-width:2.5;fill:none}.g-arrow{fill:#111}.g-num{fill:#111;font:500 17px 'IBM Plex Sans',Arial}.g-title{fill:#333;font:600 15px 'IBM Plex Sans',Arial}
+.q .tb{margin:.15in 0}
 .rels .tb{font-size:14pt}.rels .tb th,.rels .tb td{padding:.01in .22in;min-width:.6in}
 .rel .chs{grid-template-columns:1fr 1fr;grid-auto-flow:column;font-size:20pt;gap:.25in .4in;margin-top:.15in}
 footer{margin-top:auto;display:flex;justify-content:space-between;border-top:2px solid #111;padding-top:.1in;font-size:11pt;color:#333}
@@ -100,10 +107,10 @@ footer{margin-top:auto;display:flex;justify-content:space-between;border-top:2px
 .dir{font-size:12pt;margin:0 0 .15in;line-height:1.4}
 .rec{width:100%;border-collapse:collapse;font-size:12pt}
 .rec th{background:#111;color:#fff;text-align:left;padding:.06in .1in;font-weight:600}
-.rec td{border:1.5px solid #111;height:.58in;padding:.04in .1in;vertical-align:middle}
+.rec td{border:1.5px solid #111;height:.47in;padding:.04in .1in;vertical-align:middle}
 .rec td.sn{width:.8in;text-align:center;font:700 18pt 'Oswald',Impact,sans-serif}
 .rec td.ab{width:1in}
-.key .rec td{height:.6in;font-size:11.5pt;line-height:1.3}
+.key .rec td{height:.46in;font-size:11pt;line-height:1.25}
 .key .rec td.src{width:1.15in;font-size:10.5pt;color:#333}
 .key .rec td.ka{width:.85in;text-align:center;font-size:20pt}
 """
