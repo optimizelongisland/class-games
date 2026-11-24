@@ -36,6 +36,7 @@ const GR = {
   steps: () => G([{ p: [[-4.5, -3], [-2, -1]] }, { p: [[-2, -1], [1, -1]] }, { p: [[1, -1], [2, 2]] }, ray([2, 2], [4.5, 2])], 'A line that rises, goes flat, rises again, then stays flat'),
   segment: () => G([{ p: [[3, -3], [3, 3]] }], 'A vertical segment', [[3, -3], [3, 3]])
 };
+const DOTS = (d, label) => G([], label, d);
 const mapping = (i, o, a) => U.mapping(i, o, a, 'graph mini map');
 
 /* station 12 style: each relation in its own box, graphs drawn as small pictures */
@@ -213,23 +214,22 @@ U.PRACTICE = {
       { q: 'Which mapping is <b>not</b> a function?', choices: [mapping([1, 2, 3], [0], [[0, 0], [1, 0], [2, 0]]), mapping([4, 5], [8, 9], [[0, 1], [1, 0]]), mapping([-1, 0, 1], [2, 3], [[0, 0], [1, 0], [1, 1], [2, 1]]), mapping([7, 8, 9], [1, 2, 3], [[0, 0], [1, 1], [2, 2]])], right: 2,
         ans: 'The input 0 has two arrows, one to 2 and one to 3.' }] },
 
-  15: { topic: 'Equations: function or not?',
-    ex: { q: 'Is ' + nw(x + ' = ' + M + '3') + ' a function?',
-      steps: ['Picture the graph. Every point on it has ' + nw(x + ' = ' + M + '3') + ', so it is a vertical line.',
-        'The one input ' + M + '3 goes to every ' + y + '-value: (' + M + '3, 0), (' + M + '3, 1), (' + M + '3, 2) and so on.',
-        'One input with many outputs, so it fails the vertical line test.'],
-      ans: '<b>Not a function.</b> (' + nw(y + ' = ' + M + '3') + ', a horizontal line, would be a function.)' },
+  15: { topic: 'Vertical line test',
+    ex: { q: 'Is this graph a function?' + DOTS([[-4, 1], [-2, -2], [1, 3], [1, -1], [3, 2]], 'Five dots, two of them stacked at x = 1'),
+      steps: [VLT, 'At ' + nw(x + ' = 1') + ' the line touches two dots at once: (1, 3) and (1, ' + M + '1).',
+        'One input with two outputs, so it fails the vertical line test.'],
+      ans: '<b>Not a function.</b> The input 1 goes to both 3 and ' + M + '1.' },
     tries: [
-      { q: 'Which equation does <b>not</b> represent a function?', choices: [nw(y + ' = 2' + x + ' + 3'), nw(y + ' = 7'), nw(x + ' = 1'), nw(y + ' = ' + x + '<sup>2</sup> + 1')], right: 2,
-        ans: nw(x + ' = 1') + ' is a vertical line.' },
-      { q: 'Which equation represents a function?', choices: [nw(x + ' = ' + M + '5'), nw(x + ' = 0'), nw(y + ' = ' + M + '4' + x + ' + 1'), nw(x + ' = 8')], right: 2,
-        ans: nw(y + ' = ' + M + '4' + x + ' + 1') + ' is a slanted line. The others are vertical lines.' },
-      { q: 'Which equation does <b>not</b> represent a function?', choices: [nw(y + ' = ' + M + x), nw(x + ' = 6'), nw(y + ' = 4'), nw(y + ' = ' + x + ' ' + M + ' 9')], right: 1,
-        ans: nw(x + ' = 6') + ' is a vertical line.' },
-      { q: 'Which equation represents a function?', choices: [nw(x + ' = 2'), nw(y + ' = 3'), nw(x + ' = ' + M + '1'), nw(x + ' = 10')], right: 1,
-        ans: nw(y + ' = 3') + ' is a horizontal line, so every ' + x + ' goes to 3.' },
-      { q: 'Which equation does <b>not</b> represent a function?', choices: [nw(y + ' = 5' + x), nw(y + ' = ' + x + '<sup>2</sup>'), nw(y + ' = 0'), nw(x + ' = ' + M + '7')], right: 3,
-        ans: nw(x + ' = ' + M + '7') + ' is a vertical line.' }] },
+      { q: 'Which graph does <b>not</b> represent a function?', choices: [GR.wave(), DOTS([[-3, 2], [-1, -1], [2, 1], [4, -3]], 'Four dots in different columns'), GR.circle(), GR.vUp()], right: 2,
+        ans: 'The circle: a vertical line through the middle touches it twice.' },
+      { q: 'Which graph does <b>not</b> represent a function?', choices: [DOTS([[-4, -2], [-1, 3], [0, 0], [2, 3], [4, 1]], 'Five dots in different columns'), DOTS([[-3, 1], [0, 4], [0, -2], [3, 1]], 'Four dots, two of them stacked at x = 0'), GR.cubic(), GR.horizontal()], right: 1,
+        ans: 'The dots (0, 4) and (0, ' + M + '2) are in the same column.' },
+      { q: 'Which graph represents a function?', choices: [GR.sideways(), GR.vertical(), DOTS([[-2, -3], [-2, 2], [1, 0], [3, 4]], 'Four dots, two of them stacked at x = ' + M + '2'), GR.parabolaDown()], right: 3,
+        ans: 'The upside-down U: every vertical line touches it only once.' },
+      { q: 'Which graph represents a function?', choices: [GR.oval(), DOTS([[-4, 3], [-1, -2], [1, 2], [3, -1]], 'Four dots in different columns'), GR.vSide(), GR.sStand()], right: 1,
+        ans: 'No two dots share a column, so each input has one output.' },
+      { q: 'Which graph does <b>not</b> represent a function?', choices: [GR.steps(), GR.slant(), GR.sidewaysLeft(), DOTS([[-3, -3], [-1, -1], [1, 1], [3, 3]], 'Four dots on a slant')], right: 2,
+        ans: 'The U opening left: a vertical line at ' + nw(x + ' = 0') + ' touches it twice.' }] },
 
   16: { topic: 'Missing value in a table',
     ex: { q: 'This table should be a function. Can the <b>?</b> be 4?' + tb(xy, [[2, 1], [4, 3], [6, 5], ['?', 7]]),

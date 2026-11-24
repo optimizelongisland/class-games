@@ -34,7 +34,7 @@ WHY = {
   12: 'I repeats x = 2 (6 and −6); III fails the vertical line test. II has no repeated x, and IV is a non-vertical line.',
   13: 'The x-values 1, 2, 3, 4 never repeat. The table repeats 7, the circle fails the vertical line test, and 6 maps to 5 and 7.',
   14: 'Each input (−1, 0, 1) has one arrow. In the others, 2, 1 or 5 has two arrows.',
-  15: 'x = 4 is a vertical line, so the input 4 has every y-value. The others pass the vertical line test.',
+  15: 'Two dots are stacked at x = 2, so the input 2 has two outputs. The wave, the other dots and the V all pass the vertical line test.',
   16: '2 is already used (2 goes to 7), so it can’t also go to 11. 4, 0 and 6 are new x-values.',
 }
 
@@ -98,6 +98,7 @@ header{display:flex;align-items:center;gap:.25in;border-bottom:4px solid #111;pa
 svg.graph{width:3.1in;height:auto;display:block}
 .chs li>div{flex:1;min-width:0}
 .g-axis{stroke:#111;stroke-width:2.5;fill:none}.g-arrow{fill:#111}.g-num{fill:#111;font:500 17px 'IBM Plex Sans',Arial}.g-title{fill:#333;font:600 15px 'IBM Plex Sans',Arial}
+.g-grid{stroke:#bbb;stroke-width:1}.g-curve{stroke:#111;stroke-width:3.5;fill:none}.g-dot{fill:#111}.g-dot.open{fill:#fff;stroke:#111;stroke-width:2.5}.g-lab{fill:#111;font:italic 600 18px 'IBM Plex Sans',Arial}.chs svg.graph{width:2.6in}
 .q .tb{margin:.15in 0}
 .rels .tb{font-size:14pt}.rels .tb th,.rels .tb td{padding:.01in .22in;min-width:.6in}
 .rel .chs{grid-template-columns:1fr 1fr;grid-auto-flow:column;font-size:20pt;gap:.25in .4in;margin-top:.15in}
