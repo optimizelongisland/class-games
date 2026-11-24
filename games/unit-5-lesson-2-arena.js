@@ -336,12 +336,17 @@ function pkDraw(now) {
     boxes.push([b, p]);
   }
   // goalie: bounces in the middle until you kick, then dives
-  const kh = g.h * 0.82;
+  const kh = Math.min(g.h * 0.82, g.w * 0.5);
   let gx = g.x0 + g.w / 2, tilt = 0, lift = Math.abs(Math.sin(now / 280)) * 7, reach = false;
   if (pk.dive) { const t = clamp((now - pk.dive.t) / 360, 0, 1); gx = pk.dive.from + (pk.dive.to - pk.dive.from) * t; tilt = pk.dive.tilt * t; lift = Math.sin(Math.PI * Math.min(t, 1)) * kh * (pk.dive.col === 1 ? 0.12 : 0.18); reach = true; }
   pkKeeper(gx, g.y1 - lift, kh, tilt, reach, now);
   // points on top so they can always be read
-  for (const [b, p] of boxes) label(p + (p === 1 ? ' PT' : ' PTS'), b.x + b.w / 2, b.y + b.h / 2, Math.round(clamp(b.h * 0.24, 15, 28)), p === 3 ? '#ffcc33' : p === 2 ? '#2fd4ff' : '#fff');
+  for (const [b, p] of boxes) {
+    const sz = Math.round(clamp(b.h * 0.22, 14, 26)), txt = p + (p === 1 ? ' PT' : ' PTS'), cx = b.x + b.w / 2, cy = b.x === g.x0 + g.w / 3 ? b.y + sz * 0.9 + 6 : b.y + b.h / 2;
+    ctx.font = '700 ' + sz + 'px ' + F; const tw = ctx.measureText(txt).width;
+    ctx.fillStyle = 'rgba(5,10,22,.6)'; ctx.beginPath(); ctx.roundRect(cx - tw / 2 - 8, cy - sz * 0.62, tw + 16, sz * 1.24, sz * 0.5); ctx.fill();
+    label(txt, cx, cy, sz, p === 3 ? '#ffcc33' : p === 2 ? '#2fd4ff' : '#fff');
+  }
   // posts + crossbar
   ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(g.x0 + 5, g.y1 + 4); ctx.lineTo(g.x0 + 5, g.y0 + 5); ctx.lineTo(g.x1 + 5, g.y0 + 5); ctx.lineTo(g.x1 + 5, g.y1 + 4); ctx.stroke();
   ctx.strokeStyle = '#fff'; ctx.lineWidth = 8; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(g.x0, g.y1); ctx.lineTo(g.x0, g.y0); ctx.lineTo(g.x1, g.y0); ctx.lineTo(g.x1, g.y1); ctx.stroke(); ctx.lineJoin = 'miter';
@@ -364,7 +369,7 @@ function pkDraw(now) {
   } else if (pk.left > 0) ballSoccer(bx, by, br);
   // boot: winds up behind the ball, swings through on the kick
   let ka = -0.5; if (f) { const t = (now - f.t) / 160; ka = t < 1 ? -0.5 + 1.3 * t : 0.8 - Math.min(1, (t - 1) / 4) * 1.3; }
-  ctx.save(); ctx.translate(bx - br * 3.2, H + 30); ctx.rotate(ka); ctx.lineCap = 'round';
+  ctx.save(); ctx.translate(bx - br * 2.6, by + br * 2.4); ctx.rotate(ka); ctx.lineCap = 'round';
   ctx.strokeStyle = '#fff'; ctx.lineWidth = br * 0.95; ctx.beginPath(); ctx.moveTo(-br * 0.4, br * 1.5); ctx.lineTo(0, -br * 1.6); ctx.stroke();
   ctx.strokeStyle = '#ff4d3d'; ctx.lineWidth = br * 0.95; ctx.beginPath(); ctx.moveTo(-br * 0.1, -br * 0.4); ctx.lineTo(0, -br * 0.9); ctx.stroke();
   ctx.fillStyle = '#111'; ctx.beginPath(); ctx.ellipse(br * 0.35, -br * 2.0, br * 0.75, br * 0.45, 0.2, 0, 7); ctx.fill();
