@@ -312,7 +312,7 @@ function jobs(k) {
   const r = P[k % P.length];
   return { rec: r, exp: P.filter(x => x !== r).join(' & ') };
 }
-const jobBar = j => j ? '<div class="jobbar"><span class="jb r2"><b>✍️ Both of you</b> solve it on paper</span><span class="jb r1"><b>🎯 ' + esc(j.rec) + '</b> answers first. Wrong? ' + esc(j.exp) + ' can steal!</span></div>' : '';
+const jobBar = j => j ? '<div class="jobbar"><span class="jb r2"><b>✍️ Both of you</b> solve it</span><span class="jb r1"><b>🎯 ' + esc(j.rec) + '</b> answers first. Wrong? ' + esc(j.exp) + ' can steal!</span></div>' : '';
 const hue = i => Math.round((i - 1) * 360 / 16 + 190) % 360;
 // stations each student asked for extra practice on (plus any part the pair skipped)
 function practiceFor(k) {
@@ -379,7 +379,7 @@ function renderSetup() {
     '<input data-n="' + k + '" maxlength="16" value="' + esc(S.names[k] || '') + '" autocomplete="off" autocapitalize="words" spellcheck="false"' + (k === 0 && !S.names[0] ? ' class="need"' : '') + '>' + (k === 0 ? '<span id="need" style="color:var(--yellow);font-size:.95rem"></span>' : '') + '</label>').join('');
   view.innerHTML = '<section class="card"><h2>Type your first names</h2><div class="names" id="names">' + nm + '</div></section>' +
     '<section class="card"><p class="lab">How to play</p><div class="roles">' +
-    '<div class="role r1"><b>✍️ Both solve</b><span>Each of you works out every station on your own paper at the same time.</span></div>' +
+    '<div class="role r1"><b>✍️ Both solve</b><span>Each of you solves every station at the same time.</span></div>' +
     '<div class="role r2"><b>🎯 Take turns</b><span>The game says whose turn it is. That partner enters their answer, and you switch every station.</span></div>' +
     '<div class="role r1"><b>🔁 Steal</b><span>If they get it wrong, the other partner can steal the turn and answer.</span></div></div></section>' +
     '<div class="row"><button class="btn fill cyan big" id="go">Next: pick your first station &rarr;</button></div>';
@@ -514,7 +514,7 @@ function renderStation() {
   const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
   const help = '<div class="helpbar">' + (S.hintNow < hints.length ? '<button class="btn line violet" id="hintb">Need a hint?' + (S.hintNow ? ' (' + (hints.length - S.hintNow) + ' more)' : '') + '</button>' : '') +
     (S.wrongNow >= 3 ? '<button class="link" id="skip">Skip this part for now (tell your teacher)</button>' : '') + '</div>';
-  parts += '<div class="part now pop">' + turnLine() + (HIDE ? '<p class="pq">📄 Read the <b>Station ' + q.n + '</b> card. Solve it on paper, then tap the number of your answer.</p>' : '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>') + inp +
+  parts += '<div class="part now pop">' + turnLine() + (HIDE ? '<p class="pq">📄 Read the <b>Station ' + q.n + '</b> card. Solve it, then tap the number of your answer.</p>' : '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>') + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   // under the answer box: show the station problem, or open an extra example
@@ -532,7 +532,7 @@ function renderStation() {
   if (J && since < 6400) {
     view.insertAdjacentHTML('beforeend', '<div class="rolepop" id="rolepop" style="animation-delay:-' + since + 'ms"><div class="rp"><p class="rps">Station ' + q.n + '</p>' +
       '<p class="rpa">🎯 ' + esc(J.rec) + ' answers first</p>' +
-      '<p class="rpl">✍️ <b>Both of you</b> solve it on paper</p>' +
+      '<p class="rpl">✍️ <b>Both of you</b> solve it</p>' +
       '<p class="rpl">🔁 Wrong? <b>' + esc(J.exp) + '</b> can steal!</p><p class="rpt">Tap anywhere to start</p></div></div>');
     $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
   }
