@@ -638,9 +638,9 @@ function reward(msg, d, k) {
 }
 // Prize boxes: per-student points = team total split evenly. Change the cutoffs here.
 const LEVELS = [
-  { lv: 1, min: 0, cut: 'Under 100', pick: 'Pick one', p: [['🎫', 'Ticket'], ['🍬', 'Jolly Rancher']] },
-  { lv: 2, min: 100, cut: '100–139', pick: 'Pick one', p: [['🦖', '3D printed animal'], ['🍓', 'Squishy']], or: 'OR trade it for two Level 1 prizes' },
-  { lv: 3, min: 140, cut: '140+', pick: 'Grand prize', p: [['🦆', 'Rubber ducky'], ['🎁', 'Mystery plushy']], or: 'OR trade it for one Level 2 + one Level 1 prize,<br>OR three Level 1 prizes' }];
+  { lv: 1, min: 0, cut: 'Under 80', pick: 'Pick one', p: [['🎫', 'Ticket'], ['🍬', 'Jolly Rancher']] },
+  { lv: 2, min: 80, cut: '80–119', pick: 'Pick one', p: [['🦖', '3D printed animal'], ['🍓', 'Squishy']], or: 'OR trade it for two Level 1 prizes' },
+  { lv: 3, min: 120, cut: '120+', pick: 'Grand prize', p: [['🦆', 'Rubber ducky'], ['🎁', 'Mystery plushy']], or: 'OR trade it for one Level 2 + one Level 1 prize,<br>OR three Level 1 prizes' }];
 const teamPts = () => S.tp || 0;
 const eachPts = () => Math.floor(teamPts() / Math.max(1, people().length));
 const level = () => LEVELS.filter(L => eachPts() >= L.min).pop();
