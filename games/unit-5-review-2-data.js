@@ -82,6 +82,7 @@ function graph(g) {
    `noprint: true` leaves a part off the printed sheet; `pc: false` prints it without its choices.
    `pq` (optional) replaces the part's wording on the printed station sheet; '' leaves it off.
    `hints` are shown one at a time on the hint page and on the device. */
+const AN = v('a') + '<sub>' + v('n') + '</sub> = ', A = k => v('a') + '<sub>' + k + '</sub> = ';
 const Q = [
   { n: 1, ready: true, title: 'Is it a function?',
     text: 'Marcel claims that the graph below represents a function.',
@@ -204,32 +205,26 @@ const Q = [
                 'Calculator tip: press the Y= key and type 2(5)^(X ' + M + ' 1) (use X for ' + v('n') + '). Then open the TABLE and read the y-values for X = 1, 2, 3, 4, 5.'] }
     ] },
   { n: 11, ready: true, title: 'Sequence: 1, 2, 4, 8, ...',
-    text: 'Given the following: &nbsp;1, 2, 4, 8, 16, 32, …',
+    text: 'Given the following geometric sequence: &nbsp;1, 2, 4, 8, 16, 32, …',
     parts: [
-      { t: 'mc', q: 'Is the pattern Arithmetic, Geometric, or Neither?', choices: ['Arithmetic', 'Geometric', 'Neither'], answer: 1,
-        hints: ['Arithmetic = you ADD the same number each time. Geometric = you MULTIPLY by the same number each time.',
-                'Is 1 → 2 → 4 → 8 adding the same number each time, or multiplying by the same number?'] },
-      { t: 'mc', q: 'Which rule represents the ' + v('n') + 'th term of the sequence?', labels: 'abcd',
-        choices: [v('a') + '<sub>' + v('n') + '</sub> = ' + '1 + 2(' + v('n') + ' ' + M + ' 1)', v('a') + '<sub>' + v('n') + '</sub> = ' + '2' + sup(v('n')), v('a') + '<sub>' + v('n') + '</sub> = ' + '1(2)' + sup('(' + v('n') + ' ' + M + ' 1)'), v('a') + '<sub>' + v('n') + '</sub> = ' + '2(1)' + sup('(' + v('n') + ' ' + M + ' 1)')], answer: 2,
-        hints: ['Geometric rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '.',
-                v('a') + '<sub>1</sub> is the first term. ' + v('r') + ' is what you multiply by each time.',
-                'Check each rule: when ' + v('n') + ' = 1 it should give 1, and when ' + v('n') + ' = 2 it should give 2.'] },
-      { t: 'mc', q: 'What is the 10th term of the sequence?', labels: 'abcd', choices: ['1024', '512', '19', '20'], answer: 1,
-        hints: ['Use your rule and replace ' + v('n') + ' with 10.', 'Do the exponent first: 2' + sup('9') + ' means 2 multiplied by itself 9 times.'] }
+      { t: 'mc', q: 'Which rule represents the ' + v('n') + 'th term of the sequence, and what is the 10th term?', labels: 'abcd',
+        choices: [AN + '2' + sup(v('n')) + '<br>' + A('10') + '1024', AN + '1 + 2(' + v('n') + ' ' + M + ' 1)<br>' + A('10') + '19',
+                  AN + '1(2)' + sup('(' + v('n') + ' ' + M + ' 1)') + '<br>' + A('10') + '512', AN + '1(2)' + sup('(' + v('n') + ' ' + M + ' 1)') + '<br>' + A('10') + '1024'], answer: 2,
+        hints: ['Geometric means you MULTIPLY by the same number each time. What do you multiply 1 by to get 2? 2 by to get 4?',
+                'Geometric rule: ' + AN + v('a') + '<sub>1</sub> · ' + v('r') + sup('(' + v('n') + ' ' + M + ' 1)') + '. ' + v('a') + '<sub>1</sub> is the first term, ' + v('r') + ' is what you multiply by.',
+                'Check the rule: when ' + v('n') + ' = 1 it should give 1, and when ' + v('n') + ' = 2 it should give 2.',
+                'For the 10th term, replace ' + v('n') + ' with 10. Do the exponent first: 2' + sup('9') + ' = 512.'] }
     ] },
   { n: 12, ready: true, title: 'Sequence: 4, 7, 10, ...',
-    text: 'Given the following: &nbsp;4, 7, 10, 13, 16, …',
+    text: 'Given the following arithmetic sequence: &nbsp;4, 7, 10, 13, 16, …',
     parts: [
-      { t: 'mc', q: 'Is the pattern Arithmetic, Geometric, or Neither?', choices: ['Arithmetic', 'Geometric', 'Neither'], answer: 0,
-        hints: ['Arithmetic = you ADD the same number each time. Geometric = you MULTIPLY by the same number each time.',
-                'What do you do to 4 to get 7? To 7 to get 10?'] },
-      { t: 'mc', q: 'Which rule represents the ' + v('n') + 'th term of the sequence?', labels: 'abcd',
-        choices: [v('a') + '<sub>' + v('n') + '</sub> = ' + '4 + 3(' + v('n') + ' ' + M + ' 1)', v('a') + '<sub>' + v('n') + '</sub> = ' + '3 + 4(' + v('n') + ' ' + M + ' 1)', v('a') + '<sub>' + v('n') + '</sub> = ' + '4(3)' + sup('(' + v('n') + ' ' + M + ' 1)'), v('a') + '<sub>' + v('n') + '</sub> = ' + '4 + 3' + v('n')], answer: 0,
-        hints: ['Arithmetic rule: ' + v('a') + '<sub>' + v('n') + '</sub> = ' + v('a') + '<sub>1</sub> + (' + v('n') + ' ' + M + ' 1)' + v('d') + '.',
-                v('a') + '<sub>1</sub> is the first term. ' + v('d') + ' is the common difference (what you add each time).',
-                'Check your rule: when ' + v('n') + ' = 1 it should give 4, and when ' + v('n') + ' = 2 it should give 7.'] },
-      { t: 'mc', q: 'What is the 12th term of the sequence?', labels: 'abcd', choices: ['40', '47', '36', '37'], answer: 3,
-        hints: ['Use your rule and replace ' + v('n') + ' with 12.', 'Remember order of operations: parentheses, then multiply, then add.'] }
+      { t: 'mc', q: 'Which rule represents the ' + v('n') + 'th term of the sequence, and what is the 12th term?', labels: 'abcd',
+        choices: [AN + '3 + 4(' + v('n') + ' ' + M + ' 1)<br>' + A('12') + '47', AN + '4 + 3' + v('n') + '<br>' + A('12') + '40',
+                  AN + '4 + 3(' + v('n') + ' ' + M + ' 1)<br>' + A('12') + '40', AN + '4 + 3(' + v('n') + ' ' + M + ' 1)<br>' + A('12') + '37'], answer: 3,
+        hints: ['Arithmetic means you ADD the same number each time. What do you add to 4 to get 7?',
+                'Arithmetic rule: ' + AN + v('a') + '<sub>1</sub> + (' + v('n') + ' ' + M + ' 1)' + v('d') + '. ' + v('a') + '<sub>1</sub> is the first term, ' + v('d') + ' is what you add each time.',
+                'Check the rule: when ' + v('n') + ' = 1 it should give 4, and when ' + v('n') + ' = 2 it should give 7.',
+                'For the 12th term, replace ' + v('n') + ' with 12: 4 + 3(11). Parentheses first, then multiply, then add.'] }
     ] },
   { n: 13, ready: true, title: 'Build an arithmetic sequence',
     text: 'Write an arithmetic sequence in which ' + nw(v('a') + '<sub>1</sub> = 3') + ' and ' + nw(v('a') + '<sub>4</sub> = 15') + '. Find the 13th term.',
