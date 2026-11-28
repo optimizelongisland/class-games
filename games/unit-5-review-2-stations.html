@@ -330,7 +330,7 @@ const KEY = 'u5r2-state';
 let rolesAt = 0, altOpen = 0, probOpen = 0, exOpen = 0, xs = {}, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) { if (s.ppts && s.tp == null) s.tp = Object.values(s.ppts).reduce((a, b) => a + (+b || 0), 0); return Object.assign(blank(), s); } } catch (e) {} return blank(); }
 function save() { S.last = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const people = () => (S.names || []).map(x => x.trim()).filter(Boolean);
 // who does which role: the Recorder rotates through the partners, one station at a time
