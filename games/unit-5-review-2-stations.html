@@ -275,28 +275,18 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 .nums.g4 .num:hover:not(:disabled),.nums.g6 .num:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px) rotate(-1deg)}
 .nums .num small{color:var(--cream);opacity:.9}
 /* station picker: a 4 by 4 grid of carnival "Admit one" tickets */
-.nums.tix{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.8rem,1.8vw,1.4rem);max-width:900px;margin:.4rem auto 0}
+.nums.tix{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.7rem,1.6vw,1.2rem);max-width:960px;margin:.4rem auto 0}
 @media (max-width:560px){.nums.tix{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .nums.tix .num{min-height:0;padding:0;border:0;background:none;color:var(--cream);border-radius:0;
-  filter:drop-shadow(0 5px 0 rgba(0,0,0,.4)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .15s ease}
+  filter:drop-shadow(0 4px 0 rgba(0,0,0,.35));transition:transform .15s ease}
 .nums.tix .num:hover:not(:disabled){transform:translateY(-3px) rotate(-1.5deg)}
 .nums.tix .num:nth-child(even):hover:not(:disabled){transform:translateY(-3px) rotate(1.5deg)}
 .nums.tix .num:active:not(:disabled){transform:translateY(1px)}
-.tk{--r:11px;--px:30%;display:flex;align-items:stretch;min-height:clamp(5.6rem,9vw,7rem);
-  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px),linear-gradient(160deg,color-mix(in srgb,var(--tk) 78%,#fff),var(--tk) 70%);
-  -webkit-mask:radial-gradient(circle var(--r) at 0 0,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 0,#0000 98%,#000),
-    radial-gradient(circle var(--r) at 0 100%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 100%,#0000 98%,#000),
-    radial-gradient(circle 8px at var(--px) 0,#0000 98%,#000),radial-gradient(circle 8px at var(--px) 100%,#0000 98%,#000);
-  -webkit-mask-composite:source-in;mask:radial-gradient(circle var(--r) at 0 0,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 0,#0000 98%,#000),
-    radial-gradient(circle var(--r) at 0 100%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 100%,#0000 98%,#000),
-    radial-gradient(circle 8px at var(--px) 0,#0000 98%,#000),radial-gradient(circle 8px at var(--px) 100%,#0000 98%,#000);mask-composite:intersect}
-.tk .stub{flex:0 0 var(--px);display:grid;place-items:center;writing-mode:vertical-rl;transform:rotate(180deg);
-  font:700 clamp(.55rem,.45rem + .3vw,.72rem) var(--body);letter-spacing:.18em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.16);
-  border-left:2px dashed rgba(255,241,220,.75)}
-.tk .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:7px 9px 7px 7px;border:1.5px solid rgba(255,241,220,.55);border-radius:6px;padding:.25rem .2rem}
-.tk .tb small{font:700 clamp(.58rem,.48rem + .3vw,.75rem) var(--body);letter-spacing:.2em;text-transform:uppercase;opacity:.95;color:#fff6d6}
-.tk .tb b{font:400 clamp(2rem,1.4rem + 2.2vw,3rem)/1 var(--disp);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.28)}
-.tk .tb i{font:600 clamp(.5rem,.42rem + .25vw,.66rem) var(--mono);font-style:normal;letter-spacing:.12em;opacity:.8;margin-top:.15rem}
+.tk{--r:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:2.1/1;border-radius:12px;background:var(--tk);
+  -webkit-mask:radial-gradient(circle var(--r) at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--r) at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle var(--r) at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--r) at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.tk small{font:700 clamp(.6rem,.5rem + .3vw,.78rem) var(--body);letter-spacing:.2em;text-transform:uppercase;color:#fff6d6}
+.tk b{font:400 clamp(1.9rem,1.3rem + 2vw,2.8rem)/1 var(--disp);color:#fff}
 .nums.tix .num:nth-child(4n+1){--tk:#e8455a}.nums.tix .num:nth-child(4n+2){--tk:#2f6fd6}.nums.tix .num:nth-child(4n+3){--tk:#8a2fc0}.nums.tix .num:nth-child(4n+4){--tk:#e0761f}
 .nums.tix .num:focus-visible{outline:3px solid #fff;outline-offset:4px}
 /* "Station 9" heading is a marquee sign with lights */
@@ -435,7 +425,7 @@ function stationGrid(hideDone) {
     const d = S.q['q' + q.n] && S.q['q' + q.n].done;
     if (d && hideDone) return '<span class="num gap" aria-hidden="true"></span>';
     return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + ' aria-label="Station ' + q.n + '">' +
-      '<span class="tk"><span class="stub">Admit one</span><span class="tb"><small>Station</small><b>' + q.n + '</b><i>No. ' + String(q.n).padStart(4, '0') + '</i></span></span></button>';
+      '<span class="tk"><small>Station</small><b>' + q.n + '</b></span></button>';
   }).join('');
 }
 function renderPick() {
