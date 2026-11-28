@@ -326,8 +326,8 @@ function jobs(k) {
 const jobBar = j => j ? '<div class="jobbar"><span class="jb r1"><b>✏️ ' + esc(j.rec) + '</b> Recorder: writes the work &amp; types</span><span class="jb r2"><b>🗣️ ' + esc(j.exp) + '</b> Explainer: talks it through</span></div>' : '';
 const hue = i => Math.round((i - 1) * 360 / 16 + 190) % 360;
 // stations each student asked for extra practice on (plus any part the pair skipped)
-// practice sheets use the numbers in the paper review packet (1 to 18), not the 16 station numbers
-const packetNums = L => [...new Set(L.map(n => (U.byN(n) || {}).old || n))].sort((a, b) => a - b);
+// station numbers are the review packet numbers (1 to 16), so practice uses them as they are
+const packetNums = L => [...new Set(L)].sort((a, b) => a - b);
 function practiceFor(k) {
   const L = U.READY.map(q => q.n).filter(n => {
     const f = S.feel['q' + n] || {}, st = S.q['q' + n];

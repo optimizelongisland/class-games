@@ -304,9 +304,9 @@ const Q = [
 const EST = { 1: 3, 2: 2, 3: 3, 4: 3, 5: 5, 6: 4, 7: 2, 8: 2, 9: 3, 10: 3, 11: 5, 12: 5, 13: 4, 14: 5, 15: 3, 16: 3, 17: 2, 18: 4 };
 Q.forEach(q => { q.est = EST[q.n] || 3; });
 
-// Stations used in class (16): packet questions 6, 13, 14 and 18 are done together as a class instead,
-// and packet question 5 is split into three multiple-choice stations. Everything is renumbered 1 to 16
-// (the game, hints, practice sheets and the printable stations all use these new numbers).
+// Stations used in class (16), numbered like the updated review packet: packet 1-16 are the stations
+// (the old packet's #5 is now packet 5, 6 and 7), and packet 17-20 (old 6, 18, 13, 14) are done
+// together as a class. The game, hints and printable stations use these numbers; practice adds 17-20.
 (function restation() {
   const by = n => Q.find(q => q.n === n), q5 = by(5);
   const g5 = { text: q5.text, graph: q5.graph, est: 3 };
@@ -484,9 +484,9 @@ function readCode(code) {
   if (!an) return null;
   let m = 0;
   for (const ch of c.slice(an.length)) { const d = ABC.indexOf(ch); if (d < 0) return null; m = m * ABC.length + d; }
-  if (!m || m >= (1 << 18) || animalOf(m) !== an) return null;
+  if (!m || m >= (1 << 20) || animalOf(m) !== an) return null;
   const out = [];
-  for (let n = 1; n <= 18; n++) if (m & (1 << (n - 1))) out.push(n);
+  for (let n = 1; n <= 20; n++) if (m & (1 << (n - 1))) out.push(n);
   return out;
 }
 
