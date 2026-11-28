@@ -399,4 +399,41 @@ Object.keys(U.PRACTICE).forEach(s_ => U.PRACTICE[s_].tries.forEach((t, i) => {
     if (pt.t === 'mc') pt.answer = pt.right;
   });
 }));
+
+// Match the 16 stations used in class (see restation() in unit-5-review-2-data.js): drop packet
+// questions 6, 13, 14 and 18, split packet question 5 into three stations, and renumber 1 to 16.
+(function restation() {
+  const P = U.PRACTICE, o = P[5], e = o.ex, tg = o.tries[1].graph;
+  const one = (q, graph, sub) => ({ q, graph, sub: [Object.assign({ q: null }, sub)] });
+  const g2 = { x: [-7, 6], y: [-4, 3], ticks: { x: 1, y: 1 }, curves: [sm([[-6, 2], [-2, -3], [2, 1], [5, -1]])], dots: [[-6, 2], [5, -1]] };
+  const s5 = { topic: 'Domain and range from a graph',
+    ex: { lead: e.lead, q: e.lead + ' State the domain and range.', graph: e.graph, steps: e.steps.slice(0, 2), ans: e.ans.split(', ')[0] },
+    parts: o.parts.slice(0, 2),
+    tries: [
+      { q: 'Use this graph of ' + nw(y + ' = ' + fx()) + '.', graph: o.tries[0].graph, sub: o.tries[0].sub.filter(x_ => !/^Find/.test(x_.q)) },
+      { q: 'Use this graph of ' + nw(y + ' = ' + fx()) + '.', graph: g2, sub: [
+        { q: 'State the domain.', t: 'mc', choices: [iv(-3, le, y, le, 2), iv(-6, le, x, le, 5), iv(-6, lt, x, lt, 5), iv(-7, le, x, le, 6)], right: 1, answer: 1,
+          ans: 'The graph starts at the closed dot ' + nw(x + ' = ' + M + '6') + ' and ends at the closed dot ' + nw(x + ' = 5') + '.' },
+        { q: 'State the range.', t: 'mc', choices: [iv(-6, le, x, le, 5), iv(-1, le, y, le, 2), iv(-3, le, y, le, 2), iv(-3, le, y, le, 1)], right: 2, answer: 2,
+          ans: 'The lowest point is ' + nw(y + ' = ' + M + '3') + '. The highest point is the left dot at ' + nw(y + ' = 2') + '.' }] }] };
+  const s6 = { topic: 'Find ' + x + ' when ' + fx() + ' equals a number',
+    ex: { lead: e.lead, q: e.lead + ' Find ' + x + ' when ' + nw(fx() + ' = 4') + '.', graph: e.graph, steps: [e.steps[2]], ans: nw(x + ' = ' + M + '1') },
+    parts: [o.parts[2]],
+    tries: [Object.assign({}, o.tries[1], { q: 'Use this graph of ' + nw(y + ' = ' + fx()) + '. What is ' + x + ' when ' + nw(fx() + ' = 3') + '?' }),
+      one('Use the same graph. What is ' + x + ' when ' + nw(fx() + ' = ' + M + '1') + '?', tg,
+        { t: 'num', answer: 1, prefix: x + ' =', ans: 'Find the height ' + M + '1 on the graph. It happens at ' + nw(x + ' = 1') + '.' })] };
+  const s7 = { topic: 'Find ' + fx('f', 'a') + ' from a graph',
+    ex: { lead: e.lead, q: e.lead + ' Find ' + fx('f', 3) + '.', graph: e.graph, steps: [e.steps[3]], ans: nw(fx('f', 3) + ' = ' + M + '2') },
+    parts: [o.parts[3]],
+    tries: [
+      one('Use this graph of ' + nw(y + ' = ' + fx()) + '. Find ' + fx('f', 1) + '.', tg,
+        { t: 'num', answer: -1, prefix: fx('f', 1) + ' =', ans: 'Go to ' + nw(x + ' = 1') + '. The graph is at height ' + M + '1, so ' + nw(fx('f', 1) + ' = ' + M + '1') + '.' }),
+      one('Use the same graph. Find ' + fx('f', M + '3') + '.', tg,
+        { t: 'num', answer: 3, prefix: fx('f', M + '3') + ' =', ans: 'Go to ' + nw(x + ' = ' + M + '3') + '. The graph is at height 3, so ' + nw(fx('f', M + '3') + ' = 3') + '.' })] };
+  const out = {}; let k = 0;
+  [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 15, 16, 17].forEach(n_ => {
+    if (n_ === 5) { out[++k] = s5; out[++k] = s6; out[++k] = s7; } else out[++k] = P[n_];
+  });
+  U.PRACTICE = out;
+})();
 })();

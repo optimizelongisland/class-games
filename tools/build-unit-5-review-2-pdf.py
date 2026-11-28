@@ -1,5 +1,5 @@
 """Builds resources/algebra/unit-5-review-2-stations.pdf: one station per page, each with a
-"Another way to write it" QR on Station 16 (hints live in the game). Questions come from games/unit-5-review-2-data.js, so edit them there.
+"Another way to write it" QR on Station 15 (hints live in the game). Questions come from games/unit-5-review-2-data.js, so edit them there.
 Needs: python3 with `pip install qrcode`, node, and Playwright (Chromium).
 Run from the repo root:  python3 tools/build-unit-5-review-2-pdf.py"""
 import json, os, re, subprocess, sys, tempfile, io
