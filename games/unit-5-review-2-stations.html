@@ -141,6 +141,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .pbox .ri{font-size:2.2rem;display:block}.pbox b{display:block;font:400 1.3rem var(--disp)}.pbox small{color:var(--mute)}
 .pbox.on{opacity:1;border:3px solid var(--gold,#ffd23d);box-shadow:0 0 0 4px rgba(255,210,61,.25),0 6px 0 rgba(0,0,0,.35);transform:scale(1.04)}
 .pbox.on b{color:var(--gold,#ffd23d)}
+.pbox .por{font-size:.88rem;color:var(--mute)}
 @media (max-width:520px){.pboxes{grid-template-columns:1fr}.pbox.on{transform:none}}
 .tprize{margin:.6rem 0 0}.tprize b{color:var(--gold,#ffd23d)}
 .tsum{max-width:1180px;margin-inline:auto}
@@ -631,7 +632,7 @@ function reward(msg, d, k) {
   Carnival.play({ msg, who: '', game: S.rg, team: 'Your team', scores: scoreList(), onDone: p => { S.tp = (S.tp || 0) + p; save(); meta(); return scoreList(); } });
 }
 // Prize boxes: per-student points = team total split evenly. Change the cutoffs here.
-const LEVELS = [{ lv: 1, min: 0, ri: '🎟️', what: 'Ticket or candy' }, { lv: 2, min: 100, ri: '🐙', what: 'Squishy or 3D printed animal' }, { lv: 3, min: 140, ri: '🦆', what: 'Rubber ducky or mystery plushy' }];
+const LEVELS = [{ lv: 1, min: 0, ri: '🎟️', what: 'Ticket or Jolly Rancher' }, { lv: 2, min: 100, ri: '🐙', what: '3D printed animal or squishy', or: 'or 2 Level 1 prizes' }, { lv: 3, min: 140, ri: '🦆', what: 'Rubber ducky or mystery plushy', or: 'or a Level 2 + Level 1, or 3 Level 1 prizes' }];
 const teamPts = () => S.tp || 0;
 const eachPts = () => Math.floor(teamPts() / Math.max(1, people().length));
 const level = () => LEVELS.filter(L => eachPts() >= L.min).pop();
@@ -642,7 +643,7 @@ function prizeCard() {
   return '<section class="card pcount"><p class="lab">🎪 Prize counter</p><p>Your team earned</p><p class="tot">' + teamPts() + ' points</p>' +
     (n > 1 ? '<p class="each">Split ' + n + ' ways, ' + P.map(esc).join(' and ') + ' each get <b>' + eachPts() + ' points</b>. Each of you picks from the <b>Level ' + L.lv + '</b> box!</p>'
       : '<p class="each">Pick from the <b>Level ' + L.lv + '</b> box!</p>') +
-    '<div class="pboxes">' + LEVELS.map((x, j) => '<div class="pbox' + (x === L ? ' on' : '') + '"><span class="ri">' + x.ri + '</span><b>Level ' + x.lv + '</b>' + esc(x.what) + '<br><small>' +
+    '<div class="pboxes">' + LEVELS.map((x, j) => '<div class="pbox' + (x === L ? ' on' : '') + '"><span class="ri">' + x.ri + '</span><b>Level ' + x.lv + '</b>' + esc(x.what) + (x.or ? '<br><i class="por">' + esc(x.or) + '</i>' : '') + '<br><small>' +
       (j === 0 ? 'under ' + LEVELS[1].min : j === LEVELS.length - 1 ? x.min + '+' : x.min + ' to ' + (LEVELS[j + 1].min - 1)) + ' points each</small></div>').join('') + '</div>' +
     '<p class="ptip">Show this screen to your teacher to get your prize.</p></section>';
 }
