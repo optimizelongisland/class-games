@@ -426,7 +426,7 @@ function check(part, input) {
 }
 function keyOf(part) {
   if (part.key) return part.key;
-  if (part.t === 'mc') return (part.labels || 'ABCDEF')[part.answer] + ') ' + part.choices[part.answer].replace(/<br>/g, ', ').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<');
+  if (part.t === 'mc') return '(' + (part.labels || '123456')[part.answer] + ') ' + part.choices[part.answer].replace(/<br>/g, ', ').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<');
   if (part.t === 'seq') return part.answer.join(', ');
   if (part.t === 'num') return String(part.answer).replace('-', '\u2212');
   return String(part.answer);
@@ -490,6 +490,8 @@ function readCode(code) {
   return out;
 }
 
+// every multiple choice uses Regents-style numbers (1) to (4)
+Q.forEach(q => q.parts.forEach(p => { if (p.t === 'mc') p.labels = '1234'; }));
 window.U5R2 = { Q, PERIODS, periodSession, H: { v, fr, sup, nw, rt, M }, READY: Q.filter(q => q.ready), byN: n => Q.find(q => q.n === +n), graph, check, keyOf, clean,
   SITE, practiceCode, readCode, dbBase, dbWrite, dbPush, dbRead, currentSession, today,
   practiceURL: (name, list, period) => 'unit-5-review-2-practice.html?name=' + encodeURIComponent(name) + '&q=' + list.join(',') + (period ? '&p=' + period : ''),
