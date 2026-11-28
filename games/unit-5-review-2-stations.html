@@ -124,7 +124,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .rolepop .rpr{display:flex;align-items:center;gap:1rem;text-align:left;background:rgba(0,0,0,.22);border:2px solid var(--c);border-radius:16px;padding:.8rem 1.1rem;margin:.7rem 0 0}
 .rolepop .rpr .ic{font-size:clamp(2.2rem,1.6rem + 2.5vw,3.2rem);line-height:1}
 .rolepop .rpr b{display:block;font:400 clamp(1.9rem,1.2rem + 3.4vw,3.2rem)/1.05 var(--disp);color:var(--c)}
-.rolepop .rpr span{display:block;font:600 clamp(1.05rem,.95rem + .8vw,1.4rem) var(--body,system-ui);color:var(--fg);margin-top:.2rem}
+.rolepop .rpr span{display:block;font:400 clamp(1.3rem,1rem + 1.4vw,1.9rem) var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--fg);margin-top:.15rem}
 .rolepop .r1{--c:var(--pink)} .rolepop .r2{--c:var(--cyan)}
 .rolepop .rpt{font-size:.95rem;color:var(--mute);margin:1rem 0 0}
 @keyframes rpbump{0%{transform:scale(.7)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
@@ -132,7 +132,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .stitle{margin:0;font-size:clamp(2.2rem,1.6rem + 2vw,3rem);line-height:1.05;white-space:nowrap}
 .sthead #leave{white-space:nowrap}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
-.turn.steal{color:var(--yellow)}
+.turn.help{color:var(--yellow)}
 .pcount{max-width:1180px;margin:0 auto 1rem;text-align:center}
 .pcount .tot{font:400 clamp(2.4rem,1.6rem + 3vw,4rem)/1 var(--disp);color:var(--gold,#ffd23d);margin:.2rem 0}
 .pcount .each{font-size:1.15rem;margin:.2rem 0 1rem}
@@ -275,28 +275,18 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 .nums.g4 .num:hover:not(:disabled),.nums.g6 .num:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px) rotate(-1deg)}
 .nums .num small{color:var(--cream);opacity:.9}
 /* station picker: a 4 by 4 grid of carnival "Admit one" tickets */
-.nums.tix{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.8rem,1.8vw,1.4rem);max-width:900px;margin:.4rem auto 0}
+.nums.tix{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.7rem,1.6vw,1.2rem);max-width:960px;margin:.4rem auto 0}
 @media (max-width:560px){.nums.tix{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .nums.tix .num{min-height:0;padding:0;border:0;background:none;color:var(--cream);border-radius:0;
-  filter:drop-shadow(0 5px 0 rgba(0,0,0,.4)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .15s ease}
+  filter:drop-shadow(0 4px 0 rgba(0,0,0,.35));transition:transform .15s ease}
 .nums.tix .num:hover:not(:disabled){transform:translateY(-3px) rotate(-1.5deg)}
 .nums.tix .num:nth-child(even):hover:not(:disabled){transform:translateY(-3px) rotate(1.5deg)}
 .nums.tix .num:active:not(:disabled){transform:translateY(1px)}
-.tk{--r:11px;--px:30%;display:flex;align-items:stretch;min-height:clamp(5.6rem,9vw,7rem);
-  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px),linear-gradient(160deg,color-mix(in srgb,var(--tk) 78%,#fff),var(--tk) 70%);
-  -webkit-mask:radial-gradient(circle var(--r) at 0 0,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 0,#0000 98%,#000),
-    radial-gradient(circle var(--r) at 0 100%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 100%,#0000 98%,#000),
-    radial-gradient(circle 8px at var(--px) 0,#0000 98%,#000),radial-gradient(circle 8px at var(--px) 100%,#0000 98%,#000);
-  -webkit-mask-composite:source-in;mask:radial-gradient(circle var(--r) at 0 0,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 0,#0000 98%,#000),
-    radial-gradient(circle var(--r) at 0 100%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 100%,#0000 98%,#000),
-    radial-gradient(circle 8px at var(--px) 0,#0000 98%,#000),radial-gradient(circle 8px at var(--px) 100%,#0000 98%,#000);mask-composite:intersect}
-.tk .stub{flex:0 0 var(--px);display:grid;place-items:center;writing-mode:vertical-rl;transform:rotate(180deg);
-  font:700 clamp(.55rem,.45rem + .3vw,.72rem) var(--body);letter-spacing:.18em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.16);
-  border-left:2px dashed rgba(255,241,220,.75)}
-.tk .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:7px 9px 7px 7px;border:1.5px solid rgba(255,241,220,.55);border-radius:6px;padding:.25rem .2rem}
-.tk .tb small{font:700 clamp(.58rem,.48rem + .3vw,.75rem) var(--body);letter-spacing:.2em;text-transform:uppercase;opacity:.95;color:#fff6d6}
-.tk .tb b{font:400 clamp(2rem,1.4rem + 2.2vw,3rem)/1 var(--disp);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.28)}
-.tk .tb i{font:600 clamp(.5rem,.42rem + .25vw,.66rem) var(--mono);font-style:normal;letter-spacing:.12em;opacity:.8;margin-top:.15rem}
+.tk{--r:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:2.1/1;border-radius:12px;background:var(--tk);
+  -webkit-mask:radial-gradient(circle var(--r) at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--r) at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle var(--r) at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--r) at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.tk small{font:700 clamp(.6rem,.5rem + .3vw,.78rem) var(--body);letter-spacing:.2em;text-transform:uppercase;color:#fff6d6}
+.tk b{font:400 clamp(1.9rem,1.3rem + 2vw,2.8rem)/1 var(--disp);color:#fff}
 .nums.tix .num:nth-child(4n+1){--tk:#e8455a}.nums.tix .num:nth-child(4n+2){--tk:#2f6fd6}.nums.tix .num:nth-child(4n+3){--tk:#8a2fc0}.nums.tix .num:nth-child(4n+4){--tk:#e0761f}
 .nums.tix .num:focus-visible{outline:3px solid #fff;outline-offset:4px}
 /* "Station 9" heading is a marquee sign with lights */
@@ -340,7 +330,7 @@ const KEY = 'u5r2-state';
 let rolesAt = 0, altOpen = 0, probOpen = 0, exOpen = 0, xs = {}, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) { if (s.ppts && s.tp == null) s.tp = Object.values(s.ppts).reduce((a, b) => a + (+b || 0), 0); return Object.assign(blank(), s); } } catch (e) {} return blank(); }
 function save() { S.last = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const people = () => (S.names || []).map(x => x.trim()).filter(Boolean);
 // who does which role: the Recorder rotates through the partners, one station at a time
@@ -435,7 +425,7 @@ function stationGrid(hideDone) {
     const d = S.q['q' + q.n] && S.q['q' + q.n].done;
     if (d && hideDone) return '<span class="num gap" aria-hidden="true"></span>';
     return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + ' aria-label="Station ' + q.n + '">' +
-      '<span class="tk"><span class="stub">Admit one</span><span class="tb"><small>Station</small><b>' + q.n + '</b><i>No. ' + String(q.n).padStart(4, '0') + '</i></span></span></button>';
+      '<span class="tk"><small>Station</small><b>' + q.n + '</b></span></button>';
   }).join('');
 }
 function renderPick() {
@@ -569,8 +559,8 @@ function renderStation() {
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
   if (J && since < 6400) {
     view.insertAdjacentHTML('beforeend', '<div class="rolepop" id="rolepop" style="animation-delay:-' + since + 'ms"><div class="rp"><p class="rps">Station ' + q.n + '</p>' +
-      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + ' · Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div></div>' +
-      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + ' · Explainer</b><span>Talks through each step out loud.</span></div></div>' +
+      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + '</b><span>Recorder</span></div></div>' +
+      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + '</b><span>Explainer</span></div></div>' +
       '<p class="rpt">Tap anywhere to start</p></div></div>');
     $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
   }
@@ -631,7 +621,7 @@ const answerer = () => (owner() + (S.wrongNow || 0)) % Math.max(1, people().leng
 function turnLine() {
   const P = people(); if (P.length < 2) return '';
   const a = answerer();
-  return S.wrongNow ? '<p class="turn steal">🤝 Help out! <b>' + esc(P[a]) + '</b>, your turn to try</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
+  return S.wrongNow ? '<p class="turn help">🤝 Help out! <b>' + esc(P[a]) + '</b>, your turn to try</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
 }
 // Add ?nofun to the address to turn the games off.
 const NOFUN = new URLSearchParams(location.search).has('nofun');
@@ -648,9 +638,9 @@ function reward(msg, d, k) {
 }
 // Prize boxes: per-student points = team total split evenly. Change the cutoffs here.
 const LEVELS = [
-  { lv: 1, min: 0, cut: 'Under 100', pick: 'Pick one', p: [['🎫', 'Ticket'], ['🍬', 'Jolly Rancher']] },
-  { lv: 2, min: 100, cut: '100–139', pick: 'Pick one', p: [['🦖', '3D printed animal'], ['🍓', 'Squishy']], or: 'OR trade it for two Level 1 prizes' },
-  { lv: 3, min: 140, cut: '140+', pick: 'Grand prize', p: [['🦆', 'Rubber ducky'], ['🎁', 'Mystery plushy']], or: 'OR trade it for one Level 2 + one Level 1 prize,<br>OR three Level 1 prizes' }];
+  { lv: 1, min: 0, cut: 'Under 80', pick: 'Pick one', p: [['🎫', 'Ticket'], ['🍬', 'Jolly Rancher']] },
+  { lv: 2, min: 80, cut: '80–119', pick: 'Pick one', p: [['🦖', '3D printed animal'], ['🍓', 'Squishy']], or: 'OR trade it for two Level 1 prizes' },
+  { lv: 3, min: 120, cut: '120+', pick: 'Grand prize', p: [['🦆', 'Rubber ducky'], ['🎁', 'Mystery plushy']], or: 'OR trade it for one Level 2 + one Level 1 prize,<br>OR three Level 1 prizes' }];
 const teamPts = () => S.tp || 0;
 const eachPts = () => Math.floor(teamPts() / Math.max(1, people().length));
 const level = () => LEVELS.filter(L => eachPts() >= L.min).pop();
@@ -694,7 +684,7 @@ function submit(val, el) {
   const jj = jobs(doneList().length);
   f.innerHTML = (r.msg ? esc(r.msg) : people().length > 1 ? 'Not quite. ' + esc(people()[answerer()]) + ', help out and try it! (Still worth 5 points.)' : 'Not quite. Talk it through again and check your work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
-  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner can steal
+  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner helps and tries
   if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
   else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
 }
