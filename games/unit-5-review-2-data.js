@@ -186,7 +186,8 @@ const Q = [
   { n: 9, ready: true, title: 'Terms from a formula',
     text: 'Find the first 5 terms given the formula ' + nw(v('f') + '(' + v('n') + ') = 3(' + v('n') + ' ' + M + ' 1) + 4'),
     parts: [
-      { t: 'seq', q: 'Type the first 5 terms, separated by commas.', pq: '', answer: [4, 7, 10, 13, 16], placeholder: 'e.g. 1, 2, 3, 4, 5',
+      { t: 'mc', q: 'Choose the first 5 terms.', pq: '', labels: 'abcd',
+        choices: ['7, 10, 13, 16, 19', '6, 9, 12, 15, 18', '4, 7, 10, 13, 16', '1, 4, 7, 10, 13'], answer: 2,
         hints: ['The first term is ' + v('f') + '(1). Replace ' + v('n') + ' with 1.',
                 v('f') + '(1) = 3(1 ' + M + ' 1) + 4 = 3(0) + 4. Now do ' + v('f') + '(2), ' + v('f') + '(3), ' + v('f') + '(4), ' + v('f') + '(5).',
                 'Check: do the terms go up by the same amount each time? They should!',
@@ -195,7 +196,8 @@ const Q = [
   { n: 10, ready: true, title: 'Terms from a formula',
     text: 'Find the first 5 terms given the formula ' + nw(v('f') + '(' + v('n') + ') = 2(5)' + sup(v('n') + ' ' + M + ' 1')),
     parts: [
-      { t: 'seq', q: 'Type the first 5 terms, separated by commas.', pq: '', answer: [2, 10, 50, 250, 1250], placeholder: 'e.g. 1, 2, 3, 4, 5',
+      { t: 'mc', q: 'Choose the first 5 terms.', pq: '', labels: 'abcd',
+        choices: ['10, 50, 250, 1250, 6250', '2, 10, 50, 250, 1250', '1, 10, 100, 1000, 10000', '2, 7, 12, 17, 22'], answer: 1,
         hints: ['The first term is ' + v('f') + '(1). Replace ' + v('n') + ' with 1: 2(5)' + sup('1 ' + M + ' 1') + ' = 2(5)' + sup('0') + '.',
                 'Anything to the 0 power is 1. Do the exponent BEFORE you multiply by 2.',
                 'Each term is 5 times the one before it.',
