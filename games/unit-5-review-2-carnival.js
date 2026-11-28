@@ -137,7 +137,8 @@ function finish(msg) {
   board(scores); q('cvn-skip').hidden = true;
   setTimeout(() => {
     q('cvn-big').textContent = '+' + got + (got === 1 ? ' point' : ' points');
-    q('cvn-sub').textContent = msg + (opts.who ? ' ' + opts.who + ' now has ' + ((scores || []).find(x => x.name === opts.who) || { pts: got }).pts + ' points.' : '');
+    q('cvn-sub').textContent = msg + (opts.team && scores && scores[0] ? ' ' + opts.team + ' now has ' + scores[0].pts + ' points.' :
+      opts.who ? ' ' + opts.who + ' now has ' + ((scores || []).find(x => x.name === opts.who) || { pts: got }).pts + ' points.' : '');
     q('cvn-how').textContent = '';
     q('cvn-go').textContent = 'Back to the station';
     q('cvn-over').hidden = false; q('cvn-go').focus();
