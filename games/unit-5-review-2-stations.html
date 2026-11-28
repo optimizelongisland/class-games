@@ -118,8 +118,17 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .panel .tag{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin:0 0 .4rem;font-weight:700}
 .panel .part{background:var(--panel2)}
 .ch.good{border-color:var(--green)}
-.rolepop{position:fixed;left:50%;top:1.2rem;transform:translateX(-50%);z-index:50;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:.4rem 1.2rem .8rem;box-shadow:0 10px 30px rgba(0,0,0,.6);pointer-events:none;width:max-content;max-width:calc(100vw - 2rem);animation:rolepop 4.6s ease forwards}
-@keyframes rolepop{0%{opacity:0;transform:translate(-50%,-10px)}8%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;visibility:hidden}}
+.rolepop{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:1rem;background:rgba(10,4,24,.74);cursor:pointer;animation:rolepop 6.5s ease forwards}
+.rolepop .rp{background:var(--panel2);border:3px solid var(--gold,#ffd23d);border-radius:22px;padding:1.4rem 1.6rem 1.5rem;max-width:680px;width:100%;text-align:center;box-shadow:0 0 0 6px rgba(255,210,61,.15),0 20px 60px rgba(0,0,0,.7);animation:rpbump .5s ease}
+.rolepop .rps{font:400 1.2rem var(--disp);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:0 0 .6rem}
+.rolepop .rpr{display:flex;align-items:center;gap:1rem;text-align:left;background:rgba(0,0,0,.22);border:2px solid var(--c);border-radius:16px;padding:.8rem 1.1rem;margin:.7rem 0 0}
+.rolepop .rpr .ic{font-size:clamp(2.2rem,1.6rem + 2.5vw,3.2rem);line-height:1}
+.rolepop .rpr b{display:block;font:400 clamp(1.9rem,1.2rem + 3.4vw,3.2rem)/1.05 var(--disp);color:var(--c)}
+.rolepop .rpr span{display:block;font:600 clamp(1.05rem,.95rem + .8vw,1.4rem) var(--body,system-ui);color:var(--fg);margin-top:.2rem}
+.rolepop .r1{--c:var(--pink)} .rolepop .r2{--c:var(--cyan)}
+.rolepop .rpt{font-size:.95rem;color:var(--mute);margin:1rem 0 0}
+@keyframes rpbump{0%{transform:scale(.7)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes rolepop{0%{opacity:0}5%{opacity:1}88%{opacity:1}100%{opacity:0;visibility:hidden}}
 .stitle{margin:0;font-size:clamp(2.2rem,1.6rem + 2vw,3rem);line-height:1.05;white-space:nowrap}
 .sthead #leave{white-space:nowrap}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
@@ -167,6 +176,10 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .part .got{font:600 1.05rem var(--mono);color:var(--green);margin-top:.3rem}
 .part.sk .got{color:var(--orange)}
 .chs{display:grid;gap:.6rem}
+.chs.lets{grid-template-columns:repeat(auto-fit,minmax(5rem,1fr));gap:.8rem}
+.chs.lets .ch{justify-content:center;padding:1rem .4rem}
+.chs.lets .ch .k{font-size:1.7rem;width:3.4rem;height:3.4rem;margin:0}
+.pchs{margin-top:.6rem}.pchs .ch{cursor:default}
 .ch{display:flex;gap:.8rem;align-items:center;text-align:left;min-height:3rem;padding:.45rem .8rem;border-radius:14px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-size:1rem;line-height:1.35}
 .ch .k{flex:none;display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:10px;background:var(--line);font:600 1rem var(--mono)}
 .ch.bad{border-color:var(--red);opacity:.55;cursor:default;text-decoration:line-through}
@@ -234,6 +247,31 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 .nums .num:nth-child(4n+2){--tk:#2f6fd6} .nums .num:nth-child(4n+3){--tk:#8a2fc0} .nums .num:nth-child(4n+4){--tk:#e0761f}
 .nums.g4 .num:hover:not(:disabled),.nums.g6 .num:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px) rotate(-1deg)}
 .nums .num small{color:var(--cream);opacity:.9}
+/* station picker: a 4 by 4 grid of carnival "Admit one" tickets */
+.nums.tix{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.8rem,1.8vw,1.4rem);max-width:900px;margin:.4rem auto 0}
+@media (max-width:560px){.nums.tix{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nums.tix .num{min-height:0;padding:0;border:0;background:none;color:var(--cream);border-radius:0;
+  filter:drop-shadow(0 5px 0 rgba(0,0,0,.4)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .15s ease}
+.nums.tix .num:hover:not(:disabled){transform:translateY(-3px) rotate(-1.5deg)}
+.nums.tix .num:nth-child(even):hover:not(:disabled){transform:translateY(-3px) rotate(1.5deg)}
+.nums.tix .num:active:not(:disabled){transform:translateY(1px)}
+.tk{--r:11px;--px:30%;display:flex;align-items:stretch;min-height:clamp(5.6rem,9vw,7rem);
+  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px),linear-gradient(160deg,color-mix(in srgb,var(--tk) 78%,#fff),var(--tk) 70%);
+  -webkit-mask:radial-gradient(circle var(--r) at 0 0,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 0,#0000 98%,#000),
+    radial-gradient(circle var(--r) at 0 100%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 100%,#0000 98%,#000),
+    radial-gradient(circle 8px at var(--px) 0,#0000 98%,#000),radial-gradient(circle 8px at var(--px) 100%,#0000 98%,#000);
+  -webkit-mask-composite:source-in;mask:radial-gradient(circle var(--r) at 0 0,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 0,#0000 98%,#000),
+    radial-gradient(circle var(--r) at 0 100%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 100%,#0000 98%,#000),
+    radial-gradient(circle 8px at var(--px) 0,#0000 98%,#000),radial-gradient(circle 8px at var(--px) 100%,#0000 98%,#000);mask-composite:intersect}
+.tk .stub{flex:0 0 var(--px);display:grid;place-items:center;writing-mode:vertical-rl;transform:rotate(180deg);
+  font:700 clamp(.55rem,.45rem + .3vw,.72rem) var(--body);letter-spacing:.18em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.16);
+  border-left:2px dashed rgba(255,241,220,.75)}
+.tk .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:7px 9px 7px 7px;border:1.5px solid rgba(255,241,220,.55);border-radius:6px;padding:.25rem .2rem}
+.tk .tb small{font:700 clamp(.58rem,.48rem + .3vw,.75rem) var(--body);letter-spacing:.2em;text-transform:uppercase;opacity:.95;color:#fff6d6}
+.tk .tb b{font:400 clamp(2rem,1.4rem + 2.2vw,3rem)/1 var(--disp);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.28)}
+.tk .tb i{font:600 clamp(.5rem,.42rem + .25vw,.66rem) var(--mono);font-style:normal;letter-spacing:.12em;opacity:.8;margin-top:.15rem}
+.nums.tix .num:nth-child(4n+1){--tk:#e8455a}.nums.tix .num:nth-child(4n+2){--tk:#2f6fd6}.nums.tix .num:nth-child(4n+3){--tk:#8a2fc0}.nums.tix .num:nth-child(4n+4){--tk:#e0761f}
+.nums.tix .num:focus-visible{outline:3px solid #fff;outline-offset:4px}
 /* "Station 9" heading is a marquee sign with lights */
 .stitle{display:inline-block;color:#fff;padding:.25em .7em .3em;border-radius:16px;border:3px solid var(--gold);
   background:radial-gradient(circle,#fff6b0 0 3px,transparent 4px) 0 4px/22px 12px repeat-x,
@@ -249,7 +287,7 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 .sheets a{background:var(--gold);color:#2a1500}
 .sheets .sh{border-color:rgba(255,210,61,.6)}
 .sheets .code b{color:var(--gold)}
-.rolepop{background:#271949;border-color:rgba(255,210,61,.45)}
+.rolepop .rp{background:#271949}
 @media (max-width:520px){.stitle{font-size:1.7rem;padding:.5em .6em .55em}}
 </style>
 </head>
@@ -368,13 +406,14 @@ function stationGrid(hideDone) {
   return U.Q.map(q => {
     const d = S.q['q' + q.n] && S.q['q' + q.n].done;
     if (d && hideDone) return '<span class="num gap" aria-hidden="true"></span>';
-    return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + '><small>Station</small>' + q.n + (q.ready ? '' : '<small>soon</small>') + '</button>';
+    return '<button class="num' + (d ? ' done' : '') + '" data-q="' + q.n + '"' + (q.ready && !d ? '' : ' disabled') + ' aria-label="Station ' + q.n + '">' +
+      '<span class="tk"><span class="stub">Admit one</span><span class="tb"><small>Station</small><b>' + q.n + '</b><i>No. ' + String(q.n).padStart(4, '0') + '</i></span></span></button>';
   }).join('');
 }
 function renderPick() {
   const first = !doneList().length;
   view.innerHTML = '<section class="card"><h2>' + (first ? 'Which station are you starting at?' : 'Which station are you going to?') + '</h2>' +
-    '<div class="nums g6" id="qnums">' + stationGrid(true) + '</div></section>' +
+    '<div class="nums tix" id="qnums">' + stationGrid(true) + '</div></section>' +
     '<button class="link" id="back">Change names</button>';
   markBusy();
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
@@ -454,15 +493,15 @@ function renderStation() {
   let parts = '';
   for (let k = 0; k < S.part; k++) {
     const sk = st.sk[k];
-    parts += '<div class="part ' + (sk ? 'sk' : 'ok') + '"><p class="pq">' + (P.length > 1 ? 'Part ' + (k + 1) + ': ' : '') + P[k].q + '</p><div class="got">' + (sk ? 'Skipped. Ask your teacher about this one.' : '✓ ' + (P[k].t === 'expr' && st.got && st.got[k] ? esc(st.got[k]).replace(/\^\(([^()]*)\)/g, '<sup>$1</sup>') : esc(st.got && st.got[k] || U.keyOf(P[k])))) + '</div></div>';
+    parts += '<div class="part ' + (sk ? 'sk' : 'ok') + '"><p class="pq">' + (HIDE ? 'Part ' + PL(k) : (P.length > 1 ? 'Part ' + (k + 1) + ': ' : '') + P[k].q) + '</p><div class="got">' + (sk ? 'Skipped. Ask your teacher about this one.' : '✓ ' + (P[k].t === 'expr' && st.got && st.got[k] ? esc(st.got[k]).replace(/\^\(([^()]*)\)/g, '<sup>$1</sup>') : esc(st.got && st.got[k] || U.keyOf(P[k])))) + '</div></div>';
   }
   const p = P[S.part];
   let inp = '';
   if (p.t === 'mc') {
     const tried = (st.wa[S.part] || []).map(Number);
-    inp = '<div class="chs" id="chs">' + p.choices.map((c, i) => {
+    inp = '<div class="chs' + (HIDE ? ' lets' : '') + '" id="chs">' + p.choices.map((c, i) => {
       const L = (p.labels || 'ABCDEF')[i], bad = tried.includes(i);
-      return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + '><span class="k">' + L + '</span><span>' + c + '</span></button>';
+      return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + ' aria-label="Choice ' + L + '"><span class="k">' + L + '</span>' + (HIDE ? '' : '<span>' + c + '</span>') + '</button>';
     }).join('') + '</div>';
   } else if (p.t === 'expr') {
     // math field: ^ raises the cursor into an exponent box, ↓ brings it back down
@@ -481,13 +520,16 @@ function renderStation() {
   const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
   const help = '<div class="helpbar">' + (S.hintNow < hints.length ? '<button class="btn line violet" id="hintb">Need a hint?' + (S.hintNow ? ' (' + (hints.length - S.hintNow) + ' more)' : '') + '</button>' : '') +
     (S.wrongNow >= 3 ? '<button class="link" id="skip">Skip this part for now (tell your teacher)</button>' : '') + '</div>';
-  parts += '<div class="part now pop">' + turnLine() + '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>' + inp +
+  parts += '<div class="part now pop">' + turnLine() + (HIDE ? '<p class="pq">📄 Read the <b>Station ' + q.n + '</b> card' + (P.length > 1 ? ', <b>part ' + PL(S.part) + '</b>' : '') + '. Solve it, then ' + (p.t === 'mc' ? 'tap ' : '') + (p.t === 'mc' ? 'the ' + (/\d/.test(p.labels || '') ? 'number' : 'letter') + ' of your answer.' : 'type your answer.') + '</p>'
+    : '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>') + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
   // under the answer box: show the station problem, or open an extra example
   const tools = '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
     (EX(q.n) ? '<button class="pill2 ex" id="exb">💡 Need an extra example?</button>' : '') + '</div>' +
-    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') + '</div>' : '');
+    (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') +
+      (HIDE ? '<p class="pq" style="margin-top:.8rem">' + (P.length > 1 ? '<b>' + PL(S.part) + '</b> ' : '') + p.q + '</p>' +
+        (p.t === 'mc' ? '<div class="chs pchs">' + p.choices.map((c, i) => '<div class="ch"><span class="k">' + (p.labels || 'ABCDEF')[i] + '</span><span>' + c + '</span></div>').join('') + '</div>' : '') : '') + '</div>' : '');
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 class="stitle">Station ' + q.n + '</h2>' +
     '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
     '</section>' +
@@ -495,7 +537,13 @@ function renderStation() {
 
   // roles pop up for a few seconds when a station opens, then fade away
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
-  if (J && since < 4600) view.insertAdjacentHTML('beforeend', '<div class="rolepop" style="animation-delay:-' + since + 'ms">' + jobBar(J) + '</div>');
+  if (J && since < 6400) {
+    view.insertAdjacentHTML('beforeend', '<div class="rolepop" id="rolepop" style="animation-delay:-' + since + 'ms"><div class="rp"><p class="rps">Station ' + q.n + '</p>' +
+      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + ' · Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div></div>' +
+      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + ' · Explainer</b><span>Talks through each step out loud.</span></div></div>' +
+      '<p class="rpt">Tap anywhere to start</p></div></div>');
+    $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
+  }
   $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
   if ($('#exb')) $('#exb').onclick = () => { exOpen = q.n; render(); scrollTo(0, 0); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
@@ -555,6 +603,10 @@ function turnLine() {
 }
 // Add ?nofun to the address to turn the games off.
 const NOFUN = new URLSearchParams(location.search).has('nofun');
+// The question and answer choices are on the printed station card, so students have to be at the station.
+// The game shows only the answer letters (Show station problem is the backup). Add ?show to show everything.
+const HIDE = !/[?&]show\b/.test(location.search);
+const PL = i => 'abcdefg'[i] + ')';
 function reward(msg, d, k) {
   if (NOFUN || !window.Carnival) { toast(msg); return; }
   const P = people(), n = P.length || 1, who = P[k] || '', round = Math.floor(d / n);
@@ -744,7 +796,7 @@ function renderBetween() {
   const prev = U.byN(S.cur), st = qs(S.cur), d = doneList().length;
   view.innerHTML = '<section class="card yay pop"><p class="hd">Good job!</p>' +
     '<p class="go">Pick any open station</p>' +
-    '<div class="nums g6" id="qnums" style="max-width:760px;margin:0 auto">' + stationGrid(true) + '</div></section>' +
+    '<div class="nums tix" id="qnums">' + stationGrid(true) + '</div></section>' +
     '';
   $('#qnums').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) goStation(+b.dataset.q); };
 }
