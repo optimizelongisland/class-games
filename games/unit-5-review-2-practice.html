@@ -139,8 +139,8 @@ function sheet() {
     const p = P[n], e = p.ex;
     const tries = p.tries.map(t => {
       k++;
-      const chs = cs => '<ol class="ch">' + cs.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>';
-      const one = t.sub.length === 1, kv = s => s.t === 'mc' ? (one && /^[A-D][.)]/.test(s.ans) ? s.ans : '<b>' + 'ABCD'[s.right] + ')</b> ' + (one ? s.ans : s.choices[s.right])) : (one ? s.ans : s.ans.replace(/\.$/, ''));
+      const chs = cs => '<ol class="ch">' + cs.map((c, i) => '<li>(' + (i + 1) + ') ' + c + '</li>').join('') + '</ol>';
+      const one = t.sub.length === 1, kv = s => s.t === 'mc' ? (one && /^\(\d\)/.test(s.ans) ? s.ans : '<b>(' + (s.right + 1) + ')</b> ' + (one ? s.ans : s.choices[s.right])) : (one ? s.ans : s.ans.replace(/\.$/, ''));
       key.push('<li><b>' + k + '.</b> (Question ' + n + ') ' + (one ? kv(t.sub[0]) : t.sub.map((s, i) => '<b>' + PL(i) + '</b> ' + kv(s)).join('; ')) + '</li>');
       return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
         t.sub.map((s, i) => (one ? '' : '<p class="q sq"><b>' + PL(i) + '</b> ' + s.q + '</p>') + (s.t === 'mc' ? chs(s.choices) : '')).join('') +
@@ -222,7 +222,7 @@ function online() {
       body = '<p class="tag" style="color:var(--accent2)">Your turn · problem ' + c.k + ' of ' + total + (one ? '' : ' · part ' + PL(j) + ' of ' + S.length) + '</p><p class="bigq">' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
         (one ? '' : S.slice(0, j).map((s, i) => '<div class="part"><p class="pq"><b>' + PL(i) + '</b> ' + s.q + '</p><p class="pa">✅ ' + shown(s, i) + '</p></div>').join('') +
           '<p class="bigq sq"><b>' + PL(j) + '</b> ' + cur.q + '</p>');
-      if (cur.t === 'mc') body += '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === cur.right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>' + 'ABCD'[i] + '</b> ' + ch + '</button>').join('') + '</div>';
+      if (cur.t === 'mc') body += '<div class="opts">' + cur.choices.map((ch, i) => '<button class="opt' + (wrong.includes(i) ? ' no' : '') + (solved && i === cur.right ? ' ok' : '') + '" data-i="' + i + '"' + (solved || wrong.includes(i) ? ' disabled' : '') + '><b>(' + (i + 1) + ')</b> ' + ch + '</button>').join('') + '</div>';
       else body += typedBox(cur, solved, st.typed || '');
       if (solved) body += '<div class="fbk good">✅ Correct! ' + cur.ans + '</div><div class="acts">' + (last ? '<button class="btn" id="nx">Next ➜</button>' : '<button class="btn" id="sbn">Next: part ' + PL(j + 1) + ' ➜</button>') + '</div>';
       else if (st.miss) body += '<div class="fbk bad">❌ ' + esc(st.msg || 'Not quite. Check your work and try again.') + '</div><div class="acts"><button class="btn ghost" id="peek">See the example again</button></div>';

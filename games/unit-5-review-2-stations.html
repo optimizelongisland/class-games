@@ -202,9 +202,9 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .part .got{font:600 1.05rem var(--mono);color:var(--green);margin-top:.3rem}
 .part.sk .got{color:var(--orange)}
 .chs{display:grid;gap:.6rem}
-.chs.lets{grid-template-columns:repeat(auto-fit,minmax(5rem,1fr));gap:.8rem}
+.chs.lets{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.4rem,1.5vw,.8rem)}
 .chs.lets .ch{justify-content:center;padding:1rem .4rem}
-.chs.lets .ch .k{font-size:1.7rem;width:3.4rem;height:3.4rem;margin:0}
+.chs.lets .ch .k{font-size:clamp(1.3rem,1rem + 1vw,1.7rem);width:auto;min-width:3.4rem;padding:0 .3rem;height:3.4rem;margin:0}
 .altp .alt{font:600 1.35rem/1.6 var(--body);color:var(--fg);margin:0}.altp .note{color:var(--mute);margin:.6rem 0 0}
 .pchs{margin-top:.6rem}.pchs .ch{cursor:default}
 .ch{display:flex;gap:.8rem;align-items:center;text-align:left;min-height:3rem;padding:.45rem .8rem;border-radius:14px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-size:1rem;line-height:1.35}
@@ -457,7 +457,7 @@ function exPanel(n) {
     Sb.slice(0, x.j).map((p, i) => '<div class="part ok"><p class="pq"><b>' + PLx(i) + '</b> ' + p.q + '</p><div class="got">✓ ' + shown(p, i) + '</div></div>').join('') +
     '<div class="part now"><p class="pq">' + (one ? (cur.q || 'Your answer:') : '<b>' + PLx(x.j) + '</b> ' + cur.q) + '</p>';
   if (cur.t === 'mc') h += '<div class="chs" id="xchs">' + cur.choices.map((c, i) => { const bad = x.wrong.includes(i), ok = x.solved && i === cur.right;
-      return '<button class="ch' + (bad ? ' bad' : '') + (ok ? ' good' : '') + '" data-i="' + i + '"' + (bad || x.solved ? ' disabled' : '') + '><span class="k">' + 'ABCDEF'[i] + '</span><span>' + c + '</span></button>'; }).join('') + '</div>';
+      return '<button class="ch' + (bad ? ' bad' : '') + (ok ? ' good' : '') + '" data-i="' + i + '"' + (bad || x.solved ? ' disabled' : '') + '><span class="k">(' + (i + 1) + ')</span><span>' + c + '</span></button>'; }).join('') + '</div>';
   else if (cur.t === 'expr') h += '<form class="ans" id="xansf" autocomplete="off">' + (cur.prefix ? '<span class="pre">' + cur.prefix + '</span>' : '') +
       '<div class="mf" id="xans" contenteditable="' + (x.solved ? 'false' : 'true') + '" role="textbox" aria-label="Your answer" spellcheck="false" autocapitalize="off" data-ph="Type your answer"></div>' +
       (x.solved ? '' : '<button class="btn fill cyan" type="submit">Check</button>') + '</form>' +
@@ -518,7 +518,7 @@ function renderStation() {
   if (p.t === 'mc') {
     const tried = (st.wa[S.part] || []).map(Number);
     inp = '<div class="chs' + (HIDE ? ' lets' : '') + '" id="chs">' + p.choices.map((c, i) => {
-      const L = (p.labels || 'ABCDEF')[i], bad = tried.includes(i);
+      const L = '(' + (i + 1) + ')', bad = tried.includes(i);
       return '<button class="ch' + (bad ? ' bad' : '') + '" data-i="' + i + '"' + (bad ? ' disabled' : '') + ' aria-label="Choice ' + L + '"><span class="k">' + L + '</span>' + (HIDE ? '' : '<span>' + c + '</span>') + '</button>';
     }).join('') + '</div>';
   } else if (p.t === 'expr') {
@@ -538,7 +538,7 @@ function renderStation() {
   const shown = hints.slice(0, S.hintNow).map((h, i) => '<div class="hint"><b>Hint ' + (i + 1) + '</b>' + h + '</div>').join('');
   const help = '<div class="helpbar">' + (S.hintNow < hints.length ? '<button class="btn line violet" id="hintb">Need a hint?' + (S.hintNow ? ' (' + (hints.length - S.hintNow) + ' more)' : '') + '</button>' : '') +
     (S.wrongNow >= 3 ? '<button class="link" id="skip">Skip this part for now (tell your teacher)</button>' : '') + '</div>';
-  parts += '<div class="part now pop">' + turnLine() + (HIDE ? '<p class="pq">📄 Read the <b>Station ' + q.n + '</b> card' + (P.length > 1 ? ', <b>part ' + PL(S.part) + '</b>' : '') + '. Solve it, then ' + (p.t === 'mc' ? 'tap ' : '') + (p.t === 'mc' ? 'the ' + (/\d/.test(p.labels || '') ? 'number' : 'letter') + ' of your answer.' : 'type your answer.') + '</p>'
+  parts += '<div class="part now pop">' + turnLine() + (HIDE ? '<p class="pq">📄 Read the <b>Station ' + q.n + '</b> card' + (P.length > 1 ? ', <b>part ' + PL(S.part) + '</b>' : '') + '. Solve it, then ' + (p.t === 'mc' ? 'tap ' : '') + (p.t === 'mc' ? 'the number of your answer.' : 'type your answer.') + '</p>'
     : '<p class="pq">' + (P.length > 1 ? 'Part ' + (S.part + 1) + ' of ' + P.length + ': ' : '') + p.q + '</p>') + inp +
     '<div class="fb" id="fb"></div><div class="hints">' + shown + '</div>' + help + '</div>';
 
@@ -549,7 +549,7 @@ function renderStation() {
     (q.alt && altOpen === q.n ? '<div class="panel altp"><p class="alt">' + q.alt.html + '</p><p class="note">' + q.alt.note + '</p></div>' : '') +
     (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') +
       (HIDE ? '<p class="pq" style="margin-top:.8rem">' + (P.length > 1 ? '<b>' + PL(S.part) + '</b> ' : '') + p.q + '</p>' +
-        (p.t === 'mc' ? '<div class="chs pchs">' + p.choices.map((c, i) => '<div class="ch"><span class="k">' + (p.labels || 'ABCDEF')[i] + '</span><span>' + c + '</span></div>').join('') + '</div>' : '') : '') + '</div>' : '');
+        (p.t === 'mc' ? '<div class="chs pchs">' + p.choices.map((c, i) => '<div class="ch"><span class="k">(' + (i + 1) + ')</span><span>' + c + '</span></div>').join('') + '</div>' : '') : '') + '</div>' : '');
   view.innerHTML = '<div class="stn"><section class="card"><div class="sthead"><h2 class="stitle">Station ' + q.n + '</h2>' +
     '<button class="btn line violet" id="leave">&larr; <span class="wl">Wrong station? </span>Back to the board</button></div>' +
     '</section>' +

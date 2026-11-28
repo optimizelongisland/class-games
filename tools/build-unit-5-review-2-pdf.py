@@ -32,7 +32,7 @@ for q in qs:
         h = '<div class="part">' + ('<p>' + lead + p['q'] + '</p>' if p['q'] else '')
         if p['choices']:
             h += '<ol class="chs' + (' wide' if any(len(re.sub(r'<[^>]+>', '', c)) > 30 for c in p['choices']) else '') + '" style="' + ('grid-template-columns:repeat(3,1fr);grid-template-rows:auto' if len(p['choices']) == 3 else 'grid-template-rows:repeat(' + str((len(p['choices']) + 1) // 2) + ',auto)') + '">' + ''.join(
-                '<li><b>' + p['labels'][k] + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
+                '<li><b>(' + str(k + 1) + ')</b><span>' + c + '</span></li>' for k, c in enumerate(p['choices'])) + '</ol>'
         parts.append(h + '</div>')
     pages.append(f'''<section class="page{' open' if not q['graph'] and not any(p['choices'] for p in q['parts']) else ''}{' dense' if q['graph'] and (len(q['parts']) > 1 or any(p['choices'] for p in q['parts'])) else ''}">
   <header><div class="num"><small>Station</small>{q['n']}</div><div class="ttl"><small>Unit 5 Review #2</small><b>{q['title']}</b></div></header>

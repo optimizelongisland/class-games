@@ -63,7 +63,7 @@ U.PRACTICE = {
       ans: '<b>Not a function.</b>' },
     tries: [
       { q: 'Which relation is a function?', choices: ['{(1, 2), (1, 3), (2, 4)}', '{(0, 5), (1, 5), (2, 5)}', '{(4, 1), (5, 2), (4, 3)}', '{(6, 0), (6, 1), (6, 2)}'],
-        ans: 'B. The ' + nw(x + '-values') + ' (0, 1, 2) do not repeat. Repeating the ' + nw(y + '-value') + ' 5 is allowed.' },
+        ans: '(2) The ' + nw(x + '-values') + ' (0, 1, 2) do not repeat. Repeating the ' + nw(y + '-value') + ' 5 is allowed.' },
       { q: 'Is {(' + M + '2, 0), (0, ' + M + '2), (2, 0), (4, 6)} a function? Explain.',
         ans: 'Yes. The ' + nw(x + '-values') + ' ' + M + '2, 0, 2, 4 do not repeat.' }] },
 
@@ -270,7 +270,7 @@ U.PRACTICE = {
       ans: '5, ' + M + '15, 45, ' + M + '135, …' },
     tries: [
       { q: 'Which sequence is geometric with a common ratio of ' + M + '3?', choices: ['2, ' + M + '1, ' + M + '4, ' + M + '7, …', '2, ' + M + '6, 18, ' + M + '54, …', '2, 6, 18, 54, …', M + '2, ' + M + '6, ' + M + '18, ' + M + '54, …'],
-        ans: 'B. Each term is the one before times ' + M + '3.' },
+        ans: '(2) Each term is the one before times ' + M + '3.' },
       { q: 'Find the common ratio of 4,&ensp;' + M + '2,&ensp;1,&ensp;' + nw(M + fr('1', '2') + ',') + '&ensp;…', ans: M + fr('1', '2') + ' (' + nw(M + '2 ÷ 4 = ' + M + fr('1', '2')) + ')' }] },
 
   18: { topic: 'Solve for x when f(x) equals a number',
