@@ -378,7 +378,7 @@ function form() {
     '<form id="cf" class="codebox"><label for="cd">Type the code the stations game gave you</label><div class="row"><input type="text" id="cd" maxlength="20" placeholder="Example: Fox7K" autocomplete="off" autocapitalize="characters" value="' + esc(code) + '"><button class="btn" type="submit">Start my practice</button></div><p id="cmsg" class="empty">' + (code && !fromCode ? 'That code doesn’t look right. Check each letter and number and try again.' : '') + '</p></form>' +
     '<a class="btn ghost nocode" href="?pick=1' + keep + '">No code? Click here</a></main>' :
     '<a class="back2" href="?' + keep.slice(1) + '">← I have a code</a>' +
-    '<h1>Pick your own questions</h1><p class="sub">Pick the review questions you want more practice on. <b>The numbers match your review packet (1 to 18).</b></p>' +
+    '<h1>Pick your own questions</h1><p class="sub">Pick the review questions you want more practice on. <b>The numbers match your review packet (1 to 20).</b></p>' +
     '<form id="f"><label for="nm">First name</label><input type="text" id="nm" maxlength="16" value="' + esc(name) + '" autocomplete="off">' +
     '<div class="picks">' + Object.keys(P).map(Number).map(n => '<label><input type="checkbox" value="' + n + '"' + (on.has(n) ? ' checked' : '') + '><span><b>' + n + '.</b> ' + P[n].topic + '</span></label>').join('') + '</div>' +
     '<button class="btn" type="submit">Start practicing</button> <span id="msg" class="empty"></span></form></main>');
