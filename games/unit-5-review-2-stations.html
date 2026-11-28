@@ -326,15 +326,16 @@ function jobs(k) {
 const jobBar = j => j ? '<div class="jobbar"><span class="jb r1"><b>✏️ ' + esc(j.rec) + '</b> Recorder: writes the work &amp; types</span><span class="jb r2"><b>🗣️ ' + esc(j.exp) + '</b> Explainer: talks it through</span></div>' : '';
 const hue = i => Math.round((i - 1) * 360 / 16 + 190) % 360;
 // stations each student asked for extra practice on (plus any part the pair skipped)
+// practice sheets use the numbers in the paper review packet (1 to 18), not the 16 station numbers
+const packetNums = L => [...new Set(L.map(n => (U.byN(n) || {}).old || n))].sort((a, b) => a - b);
 function practiceFor(k) {
   const L = U.READY.map(q => q.n).filter(n => {
     const f = S.feel['q' + n] || {}, st = S.q['q' + n];
     return f[k] === 'more' || (st && (st.sk || []).some(Boolean) && f[k] !== 'good');
   });
   // nothing flagged: still give a code, covering the stations they did (or all of them)
-  if (L.length) return L;
   const d = doneList();
-  return d.length ? d : U.READY.map(q => q.n);
+  return packetNums(L.length ? L : d.length ? d : U.READY.map(q => q.n));
 }
 const qs = n => (S.q['q' + n] = S.q['q' + n] || { w: [], sk: [], h: 0, secs: 0, done: false, wa: [] });
 const doneList = () => U.READY.filter(q => S.q['q' + q.n] && S.q['q' + q.n].done).map(q => q.n);
@@ -743,7 +744,7 @@ function sheetLinks() {
   return '<div class="sheets">' + P.map((nm, k) => {
     const L = practiceFor(k), code = U.practiceCode(L);
     return '<div class="sh">' + (code ? '<p class="code"><span>' + esc(nm) + ', write down your code:</span><b>' + code + '</b></p>' : '') +
-      '<a href="' + U.practiceURL(nm, L) + '" target="_blank" rel="noopener">Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' station' : ' stations') : 'Pick any stations') + ' &rarr;</span></a></div>';
+      '<a href="' + U.practiceURL(nm, L) + '" target="_blank" rel="noopener">Start ' + esc(nm) + '’s practice here<span>' + (L.length ? L.length + (L.length === 1 ? ' question' : ' questions') : 'Pick any questions') + ' &rarr;</span></a></div>';
   }).join('') + '</div>' +
   '<div class="codehelp"><b>To practice on another computer or phone:</b><ol><li>Go to <b>optimizelongisland.github.io/class-games</b></li><li>Under Unit 5, tap <b>Additional Practice – Unit 5 Review</b></li><li>Type your code and tap <b>Start my practice</b>. You can also print it or save it as a PDF there.</li></ol></div>';
 }
