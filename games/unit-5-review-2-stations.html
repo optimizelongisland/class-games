@@ -179,6 +179,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .chs.lets{grid-template-columns:repeat(auto-fit,minmax(5rem,1fr));gap:.8rem}
 .chs.lets .ch{justify-content:center;padding:1rem .4rem}
 .chs.lets .ch .k{font-size:1.7rem;width:3.4rem;height:3.4rem;margin:0}
+.altp .alt{font:600 1.35rem/1.6 var(--body);color:var(--fg);margin:0}.altp .note{color:var(--mute);margin:.6rem 0 0}
 .pchs{margin-top:.6rem}.pchs .ch{cursor:default}
 .ch{display:flex;gap:.8rem;align-items:center;text-align:left;min-height:3rem;padding:.45rem .8rem;border-radius:14px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-size:1rem;line-height:1.35}
 .ch .k{flex:none;display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:10px;background:var(--line);font:600 1rem var(--mono)}
@@ -310,7 +311,7 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 const U = window.U5R2, $ = s => document.querySelector(s), view = $('#view');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KEY = 'u5r2-state';
-let rolesAt = 0, probOpen = 0, exOpen = 0, xs = {}, picking = false, S = load(), session = null, online = null, newSession = false;
+let rolesAt = 0, altOpen = 0, probOpen = 0, exOpen = 0, xs = {}, picking = false, S = load(), session = null, online = null, newSession = false;
 
 function blank() { return { gid: 'g' + Math.random().toString(36).slice(2, 8), num: 0, name: '', names: ['', '', ''], period: 0, feel: {}, sid: '', last: 0, screen: 'setup', cur: 0, part: 0, at: 0, partAt: 0, wrongNow: 0, hintNow: 0, next: 0, q: {}, start: 0, finished: false }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.gid) return Object.assign(blank(), s); } catch (e) {} return blank(); }
@@ -526,7 +527,9 @@ function renderStation() {
 
   // under the answer box: show the station problem, or open an extra example
   const tools = '<div class="tools"><button class="pill2' + (probOpen === q.n ? ' on' : '') + '" id="probb">📄 ' + (probOpen === q.n ? 'Hide' : 'Show') + ' station problem</button>' +
-    (EX(q.n) ? '<button class="pill2 ex" id="exb">💡 Need an extra example?</button>' : '') + '</div>' +
+    (EX(q.n) ? '<button class="pill2 ex" id="exb">💡 Need an extra example?</button>' : '') +
+    (q.alt ? '<button class="pill2' + (altOpen === q.n ? ' on' : '') + '" id="altb">♾️ ' + (altOpen === q.n ? 'Hide' : 'Show me') + ' another way I could write this</button>' : '') + '</div>' +
+    (q.alt && altOpen === q.n ? '<div class="panel altp"><p class="alt">' + q.alt.html + '</p><p class="note">' + q.alt.note + '</p></div>' : '') +
     (probOpen === q.n ? '<div class="panel"><div class="ptext">' + q.text + '</div>' + (q.graph ? U.graph(q.graph) : '') +
       (HIDE ? '<p class="pq" style="margin-top:.8rem">' + (P.length > 1 ? '<b>' + PL(S.part) + '</b> ' : '') + p.q + '</p>' +
         (p.t === 'mc' ? '<div class="chs pchs">' + p.choices.map((c, i) => '<div class="ch"><span class="k">' + (p.labels || 'ABCDEF')[i] + '</span><span>' + c + '</span></div>').join('') + '</div>' : '') : '') + '</div>' : '');
@@ -545,6 +548,7 @@ function renderStation() {
     $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
   }
   $('#probb').onclick = () => { probOpen = probOpen === q.n ? 0 : q.n; render(); };
+  if ($('#altb')) $('#altb').onclick = () => { altOpen = altOpen === q.n ? 0 : q.n; render(); };
   if ($('#exb')) $('#exb').onclick = () => { exOpen = q.n; render(); scrollTo(0, 0); };
   if (p.t === 'mc') $('#chs').onclick = e => { const b = e.target.closest('.ch'); if (b && !b.disabled) submit(+b.dataset.i, b); };
   else if (p.t === 'expr') {
