@@ -141,7 +141,7 @@ function sheet() {
       k++;
       const chs = cs => '<ol class="ch">' + cs.map((c, i) => '<li>' + 'ABCD'[i] + ') ' + c + '</li>').join('') + '</ol>';
       const one = t.sub.length === 1, kv = s => s.t === 'mc' ? (one && /^[A-D][.)]/.test(s.ans) ? s.ans : '<b>' + 'ABCD'[s.right] + ')</b> ' + (one ? s.ans : s.choices[s.right])) : (one ? s.ans : s.ans.replace(/\.$/, ''));
-      key.push('<li><b>' + k + '.</b> (Station ' + n + ') ' + (one ? kv(t.sub[0]) : t.sub.map((s, i) => '<b>' + PL(i) + '</b> ' + kv(s)).join('; ')) + '</li>');
+      key.push('<li><b>' + k + '.</b> (Question ' + n + ') ' + (one ? kv(t.sub[0]) : t.sub.map((s, i) => '<b>' + PL(i) + '</b> ' + kv(s)).join('; ')) + '</li>');
       return '<div class="try"><p class="q"><b>' + k + '.</b> ' + t.q + '</p>' + (t.graph ? U.graph(t.graph) : '') +
         t.sub.map((s, i) => (one ? '' : '<p class="q sq"><b>' + PL(i) + '</b> ' + s.q + '</p>') + (s.t === 'mc' ? chs(s.choices) : '')).join('') +
         '<div class="work" aria-label="space for your work"></div></div>';
@@ -152,7 +152,7 @@ function sheet() {
         : '<ol>' + e.steps.map(s => '<li>' + s + '</li>').join('') + '</ol><p class="a" style="margin:0">Answer: ' + e.ans + '</p>') + '</div>' +
       '<p class="tag" style="color:var(--accent2)">Your turn</p>' + tries + '</section>';
   }).join('');
-  app.innerHTML = '<div class="bar"><a class="btn ghost" href="' + location.search.replace(/[?&]print=1/, '').replace(/^&/, '?') + '">← Practice online</a><button class="btn" id="pdf">⬇️ Save as PDF</button><a class="btn ghost" href="?' + (name ? 'name=' + encodeURIComponent(name) + '&' : '') + 'edit=1&q=' + list.join(',') + '">Add or remove stations</a></div>' +
+  app.innerHTML = '<div class="bar"><a class="btn ghost" href="' + location.search.replace(/[?&]print=1/, '').replace(/^&/, '?') + '">← Practice online</a><button class="btn" id="pdf">⬇️ Save as PDF</button><a class="btn ghost" href="?' + (name ? 'name=' + encodeURIComponent(name) + '&' : '') + 'edit=1&q=' + list.join(',') + '">Add or remove questions</a></div>' +
     '<main class="paper"><div class="head"><div><h1>' + (name ? esc(name) + '’s ' : 'My ') + 'Practice Sheet</h1><p class="sub">Unit 5 Review #2 · Functions and sequences</p></div>' +
     '<div class="who">' + (fromCode ? 'Code ' + U.practiceCode(list) + ' · ' : '') + (prm.get('p') ? 'Period ' + esc(prm.get('p')) + ' · ' : '') + new Date().toLocaleDateString() + '</div></div>' +
     (fromCode && !name ? '<p class="nmline">Name: <span></span></p>' : '') + '<p>Read each worked example first, then try the problems below it on your own. Answers are on the last page. No peeking until you finish!</p>' +
@@ -260,7 +260,7 @@ function online() {
     const miss = cards.filter(c => c.kind === 'try' && st.res[c.k] === 'miss');
     const good = cards.filter(c => c.kind === 'try' && st.res[c.k] === 'good').length;
     app.innerHTML = top + '<main class="paper card done"><h1>🎉 All done!</h1><p class="bigq">You got <b>' + good + ' of ' + total + '</b> on your own.</p>' +
-      (miss.length ? '<p>Look these over again:</p><ul class="miss">' + miss.map(c => '<li><b>Problem ' + c.k + '</b> · Station ' + c.n + ': ' + P[c.n].topic + ' <button class="btn ghost sm" data-j="' + cards.indexOf(c) + '">Try again</button></li>').join('') + '</ul>' : '<p>Nice work. You’re ready for the test on these stations.</p>') +
+      (miss.length ? '<p>Look these over again:</p><ul class="miss">' + miss.map(c => '<li><b>Problem ' + c.k + '</b> · Question ' + c.n + ': ' + P[c.n].topic + ' <button class="btn ghost sm" data-j="' + cards.indexOf(c) + '">Try again</button></li>').join('') + '</ul>' : '<p>Nice work. You’re ready for the test on these questions.</p>') +
       '<div class="acts"><a class="btn" href="' + printURL + '">🖨️ Print or save as PDF</a><button class="btn ghost" id="again">Start over</button></div></main>';
     document.getElementById('again').onclick = () => { st = { i: 0, step: 0, res: {} }; save(); draw(); };
     document.querySelectorAll('[data-j]').forEach(b => b.onclick = () => { const j = +b.dataset.j; delete st.res[cards[j].k]; go(j); });
@@ -378,7 +378,7 @@ function form() {
     '<form id="cf" class="codebox"><label for="cd">Type the code the stations game gave you</label><div class="row"><input type="text" id="cd" maxlength="20" placeholder="Example: Fox7K" autocomplete="off" autocapitalize="characters" value="' + esc(code) + '"><button class="btn" type="submit">Start my practice</button></div><p id="cmsg" class="empty">' + (code && !fromCode ? 'That code doesn’t look right. Check each letter and number and try again.' : '') + '</p></form>' +
     '<a class="btn ghost nocode" href="?pick=1' + keep + '">No code? Click here</a></main>' :
     '<a class="back2" href="?' + keep.slice(1) + '">← I have a code</a>' +
-    '<h1>Pick your own stations</h1><p class="sub">Pick the stations you want more practice on.</p>' +
+    '<h1>Pick your own questions</h1><p class="sub">Pick the review questions you want more practice on. <b>The numbers match your review packet (1 to 18).</b></p>' +
     '<form id="f"><label for="nm">First name</label><input type="text" id="nm" maxlength="16" value="' + esc(name) + '" autocomplete="off">' +
     '<div class="picks">' + Object.keys(P).map(Number).map(n => '<label><input type="checkbox" value="' + n + '"' + (on.has(n) ? ' checked' : '') + '><span><b>' + n + '.</b> ' + P[n].topic + '</span></label>').join('') + '</div>' +
     '<button class="btn" type="submit">Start practicing</button> <span id="msg" class="empty"></span></form></main>');
@@ -391,7 +391,7 @@ function form() {
   document.getElementById('f').onsubmit = e => {
     e.preventDefault();
     const q = [...document.querySelectorAll('.picks input:checked')].map(i => i.value);
-    if (!q.length) { document.getElementById('msg').textContent = 'Pick at least one station.'; return; }
+    if (!q.length) { document.getElementById('msg').textContent = 'Pick at least one question.'; return; }
     const nm = document.getElementById('nm').value.trim();
     location.search = '?' + (nm ? 'name=' + encodeURIComponent(nm) + '&' : '') + 'q=' + q.join(',') + (prm.get('p') ? '&p=' + encodeURIComponent(prm.get('p')) : '');
   };
