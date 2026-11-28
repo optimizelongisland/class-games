@@ -631,7 +631,7 @@ function reward(msg, d, k) {
   Carnival.play({ msg, who: '', game: S.rg, team: 'Your team', scores: scoreList(), onDone: p => { S.tp = (S.tp || 0) + p; save(); meta(); return scoreList(); } });
 }
 // Prize boxes: per-student points = team total split evenly. Change the cutoffs here.
-const LEVELS = [{ lv: 1, min: 0, ri: '🎟️', what: 'Tickets or candy' }, { lv: 2, min: 100, ri: '🎁', what: 'A prize item' }, { lv: 3, min: 140, ri: '🧸', what: 'A squishy' }];
+const LEVELS = [{ lv: 1, min: 0, ri: '🎟️', what: 'Ticket or candy' }, { lv: 2, min: 100, ri: '🐙', what: 'Squishy or 3D printed animal' }, { lv: 3, min: 140, ri: '🦆', what: 'Rubber ducky or mystery plushy' }];
 const teamPts = () => S.tp || 0;
 const eachPts = () => Math.floor(teamPts() / Math.max(1, people().length));
 const level = () => LEVELS.filter(L => eachPts() >= L.min).pop();
