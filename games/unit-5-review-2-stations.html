@@ -164,7 +164,8 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 @media (max-width:620px){.lvl{flex-direction:column}.lvl .side{flex:none;flex-direction:row;gap:.6rem;padding:.5rem}.lvl .side .bn{font-size:2rem}.lvl .side .cut{margin:0}
  .lvl .prz{flex-direction:column}.lvl .or{align-self:center}.lvl .tag,.lvl .need{position:static;align-self:flex-start;margin-bottom:.5rem}.lvl .need{order:-1}}
 .tprize{margin:.6rem 0 0}.tprize b{color:var(--gold,#ffd23d)}
-.tsum{max-width:1180px;margin-inline:auto}
+.tsum{max-width:1400px;margin-inline:auto}
+@media (min-width:700px){.tsum .tstats{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .tstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.7rem;margin-bottom:.8rem}
 .tstats div{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:.7rem .9rem;text-align:center}
 .tstats b{display:block;font:400 1.8rem var(--disp);color:var(--gold,#ffd23d)}
@@ -309,6 +310,10 @@ h2,.stitle,.yay .hd,.yay .go,.fp .who,.win{font-family:var(--disp);font-weight:4
 .sheets a{background:var(--gold);color:#2a1500}
 .sheets .sh{border-color:rgba(255,210,61,.6)}
 .sheets .code b{color:var(--gold)}
+.yay.fin{padding:1.2rem 1rem}.yay.fin .hd{font-size:clamp(2rem,1.4rem + 2vw,3rem);margin:0 0 .2rem}.yay.fin .go{font-size:clamp(1.3rem,1rem + 1.2vw,1.9rem);margin:.3rem 0 .4rem}.yay.fin>p{margin:.3rem 0}
+@media (min-width:900px){.yay.fin{max-width:1400px;margin-inline:auto}.fin .sheets{grid-template-columns:repeat(auto-fit,minmax(0,1fr));max-width:none;gap:1rem}
+ .fin .sheets .sh{display:flex;flex-direction:column;justify-content:space-between}.fin .sheets .code{flex-direction:column;align-items:center;gap:0}
+ .fin .sheets a{font-size:1.1rem}.fin .codehelp{max-width:none;text-align:center}.fin .codehelp ol{display:inline-block;text-align:left}}
 .rolepop .rp{background:#271949}
 @media (max-width:520px){.stitle{font-size:1.7rem;padding:.5em .6em .55em}}
 </style>
@@ -860,11 +865,11 @@ function teacherCard() {
     '<div><b>' + fixed + '</b><span>fixed after a mistake</span></div>' +
     '<div><b>' + hints + '</b><span>hints used</span></div>' +
     '<div><b>' + skips + '</b><span>parts skipped</span></div></div>' +
-    '<ul class="tflags">' + flags + '</ul>' + (hasPts() ? '<p class="tprize">Team points: <b>' + teamPts() + '</b>' + (people().length > 1 ? ' · <b>' + eachPts() + '</b> each' : '') + ' · <b>Level ' + level().lv + '</b> prize box</p>' : '') + '</section>';
+    '<ul class="tflags">' + flags + '</ul>' + '</section>';
 }
 function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
-  view.innerHTML = prizeCard() + '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
+  view.innerHTML = prizeCard() + '<section class="card yay pop fin"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
     '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>' + teacherCard();
   const pc = view.querySelector('.pcount'); if (pc) requestAnimationFrame(() => pc.scrollIntoView({ block: 'start' }));   // the whole Prize Counter fits on screen
 }
