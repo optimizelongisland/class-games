@@ -124,7 +124,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .rolepop .rpr{display:flex;align-items:center;gap:1rem;text-align:left;background:rgba(0,0,0,.22);border:2px solid var(--c);border-radius:16px;padding:.8rem 1.1rem;margin:.7rem 0 0}
 .rolepop .rpr .ic{font-size:clamp(2.2rem,1.6rem + 2.5vw,3.2rem);line-height:1}
 .rolepop .rpr b{display:block;font:400 clamp(1.9rem,1.2rem + 3.4vw,3.2rem)/1.05 var(--disp);color:var(--c)}
-.rolepop .rpr span{display:block;font:600 clamp(1.05rem,.95rem + .8vw,1.4rem) var(--body,system-ui);color:var(--fg);margin-top:.2rem}
+.rolepop .rpr span{display:block;font:400 clamp(1.3rem,1rem + 1.4vw,1.9rem) var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--fg);margin-top:.15rem}
 .rolepop .r1{--c:var(--pink)} .rolepop .r2{--c:var(--cyan)}
 .rolepop .rpt{font-size:.95rem;color:var(--mute);margin:1rem 0 0}
 @keyframes rpbump{0%{transform:scale(.7)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
@@ -559,8 +559,8 @@ function renderStation() {
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
   if (J && since < 6400) {
     view.insertAdjacentHTML('beforeend', '<div class="rolepop" id="rolepop" style="animation-delay:-' + since + 'ms"><div class="rp"><p class="rps">Station ' + q.n + '</p>' +
-      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + ' · Recorder</b></div></div>' +
-      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + ' · Explainer</b></div></div>' +
+      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + '</b><span>Recorder</span></div></div>' +
+      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + '</b><span>Explainer</span></div></div>' +
       '<p class="rpt">Tap anywhere to start</p></div></div>');
     $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
   }
