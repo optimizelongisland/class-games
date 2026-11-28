@@ -136,27 +136,28 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .pcount{max-width:1180px;margin:0 auto 1rem;text-align:center}
 .pcount .tot{font:400 clamp(2.4rem,1.6rem + 3vw,4rem)/1 var(--disp);color:var(--gold,#ffd23d);margin:.2rem 0}
 .pcount .each{font-size:1.15rem;margin:.2rem 0 1rem}
-.pc h3{font:400 clamp(1.45rem,.9rem + 2.6vw,3.4rem)/1 var(--disp);white-space:nowrap;color:#ffcf3a;text-shadow:0 4px 0 #9b2fae,0 0 24px rgba(255,207,58,.35);margin:.1rem 0 .5rem;letter-spacing:1px}
-.pc .yours{display:inline-block;background:#ffcf3a;color:#2a1240;font:400 clamp(1.1rem,.9rem + .8vw,1.5rem) var(--disp);padding:.45rem 1.4rem;border-radius:999px;box-shadow:0 4px 0 #b8861a;margin:.2rem 0 .4rem}
-.lvls{display:grid;gap:.9rem;margin-top:1rem;text-align:left}
+.pc h3{font:400 clamp(1.4rem,.9rem + 2vw,2.5rem)/1 var(--disp);white-space:nowrap;color:#ffcf3a;text-shadow:0 4px 0 #9b2fae,0 0 24px rgba(255,207,58,.35);margin:0 0 .3rem;letter-spacing:1px}
+.pc .yours{display:inline-block;background:#ffcf3a;color:#2a1240;font:400 clamp(1rem,.85rem + .6vw,1.3rem) var(--disp);padding:.3rem 1.1rem;border-radius:999px;box-shadow:0 3px 0 #b8861a;margin:0}
+.pc>p{margin:.25rem 0}
+.lvls{display:grid;gap:.55rem;margin-top:.6rem;text-align:left}
 .lvl{border:2.5px solid #ffcf3a;border-radius:18px;background:#2a1a4e;display:flex;overflow:hidden;position:relative;transition:opacity .2s}
-.lvl .side{flex:0 0 9.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.7rem .4rem;text-align:center;color:#2a1240;background:#ffcf3a}
-.lvl .side .lv{font:400 1.3rem var(--disp);letter-spacing:1px}.lvl .side .bn{font:400 4.2rem/.95 var(--disp)}
-.lvl .side .cut{margin-top:.4rem;background:#2a1240;color:#ffcf3a;border-radius:999px;padding:.25rem .7rem;font-weight:700;font-size:.9rem;white-space:nowrap}
+.lvl .side{flex:0 0 7rem;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.4rem .3rem;text-align:center;color:#2a1240;background:#ffcf3a}
+.lvl .side .lv{font:400 1rem var(--disp);letter-spacing:1px}.lvl .side .bn{font:400 2.8rem/.95 var(--disp)}
+.lvl .side .cut{margin-top:.25rem;background:#2a1240;color:#ffcf3a;border-radius:999px;padding:.15rem .55rem;font-weight:700;font-size:.8rem;white-space:nowrap}
 .lvl.l2{border-color:#ff9f43}.lvl.l2 .side{background:#ff9f43}.lvl.l3{border-color:#ff5fa2}.lvl.l3 .side{background:#ff5fa2}
-.lvl .bd{flex:1;padding:1rem;display:flex;flex-direction:column;justify-content:center;min-width:0}
-.lvl .pick{font-size:.85rem;letter-spacing:2.5px;color:#c9bde6;font-weight:700;text-transform:uppercase}
-.lvl .prz{display:flex;align-items:stretch;gap:.6rem;margin-top:.4rem}
-.lvl .pz{flex:1;display:flex;align-items:center;gap:.6rem;background:#1d1238;border:1.5px solid #4b3a7a;border-radius:12px;padding:.6rem .7rem}
-.lvl .pz .e{font-size:2.1rem;line-height:1}.lvl .pz b{font:400 1.3rem/1.1 var(--disp)}
+.lvl .bd{flex:1;padding:.55rem .8rem;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.lvl .pick{font-size:.72rem;letter-spacing:2.5px;color:#c9bde6;font-weight:700;text-transform:uppercase}
+.lvl .prz{display:flex;align-items:stretch;gap:.5rem;margin-top:.25rem}
+.lvl .pz{flex:1;display:flex;align-items:center;gap:.6rem;background:#1d1238;border:1.5px solid #4b3a7a;border-radius:10px;padding:.3rem .6rem}
+.lvl .pz .e{font-size:1.6rem;line-height:1}.lvl .pz b{font:400 1.1rem/1.1 var(--disp)}
 .lvl .or{align-self:center;font:400 1.2rem var(--disp);color:#ffcf3a}
-.lvl .trade{margin-top:.7rem;padding-top:.55rem;border-top:1.5px dashed #5a4790;font-weight:700;color:#3fd47a;font-size:1.02rem;line-height:1.45}
-.lvl .tag{position:absolute;top:.55rem;right:.6rem;background:#3fd47a;color:#10251a;font:400 1rem var(--disp);padding:.2rem .8rem;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
-.lvl .need{position:absolute;top:.6rem;right:.7rem;color:#c9bde6;font-weight:700;font-size:.9rem}
+.lvl .trade{margin-top:.35rem;padding-top:.3rem;border-top:1.5px dashed #5a4790;font-weight:700;color:#3fd47a;font-size:.9rem;line-height:1.35}
+.lvl .tag{position:absolute;top:.4rem;right:.5rem;background:#3fd47a;color:#10251a;font:400 .9rem var(--disp);padding:.12rem .65rem;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+.lvl .need{position:absolute;top:.45rem;right:.6rem;color:#c9bde6;font-weight:700;font-size:.8rem}
 .lvl.on{box-shadow:0 0 0 5px rgba(255,207,58,.3),0 8px 0 rgba(0,0,0,.35)}
 .lvl.off{opacity:.42;filter:saturate(.55)}
-.pc .ptip{display:inline-block;margin-top:1.1rem;background:#ffcf3a;color:#2a1240;font:400 1.25rem var(--disp);padding:.55rem 1.6rem;border-radius:999px;box-shadow:0 5px 0 #b8861a}
-@media (max-width:620px){.lvl{flex-direction:column}.lvl .side{flex:none;flex-direction:row;gap:.6rem;padding:.5rem}.lvl .side .bn{font-size:2.6rem}.lvl .side .cut{margin:0}
+.pc .ptip{display:inline-block;margin-top:.7rem;background:#ffcf3a;color:#2a1240;font:400 1.1rem var(--disp);padding:.4rem 1.3rem;border-radius:999px;box-shadow:0 5px 0 #b8861a}
+@media (max-width:620px){.lvl{flex-direction:column}.lvl .side{flex:none;flex-direction:row;gap:.6rem;padding:.5rem}.lvl .side .bn{font-size:2rem}.lvl .side .cut{margin:0}
  .lvl .prz{flex-direction:column}.lvl .or{align-self:center}.lvl .tag,.lvl .need{position:static;align-self:flex-start;margin-bottom:.5rem}.lvl .need{order:-1}}
 .tprize{margin:.6rem 0 0}.tprize b{color:var(--gold,#ffd23d)}
 .tsum{max-width:1180px;margin-inline:auto}
@@ -640,7 +641,7 @@ function reward(msg, d, k) {
 const LEVELS = [
   { lv: 1, min: 0, cut: 'Under 80', pick: 'Pick one', p: [['🎫', 'Ticket'], ['🍬', 'Jolly Rancher']] },
   { lv: 2, min: 80, cut: '80–119', pick: 'Pick one', p: [['🦖', '3D printed animal'], ['🍓', 'Squishy']], or: 'OR trade it for two Level 1 prizes' },
-  { lv: 3, min: 120, cut: '120+', pick: 'Grand prize', p: [['🦆', 'Rubber ducky'], ['🎁', 'Mystery plushy']], or: 'OR trade it for one Level 2 + one Level 1 prize,<br>OR three Level 1 prizes' }];
+  { lv: 3, min: 120, cut: '120+', pick: 'Grand prize', p: [['🦆', 'Rubber ducky'], ['🎁', 'Mystery plushy']], or: 'OR trade it for one Level 2 + one Level 1 prize, OR three Level 1 prizes' }];
 const teamPts = () => S.tp || 0;
 const eachPts = () => Math.floor(teamPts() / Math.max(1, people().length));
 const level = () => LEVELS.filter(L => eachPts() >= L.min).pop();
@@ -861,6 +862,7 @@ function renderFinished() {
   const mins = Math.round((Date.now() - (S.start || Date.now())) / 60000);
   view.innerHTML = prizeCard() + '<section class="card yay pop"><p class="hd">All stations done!</p><p class="go">Amazing work, ' + esc(label()) + '!</p>' +
     '<p>You finished all ' + U.READY.length + ' stations in about ' + mins + ' minutes. Now each of you practice the stations you picked, right here or on another computer.</p>' + sheetLinks() + '</section>' + teacherCard();
+  const pc = view.querySelector('.pcount'); if (pc) requestAnimationFrame(() => pc.scrollIntoView({ block: 'start' }));   // the whole Prize Counter fits on screen
 }
 
 // fresh start for a new pair on this device (also: open the page with ?new=1)
