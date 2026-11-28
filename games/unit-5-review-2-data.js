@@ -309,6 +309,27 @@ const Q = [
 const EST = { 1: 3, 2: 2, 3: 3, 4: 3, 5: 5, 6: 4, 7: 2, 8: 2, 9: 3, 10: 3, 11: 5, 12: 5, 13: 4, 14: 5, 15: 3, 16: 3, 17: 2, 18: 4 };
 Q.forEach(q => { q.est = EST[q.n] || 3; });
 
+// Stations used in class (16): packet questions 6, 13, 14 and 18 are done together as a class instead,
+// and packet question 5 is split into three multiple-choice stations. Everything is renumbered 1 to 16
+// (the game, hints, practice sheets and the printable stations all use these new numbers).
+(function restation() {
+  const by = n => Q.find(q => q.n === n), q5 = by(5);
+  const g5 = { text: q5.text, graph: q5.graph, est: 3 };
+  const split5 = [
+    Object.assign({ n: 5, ready: true, title: 'Domain and range from a graph' }, g5, { parts: [q5.parts[0]] }),
+    Object.assign({ n: 5, ready: true, title: 'Find ' + v('x') + ' when ' + v('f') + '(' + v('x') + ') = ' + M + '3' }, g5, { parts: [
+      Object.assign({}, q5.parts[1], { t: 'mc', q: 'What is the value of ' + v('x') + ' when ' + v('f') + '(' + v('x') + ') = ' + M + '3?', labels: 'abcd',
+        choices: [M + '3', '8', M + '5', '4'], answer: 2, prefix: undefined })] }),
+    Object.assign({ n: 5, ready: true, title: 'Find ' + v('f') + '(4) from a graph' }, g5, { parts: [
+      Object.assign({}, q5.parts[2], { t: 'mc', q: 'What is ' + v('f') + '(4)?', labels: 'abcd',
+        choices: ['4', '0', M + '1', '2'], answer: 1, prefix: undefined })] })
+  ];
+  const keep = [];
+  [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 15, 16, 17].forEach(n => { if (n === 5) keep.push(...split5); else keep.push(by(n)); });
+  keep.forEach((q, i) => { q.old = q.n; q.n = i + 1; });
+  Q.splice(0, Q.length, ...keep);
+})();
+
 /* ---------- answer checking ---------- */
 function clean(s) {
   return String(s).toLowerCase()
