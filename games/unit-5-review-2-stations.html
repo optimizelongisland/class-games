@@ -157,6 +157,10 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .lvl.on{box-shadow:0 0 0 5px rgba(255,207,58,.3),0 8px 0 rgba(0,0,0,.35)}
 .lvl.off{opacity:.42;filter:saturate(.55)}
 .pc .ptip{display:inline-block;margin-top:.7rem;background:#ffcf3a;color:#2a1240;font:400 1.1rem var(--disp);padding:.4rem 1.3rem;border-radius:999px;box-shadow:0 5px 0 #b8861a}
+@media (min-width:900px){.pcount.pc{max-width:1400px}.lvls{grid-template-columns:repeat(3,1fr);align-items:stretch}
+ .lvl{flex-direction:column}.lvl .side{flex:none;flex-direction:row;gap:.7rem;padding:.45rem}.lvl .side .bn{font-size:2.4rem}.lvl .side .cut{margin:0}
+ .lvl .bd{justify-content:flex-start}.lvl .prz{flex-direction:column;gap:.3rem}.lvl .or{font-size:1rem}
+ .lvl .tag,.lvl .need{position:static;align-self:flex-start;margin-bottom:.4rem}.lvl .need{order:-1}}
 @media (max-width:620px){.lvl{flex-direction:column}.lvl .side{flex:none;flex-direction:row;gap:.6rem;padding:.5rem}.lvl .side .bn{font-size:2rem}.lvl .side .cut{margin:0}
  .lvl .prz{flex-direction:column}.lvl .or{align-self:center}.lvl .tag,.lvl .need{position:static;align-self:flex-start;margin-bottom:.5rem}.lvl .need{order:-1}}
 .tprize{margin:.6rem 0 0}.tprize b{color:var(--gold,#ffd23d)}
