@@ -132,7 +132,7 @@ h2{font:800 clamp(1.4rem,1rem + 1.2vw,2.1rem)/1.1 var(--disp);margin:0 0 .8rem}
 .stitle{margin:0;font-size:clamp(2.2rem,1.6rem + 2vw,3rem);line-height:1.05;white-space:nowrap}
 .sthead #leave{white-space:nowrap}
 .turn{margin:0 0 .5rem;font:700 1.05rem var(--body,system-ui);color:var(--cyan)}
-.turn.steal{color:var(--yellow)}
+.turn.help{color:var(--yellow)}
 .pcount{max-width:1180px;margin:0 auto 1rem;text-align:center}
 .pcount .tot{font:400 clamp(2.4rem,1.6rem + 3vw,4rem)/1 var(--disp);color:var(--gold,#ffd23d);margin:.2rem 0}
 .pcount .each{font-size:1.15rem;margin:.2rem 0 1rem}
@@ -559,8 +559,8 @@ function renderStation() {
   const since = Date.now() - rolesAt, J = jobs(doneList().length);
   if (J && since < 6400) {
     view.insertAdjacentHTML('beforeend', '<div class="rolepop" id="rolepop" style="animation-delay:-' + since + 'ms"><div class="rp"><p class="rps">Station ' + q.n + '</p>' +
-      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + ' · Recorder</b><span>Writes all the work on paper and types the answer or picks the choice.</span></div></div>' +
-      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + ' · Explainer</b><span>Talks through each step out loud.</span></div></div>' +
+      '<div class="rpr r1"><span class="ic">✏️</span><div><b>' + esc(J.rec) + ' · Recorder</b></div></div>' +
+      '<div class="rpr r2"><span class="ic">🗣️</span><div><b>' + esc(J.exp) + ' · Explainer</b></div></div>' +
       '<p class="rpt">Tap anywhere to start</p></div></div>');
     $('#rolepop').onclick = () => { rolesAt = 0; $('#rolepop').remove(); };
   }
@@ -621,7 +621,7 @@ const answerer = () => (owner() + (S.wrongNow || 0)) % Math.max(1, people().leng
 function turnLine() {
   const P = people(); if (P.length < 2) return '';
   const a = answerer();
-  return S.wrongNow ? '<p class="turn steal">🤝 Help out! <b>' + esc(P[a]) + '</b>, your turn to try</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
+  return S.wrongNow ? '<p class="turn help">🤝 Help out! <b>' + esc(P[a]) + '</b>, your turn to try</p>' : '<p class="turn">🎯 <b>' + esc(P[a]) + '</b>, your turn to answer</p>';
 }
 // Add ?nofun to the address to turn the games off.
 const NOFUN = new URLSearchParams(location.search).has('nofun');
@@ -684,7 +684,7 @@ function submit(val, el) {
   const jj = jobs(doneList().length);
   f.innerHTML = (r.msg ? esc(r.msg) : people().length > 1 ? 'Not quite. ' + esc(people()[answerer()]) + ', help out and try it! (Still worth 5 points.)' : 'Not quite. Talk it through again and check your work.') +
     (S.wrongNow >= 2 && S.hintNow === 0 ? '<br><span style="color:var(--violet)">Stuck? Tap <b>Need a hint?</b> below.</span>' : '');
-  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner can steal
+  const tl = document.querySelector('.part.now .turn'); if (tl) tl.outerHTML = turnLine();   // the other partner helps and tries
   if (p.t === 'expr') { const a = $('#ans'); if (!mfText(a)) mfSet(a, String(val)); mfFocusEnd(a); }
   else if (p.t !== 'mc') { const a = $('#ans'); a.value = String(val); a.select(); }
 }
